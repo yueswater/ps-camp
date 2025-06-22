@@ -1,14 +1,18 @@
+from uuid import uuid4
+from sqlalchemy.orm import relationship
 from sqlalchemy import Column, String, Integer
 from ps_camp.db.base import Base
 import uuid
-
+from sqlalchemy.dialects.postgresql import UUID
 
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     username = Column(String, unique=True, nullable=False)
     fullname = Column(String, nullable=False)
     hashed_password = Column(String, nullable=False)
     role = Column(String, nullable=False)
-    coins = Column(Integer, default=10000)
+    coins = Column(Integer, default=0)
+
+    my_posts = relationship("Post", back_populates="user")

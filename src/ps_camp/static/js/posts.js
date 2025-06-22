@@ -1,24 +1,37 @@
 // 貼文頁面專用 JavaScript - Threads 風格互動
 
-// 當 DOM 載入完成後執行
 document.addEventListener('DOMContentLoaded', function() {
     initPostInteractions();
     initInfiniteScroll();
     initPostAnimations();
     initCategoryStyles();
-    
+    markActiveCategory();  // 加入這行：標記被選中的分類
+
     console.log("貼文頁面功能載入完成");
 });
 
-// 初始化貼文互動功能
 function initPostInteractions() {
     // 喜歡按鈕功能
     document.querySelectorAll('.like-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            toggleLike(this);
+    btn.addEventListener('click', () => {
+        const postId = btn.closest('.post-card').dataset.postId;
+        
+        fetch(`/api/posts/${postId}/like`, {
+        method: 'POST',  // ✅ 一定要是 POST
+        headers: {
+            'Content-Type': 'application/json'
+        }
+        })
+        .then(res => res.json())
+        .then(data => {
+        if (data.success) {
+            btn.querySelector('span').innerText = data.likes;
+            btn.classList.toggle('liked');
+        }
         });
     });
+    });
+
 
     // 回覆按鈕功能
     document.querySelectorAll('.comment-btn').forEach(btn => {
@@ -44,23 +57,36 @@ function initPostInteractions() {
         });
     });
 
-    // 篩選與搜尋功能
-    const filterBtn = document.querySelector('.posts-filter button');
-    if (filterBtn) {
-        filterBtn.addEventListener('click', function (e) {
-            e.preventDefault();
-            const category = document.getElementById('categoryFilter').value;
-            const keyword = document.getElementById('postSearch').value;
-
+    // 篩選分類按鈕功能（動態改網址）
+    document.querySelectorAll('.filter-tag').forEach(button => {
+        button.addEventListener('click', function () {
+            const category = this.dataset.category;
             const url = new URL(window.location.href);
-            url.searchParams.set('category', category);
-            url.searchParams.set('search', keyword);
+            const current = url.searchParams.get('category');
+
+            if (current === category) {
+                url.searchParams.delete('category'); // 取消篩選
+            } else {
+                url.searchParams.set('category', category);
+            }
             window.location.href = url.toString();
         });
-    }
+    });
 }
 
-// 切換喜歡狀態
+function markActiveCategory() {
+    const url = new URL(window.location.href);
+    const currentCategory = url.searchParams.get("category");
+
+    document.querySelectorAll(".filter-tag").forEach(btn => {
+        if (btn.dataset.category === currentCategory) {
+            btn.classList.add("active");
+        } else {
+            btn.classList.remove("active");
+        }
+    });
+}
+
 function toggleLike(button) {
     const postCard = button.closest('.post-card');
     const postId = postCard.dataset.postId;
@@ -102,8 +128,6 @@ function toggleLike(button) {
     });
 }
 
-
-// 更新喜歡數量
 function updateLikeCount(statsElement, change) {
     if (!statsElement) return;
     
@@ -114,7 +138,6 @@ function updateLikeCount(statsElement, change) {
     statsElement.textContent = `${newCount} 個讚`;
 }
 
-// 切換收藏狀態
 function toggleBookmark(button) {
     const isBookmarked = button.classList.contains('active');
     const icon = button.querySelector('i');
@@ -130,12 +153,10 @@ function toggleBookmark(button) {
     }
 }
 
-// 顯示回覆模態框
 function showCommentModal(button) {
     const postCard = button.closest('.post-card');
     const postTitle = postCard.querySelector('.post-title').textContent;
     
-    // 創建模態框
     const modal = document.createElement('div');
     modal.className = 'comment-modal';
     modal.innerHTML = `
@@ -163,12 +184,10 @@ function showCommentModal(button) {
     
     document.body.appendChild(modal);
     
-    // 顯示動畫
     setTimeout(() => {
         modal.classList.add('show');
     }, 10);
     
-    // 關閉功能
     modal.querySelector('.modal-close').addEventListener('click', () => closeModal(modal));
     modal.querySelector('.modal-cancel').addEventListener('click', () => closeModal(modal));
     modal.querySelector('.modal-overlay').addEventListener('click', (e) => {
@@ -177,11 +196,9 @@ function showCommentModal(button) {
         }
     });
     
-    // 發送回覆
     modal.querySelector('.comment-submit').addEventListener('click', () => {
         const comment = modal.querySelector('.comment-input').value.trim();
         if (comment) {
-            // 更新回覆數量
             const commentBtn = button;
             const commentSpan = commentBtn.querySelector('span');
             if (commentSpan) {
@@ -189,7 +206,6 @@ function showCommentModal(button) {
                 commentSpan.textContent = currentCount + 1;
             }
             
-            // 更新統計
             const statsItems = postCard.querySelectorAll('.stats-item');
             statsItems.forEach(item => {
                 if (item.textContent.includes('回覆')) {
@@ -205,11 +221,9 @@ function showCommentModal(button) {
         }
     });
     
-    // 聚焦到輸入框
     modal.querySelector('.comment-input').focus();
 }
 
-// 關閉模態框
 function closeModal(modal) {
     modal.classList.remove('show');
     setTimeout(() => {
@@ -217,20 +231,17 @@ function closeModal(modal) {
     }, 300);
 }
 
-// 分享貼文功能
 function sharePost(button) {
     const postCard = button.closest('.post-card');
     const postTitle = postCard.querySelector('.post-title').textContent;
     const postContent = postCard.querySelector('.post-text').textContent;
     
-    // 更新分享數量
     const shareSpan = button.querySelector('span');
     if (shareSpan) {
         const currentCount = parseInt(shareSpan.textContent) || 0;
         shareSpan.textContent = currentCount + 1;
     }
     
-    // 更新統計
     const statsItems = postCard.querySelectorAll('.stats-item');
     statsItems.forEach(item => {
         if (item.textContent.includes('分享')) {
@@ -239,7 +250,6 @@ function sharePost(button) {
         }
     });
     
-    // 檢查是否支援 Web Share API
     if (navigator.share) {
         navigator.share({
             title: postTitle,
@@ -248,20 +258,17 @@ function sharePost(button) {
         }).then(() => {
             showNotification('分享成功', 'success');
         }).catch(() => {
-            // 如果用戶取消分享，還原數字
             if (shareSpan) {
                 const currentCount = parseInt(shareSpan.textContent) || 0;
                 shareSpan.textContent = Math.max(0, currentCount - 1);
             }
         });
     } else {
-        // 降級處理：複製到剪貼板
         const shareText = `${postTitle}\n\n${postContent}\n\n來自沙政風暴`;
         navigator.clipboard.writeText(shareText).then(() => {
             showNotification('連結已複製到剪貼板', 'success');
         }).catch(() => {
             showNotification('分享功能暫時無法使用', 'error');
-            // 還原數字
             if (shareSpan) {
                 const currentCount = parseInt(shareSpan.textContent) || 0;
                 shareSpan.textContent = Math.max(0, currentCount - 1);
@@ -270,7 +277,6 @@ function sharePost(button) {
     }
 }
 
-// 無限滾動載入
 function initInfiniteScroll() {
     const loadMoreBtn = document.querySelector('.load-more-btn');
     
@@ -279,7 +285,6 @@ function initInfiniteScroll() {
             loadMorePosts(this);
         });
         
-        // 自動載入（當滾動到接近底部時）
         window.addEventListener('scroll', debounce(() => {
             if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 1000) {
                 loadMorePosts(loadMoreBtn);
@@ -288,24 +293,19 @@ function initInfiniteScroll() {
     }
 }
 
-// 載入更多貼文
 function loadMorePosts(button) {
     if (button.classList.contains('loading')) return;
     
     button.classList.add('loading');
     button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 載入中...';
     
-    // 模擬 API 請求
     setTimeout(() => {
-        // 這裡應該是實際的 API 請求
         showNotification('已載入更多貼文', 'info');
-        
         button.classList.remove('loading');
         button.innerHTML = '<i class="fas fa-chevron-down"></i> 載入更多貼文';
     }, 1500);
 }
 
-// 初始化貼文動畫
 function initPostAnimations() {
     const posts = document.querySelectorAll('.post-card');
     
@@ -315,7 +315,7 @@ function initPostAnimations() {
                 setTimeout(() => {
                     entry.target.style.opacity = '1';
                     entry.target.style.transform = 'translateY(0)';
-                }, index * 50); // 減少延遲時間
+                }, index * 50);
             }
         });
     }, {
@@ -325,19 +325,16 @@ function initPostAnimations() {
     
     posts.forEach((post, index) => {
         post.style.opacity = '0';
-        post.style.transform = 'translateY(10px)'; // 減少移動距離
+        post.style.transform = 'translateY(10px)';
         post.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
-        
         observer.observe(post);
     });
 }
 
-// 初始化分類樣式
 function initCategoryStyles() {
     document.querySelectorAll('.category-tag').forEach(tag => {
         const category = tag.textContent.toLowerCase().trim();
         
-        // 根據分類添加對應的 CSS 類別
         if (category.includes('政治') || category.includes('政策')) {
             tag.classList.add('politics');
         } else if (category.includes('經濟') || category.includes('財政')) {
@@ -350,40 +347,6 @@ function initCategoryStyles() {
     });
 }
 
-// 貼文搜尋功能
-function initPostSearch() {
-    const searchInput = document.createElement('input');
-    searchInput.type = 'text';
-    searchInput.placeholder = '搜尋貼文...';
-    searchInput.className = 'post-search';
-    
-    const postsHeader = document.querySelector('.posts-header');
-    if (postsHeader) {
-        postsHeader.insertBefore(searchInput, postsHeader.querySelector('.posts-actions'));
-    }
-    
-    searchInput.addEventListener('input', debounce((e) => {
-        filterPosts(e.target.value);
-    }, 300));
-}
-
-// 過濾貼文
-function filterPosts(searchTerm) {
-    const posts = document.querySelectorAll('.post-card');
-    const term = searchTerm.toLowerCase();
-    
-    posts.forEach(post => {
-        const title = post.querySelector('.post-title').textContent.toLowerCase();
-        const content = post.querySelector('.post-text').textContent.toLowerCase();
-        const author = post.querySelector('.author-name').textContent.toLowerCase();
-        
-        const matches = title.includes(term) || content.includes(term) || author.includes(term);
-        
-        post.style.display = matches ? 'block' : 'none';
-    });
-}
-
-// 工具函數：防抖
 function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
@@ -396,15 +359,11 @@ function debounce(func, wait) {
     };
 }
 
-// 通知功能（使用全域的 showNotification 或降級處理）
 function showNotification(message, type) {
     if (window.SandstormApp && window.SandstormApp.showNotification) {
         window.SandstormApp.showNotification(message, type);
     } else {
-        // 簡單的降級處理
         console.log(`${type}: ${message}`);
-        
-        // 創建簡單通知
         const notification = document.createElement('div');
         notification.style.cssText = `
             position: fixed;
@@ -418,14 +377,11 @@ function showNotification(message, type) {
             opacity: 0;
             transition: opacity 0.3s ease;
         `;
-        
         if (type === 'success') notification.style.background = '#28a745';
         if (type === 'error') notification.style.background = '#dc3545';
         if (type === 'warning') notification.style.background = '#ffc107';
-        
         notification.textContent = message;
         document.body.appendChild(notification);
-        
         setTimeout(() => notification.style.opacity = '1', 100);
         setTimeout(() => {
             notification.style.opacity = '0';

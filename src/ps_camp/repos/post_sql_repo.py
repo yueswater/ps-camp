@@ -17,7 +17,7 @@ class PostSQLRepository:
 
     def add(self, post: Post) -> Post:
         self.db.add(post)
-        self.db._commit()
+        self.db.commit()
         self.db.refresh(post)
         return post
 
@@ -37,7 +37,7 @@ class PostSQLRepository:
         if not post:
             return False
         self.db.delete(post)
-        self.db._commit()
+        self.db.commit()
         return True
 
     def search(self, keyword: str) -> list[Post]:

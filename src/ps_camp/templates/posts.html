@@ -4,6 +4,7 @@
 <!-- 直接在內容區塊引入 CSS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/posts.css') }}">
 
+{% if session.get("user") and posts %}
 <!-- Threads 風格的搜尋和篩選頭部 -->
 <div class="posts-header">
     <div class="posts-filter">
@@ -13,7 +14,6 @@
             <input type="text" class="search-input" placeholder="搜尋貼文、作者或內容...">
         </div>
         
-        <!-- 篩選標籤 -->
         <div class="filter-tags">
             <button class="filter-tag" data-category="規則">
                 <i class="fas fa-gavel"></i>
@@ -44,67 +44,74 @@
         </div>
     </div>
 </div>
+{% endif %}
 
 <div class="posts-container">
-    {% for post in posts %}
-    <article class="post-card" data-post-id="{{ post.id|string }}">
-        <div class="post-header">
-            <div class="author-info">
-                <div class="author-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="author-details">
-                    <h4 class="author-name">{{ post.created_by }}</h4>
-                    <span class="post-time">1小時</span>
-                </div>
-            </div>
-            <div class="post-category">
-                <span class="category-tag">{{ post.category }}</span>
-            </div>
-        </div>
-        
-        <div class="post-content">
-            <h3 class="post-title" style="font-weight: bold;">{{ post.title }}</h3>
-            <p class="post-text">{{ post.content }}</p>
-        </div>
-        
-        <div class="post-actions">
-            <button class="action-btn like-btn">
-                <i class="far fa-heart"></i>
-                <span>{{ post.likes }}</span>
-            </button>
-            <button class="action-btn comment-btn">
-                <i class="far fa-comment"></i>
-                <span>{{ post.replies }}</span>
-            </button>
-            <button class="action-btn share-btn">
-                <i class="fas fa-retweet"></i>
-                <span>0</span>
-            </button>
-            <button class="action-btn bookmark-btn">
-                <i class="far fa-bookmark"></i>
-            </button>
-        </div>
-        
-        <div class="post-stats">
-            <span class="stats-item">{{ post.likes }} 個讚</span>
-            <span class="stats-item">{{ post.replies }} 則回覆</span>
-            <span class="stats-item">0 次分享</span>
-        </div>
-    </article>
-    {% endfor %}
-    
-    {% if not posts %}
+    {% if not session.get("user") %}
     <div class="empty-state">
-        <i class="fas fa-comments"></i>
-        <h3>還沒有任何貼文</h3>
-        <p>點擊右下角的 + 按鈕開始發表貼文吧！</p>
+        <i class="fas fa-sign-in-alt"></i>
+        <h3>請先登入</h3>
+        <p>登入後才能瀏覽貼文內容！</p>
     </div>
+    {% else %}
+        {% if posts %}
+            {% for post in posts %}
+            <article class="post-card" data-post-id="{{ post.id|string }}">
+                <div class="post-header">
+                    <div class="author-info">
+                        <div class="author-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="author-details">
+                            <h4 class="author-name">{{ post.user.fullname }}</h4>
+                            <span class="post-time">1小時</span>
+                        </div>
+                    </div>
+                    <div class="post-category">
+                        <span class="category-tag">{{ post.category }}</span>
+                    </div>
+                </div>
+                
+                <div class="post-content">
+                    <h3 class="post-title" style="font-weight: bold;">{{ post.title }}</h3>
+                    <div class="post-text">
+                        {{ post.content|safe }}
+                        <a href="{{ url_for('view_post', post_id=post.id) }}" class="read-more">顯示更多</a>
+                    </div>
+                </div>
+                
+                <!-- <div class="post-actions">
+                    <button class="action-btn like-btn">
+                        <i class="far fa-heart"></i>
+                        <span>{{ post.likes|length }}</span>
+                    </button>
+                    <button class="action-btn comment-btn">
+                        <i class="far fa-comment"></i>
+                        <span>{{ post.replies|length }}</span>
+                    </button>
+                    <button class="action-btn bookmark-btn">
+                        <i class="far fa-bookmark"></i>
+                    </button>
+                </div>
+                
+                <div class="post-stats">
+                    <span class="stats-item">{{ post.likes|length }} 個讚</span>
+                    <span class="stats-item">{{ post.replies|length }} 則回覆</span>
+                </div> -->
+            </article>
+            {% endfor %}
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-comments"></i>
+            <h3>還沒有任何貼文</h3>
+            <p>點擊右下角的 + 按鈕開始發表貼文吧！</p>
+        </div>
+        {% endif %}
     {% endif %}
 </div>
 
 <!-- 載入更多按鈕 -->
-{% if posts %}
+{% if session.get("user") and posts %}
 <div class="load-more-container">
     <button class="btn btn-outline load-more-btn">
         <i class="fas fa-chevron-down"></i>

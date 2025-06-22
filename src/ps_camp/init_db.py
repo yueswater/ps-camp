@@ -1,12 +1,8 @@
-from ps_camp.db import Base, engine
-from ps_camp.sql_models import User, Post, NPC
+from ps_camp.db.session import engine
+from ps_camp.sql_models import user_model, post_model, npc_model
 
+user_model.Base.metadata.create_all(bind=engine)
+post_model.Base.metadata.create_all(bind=engine)
+npc_model.Base.metadata.create_all(bind=engine)
 
-def init_db():
-    print("🔧 Initializing database...")
-    Base.metadata.create_all(bind=engine)
-    print("✅ Tables created successfully!")
-
-
-if __name__ == "__main__":
-    init_db()
+print("Neon 資料表初始化完成")

@@ -1,4 +1,3 @@
-// new_post.js - 新增貼文頁功能初始化
 document.addEventListener('DOMContentLoaded', () => {
     console.log("new_post.js loaded");
     
