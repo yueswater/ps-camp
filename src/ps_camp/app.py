@@ -1,3 +1,4 @@
+import os
 from uuid import UUID
 from flask import Flask, render_template, request, redirect, url_for, session
 from ps_camp.db.session import SessionLocal
@@ -121,4 +122,4 @@ def create_app():
 
 if __name__ == "__main__":
     app = create_app()
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
