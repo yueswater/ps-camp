@@ -1,19 +1,37 @@
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from ps_camp.db.base import Base
 
-# Database connection URL (SQLite here, can change to PostgreSQL, MySQL, etc.)
-# DATABASE_URL = "sqlite:///src/ps_camp/db/camp.db"
+# 預設使用 SQLite，如果有設定 DATABASE_URL 則使用該值（例如 PostgreSQL）
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///src/ps_camp/db/camp.db")
 
-# Create engine
-engine = create_engine(DATABASE_URL, echo=True, future=True)
+# 建立 engine（future=True 是 SQLAlchemy 2.0 的標準寫法）
+engine = create_engine(
+    DATABASE_URL,
+    echo=True,
+    future=True,
+    connect_args={"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+)
 
-# Create session factory
+# Session 工廠（由外部統一調用）
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-# Dependency for dependency injection (e.g. FastAPI)
+# ✅ 額外提供兩個 engine 工廠函式給 migration script 使用
+def create_sqlite_engine():
+    sqlite_url = "sqlite:///src/ps_camp/db/camp.db"
+    return create_engine(sqlite_url, connect_args={"check_same_thread": False}, future=True)
+
+
+def create_postgres_engine():
+    db_url = os.getenv("DATABASE_URL")
+    if not db_url:
+        raise ValueError("環境變數 DATABASE_URL 未設定")
+    return create_engine(db_url, future=True)
+
+
+# ✅ FastAPI 或其他框架用的 DB 依賴注入
 def get_db():
     db = SessionLocal()
     try:

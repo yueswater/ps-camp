@@ -6,8 +6,12 @@ import sys
 
 # 匯入 Base 與 post_model
 # from src.ps_camp.sql_models.base import Base
-from src.ps_camp.db.base import Base
-import src.ps_camp.sql_models.post_model
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+from ps_camp.db.base import Base
+import ps_camp.sql_models.user_model
+import ps_camp.sql_models.post_model
+import ps_camp.sql_models.npc_model
+
 
 from logging.config import fileConfig
 
@@ -19,6 +23,11 @@ from alembic import context
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+
+config.set_main_option(
+    "sqlalchemy.url",
+    os.getenv("DATABASE_URL")
+)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -68,6 +77,9 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
+
+    print("=== TABLES ===")
+    print(target_metadata.tables.keys())
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
