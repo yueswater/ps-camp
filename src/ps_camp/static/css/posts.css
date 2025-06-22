@@ -7,6 +7,142 @@
     padding: 0;
 }
 
+/* Threads 風格頁面頭部 */
+.posts-header {
+    position: sticky;
+    top: 0;
+    /* background: rgba(255, 255, 255, 0.95); */
+    /* backdrop-filter: blur(20px); */
+    /* -webkit-backdrop-filter: blur(20px); */
+    z-index: 100;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0;
+}
+
+/* 搜尋篩選容器 */
+.posts-filter {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-width: 580px;
+    margin: 0 auto;
+}
+
+/* 搜尋框 */
+.search-container {
+    position: relative;
+    width: 100%;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 24px;
+    font-size: 1rem;
+    background: #f8f9fa;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.search-input:focus {
+    background: #fff;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.search-input::placeholder {
+    color: #9ca3af;
+}
+
+.search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    font-size: 0.9rem;
+    pointer-events: none;
+}
+
+/* 篩選標籤容器 */
+.filter-tags {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding: 0.25rem 0;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.filter-tags::-webkit-scrollbar {
+    display: none;
+}
+
+/* 篩選標籤 */
+.filter-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem 1rem;
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #495057;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.filter-tag:hover {
+    background: #e9ecef;
+    border-color: #ced4da;
+}
+
+.filter-tag.active {
+    background: #000;
+    color: #fff;
+    border-color: #000;
+}
+
+.filter-tag.active:hover {
+    background: #333;
+    border-color: #333;
+}
+
+.filter-tag i {
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+/* 清除篩選按鈕 */
+.clear-filters {
+    display: none;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    background: none;
+    border: 1px solid #dc3545;
+    border-radius: 16px;
+    color: #dc3545;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.clear-filters:hover {
+    background: #dc3545;
+    color: #fff;
+}
+
+.clear-filters.show {
+    display: inline-flex;
+}
+
 /* 貼文卡片 */
 .post-card {
     background: #fff;
@@ -290,6 +426,22 @@
         height: 64px;
         font-size: 1.75rem;
     }
+
+    .posts-filter {
+        flex-direction: row;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .search-container {
+        flex: 1;
+        max-width: 300px;
+    }
+
+    .filter-tags {
+        flex: 2;
+        justify-content: flex-end;
+    }
 }
 
 /* 動畫效果 */
@@ -438,20 +590,14 @@
     border-top: 1px solid #e9ecef;
 }
 
-/* 搜尋框樣式 */
-.post-search {
-    padding: 0.75rem 1rem;
-    border: 2px solid #e9ecef;
-    border-radius: 25px;
-    font-size: 1rem;
-    width: 250px;
-    transition: all 0.2s ease;
-}
-
-.post-search:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+/* 隱藏的貼文動畫 */
+.post-card.hidden {
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+    height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
 }
 
 /* 響應式設計 */
@@ -460,6 +606,29 @@
         padding: 0;
         margin: 0;
         max-width: 100%;
+    }
+    
+    .posts-header {
+        padding: 0.75rem 1rem;
+    }
+    
+    .posts-filter {
+        gap: 0.5rem;
+    }
+    
+    .search-input {
+        padding: 0.625rem 0.875rem 0.625rem 2.25rem;
+        font-size: 0.9rem;
+    }
+    
+    .search-icon {
+        left: 0.875rem;
+        font-size: 0.8rem;
+    }
+    
+    .filter-tag {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.8rem;
     }
     
     .post-card {

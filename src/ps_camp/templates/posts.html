@@ -4,6 +4,47 @@
 <!-- 直接在內容區塊引入 CSS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/posts.css') }}">
 
+<!-- Threads 風格的搜尋和篩選頭部 -->
+<div class="posts-header">
+    <div class="posts-filter">
+        <!-- 搜尋框 -->
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" placeholder="搜尋貼文、作者或內容...">
+        </div>
+        
+        <!-- 篩選標籤 -->
+        <div class="filter-tags">
+            <button class="filter-tag" data-category="規則">
+                <i class="fas fa-gavel"></i>
+                規則
+            </button>
+            <button class="filter-tag" data-category="公告">
+                <i class="fas fa-bullhorn"></i>
+                公告
+            </button>
+            <button class="filter-tag" data-category="議題">
+                <i class="fas fa-comments"></i>
+                議題
+            </button>
+            <button class="filter-tag" data-category="成立宣言">
+                <i class="fas fa-flag"></i>
+                成立宣言
+            </button>
+            <button class="filter-tag" data-category="白皮書">
+                <i class="fas fa-file-alt"></i>
+                白皮書
+            </button>
+            
+            <!-- 清除篩選按鈕 -->
+            <button class="clear-filters">
+                <i class="fas fa-times"></i>
+                清除
+            </button>
+        </div>
+    </div>
+</div>
+
 <div class="posts-container">
     {% for post in posts %}
     <article class="post-card" data-post-id="{{ post.id|string }}">
@@ -34,11 +75,11 @@
             </button>
             <button class="action-btn comment-btn">
                 <i class="far fa-comment"></i>
-                <span>3</span>
+                <span>{{ post.replies }}</span>
             </button>
             <button class="action-btn share-btn">
                 <i class="fas fa-retweet"></i>
-                <span>2</span>
+                <span>0</span>
             </button>
             <button class="action-btn bookmark-btn">
                 <i class="far fa-bookmark"></i>

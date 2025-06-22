@@ -43,6 +43,21 @@ function initPostInteractions() {
             toggleBookmark(this);
         });
     });
+
+    // 篩選與搜尋功能
+    const filterBtn = document.querySelector('.posts-filter button');
+    if (filterBtn) {
+        filterBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            const category = document.getElementById('categoryFilter').value;
+            const keyword = document.getElementById('postSearch').value;
+
+            const url = new URL(window.location.href);
+            url.searchParams.set('category', category);
+            url.searchParams.set('search', keyword);
+            window.location.href = url.toString();
+        });
+    }
 }
 
 // 切換喜歡狀態

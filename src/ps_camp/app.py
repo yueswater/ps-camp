@@ -67,8 +67,18 @@ def create_app():
     def posts():
         db = SessionLocal()
         repo = PostSQLRepository(db)
-        all_posts = repo.get_all()
-        return render_template("posts.html", posts=all_posts)
+
+        category = request.args.get("category", "").strip()
+        keyword = request.args.get("search", "").strip()
+
+        if keyword:
+            posts = repo.search(keyword)
+        elif category:
+            posts = repo.filter(category=category)
+        else:
+            posts = repo.get_all()
+
+        return render_template("posts.html", posts=posts)
 
     @app.route("/npcs")
     def npcs():
