@@ -25,6 +25,7 @@
                             <li><a href="/register" class="nav-link">註冊</a></li>
                             <li><a href="/login" class="nav-link">登入</a></li>
                         {% else %}
+                            <li><a href="/bank" class="nav-link">銀行</a></li>
                             <li class="user-info">
                                 <span class="username">{{ session.user.fullname }}</span>
                                 <a href="/logout" class="nav-link logout">登出</a>

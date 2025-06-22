@@ -1,39 +1,122 @@
+# app.py
 import os
 from datetime import datetime
 from uuid import uuid4, UUID
 from flask import Flask, render_template, request, redirect, url_for, session, abort, jsonify
 from ps_camp.db.session import SessionLocal
-from ps_camp.sql_models.user_model import User
+from ps_camp.sql_models import User
 from ps_camp.sql_models.post_model import Post
 from ps_camp.sql_models.npc_model import NPC
 from ps_camp.repos.user_sql_repo import UserSQLRepository
 from ps_camp.repos.post_sql_repo import PostSQLRepository
 from ps_camp.repos.npc_sql_repo import NPCSQLRepository
+from ps_camp.repos.bank_sql_repo import BankSQLRepository
+from ps_camp.sql_models.bank_model import OwnerType, TransactionType
 from ps_camp.utils.password_hasher import PasswordHasher
-
+from ps_camp.utils.session_helpers import refresh_user_session
 import markdown
+
+def map_role_to_owner_type(role: str) -> OwnerType:
+    if role == "admin":
+        return OwnerType.admin
+    elif role == "政黨":
+        return OwnerType.party
+    elif role == "利益團體":
+        return OwnerType.group
+    else:
+        return OwnerType.user
 
 def create_app():
     app = Flask(__name__)
     app.secret_key = "2025ntupscamp"
 
     @app.route("/")
+    @refresh_user_session
     def home():
         return render_template("index.html")
+
+    @app.route("/bank")
+    def bank():
+        if not session.get("user"):
+            return redirect(url_for("login"))
+
+        db = SessionLocal()
+        bank_repo = BankSQLRepository(db)
+
+        user = session["user"]
+        user_id = user["id"]
+        role = user["role"]
+        owner_type = map_role_to_owner_type(role)
+
+        account = bank_repo.get_account_by_owner(user_id, owner_type)
+        if not account:
+            return "找不到您的銀行帳戶，請聯繫主辦方", 404
+
+        transactions = bank_repo.get_transactions(account.id)
+        return render_template("bank.html", account=account, transactions=transactions)
+
+    @app.route("/api/bank/transfer", methods=["POST"])
+    def bank_transfer():
+        if not session.get("user"):
+            return jsonify(success=False, message="請先登入"), 401
+
+        data = request.get_json()
+        to_account_number = data.get("to_account_number")
+        amount = int(data.get("amount", 0))
+        note = data.get("note", "")
+
+        if not to_account_number or amount <= 0:
+            return jsonify(success=False, message="輸入不完整或金額不正確"), 400
+
+        db = SessionLocal()
+        bank_repo = BankSQLRepository(db)
+
+        from_user_id = session["user"]["id"]
+        role = session["user"]["role"]
+        from_owner_type = map_role_to_owner_type(role)
+
+        from_account = bank_repo.get_account_by_owner(from_user_id, from_owner_type)
+        to_account = bank_repo.get_account_by_number(to_account_number)
+
+        if not from_account or not to_account:
+            return jsonify(success=False, message="找不到帳戶"), 404
+
+        try:
+            bank_repo.create_transaction(
+                from_account=from_account,
+                to_account=to_account,
+                amount=amount,
+                note=note,
+                transaction_type=TransactionType.transfer
+            )
+        except ValueError as e:
+            return jsonify(success=False, message=str(e)), 400
+
+        return jsonify(success=True, new_balance=from_account.balance)
 
     @app.route("/register", methods=["GET", "POST"])
     def register():
         db = SessionLocal()
         repo = UserSQLRepository(db)
+        hasher = PasswordHasher()
         if request.method == "POST":
             data = request.form
+
             new_user = User(
+                id=str(uuid4()),
                 username=data["username"],
                 fullname=data["fullname"],
-                hashed_password=data["password"],
+                hashed_password=hasher.hash_password(data["password"]),
                 role=data["role"],
+                coins=500
             )
+
             repo.add(new_user)
+
+            bank_repo = BankSQLRepository(db)
+            owner_type = map_role_to_owner_type(data["role"])
+            bank_repo.create_account(owner_id=new_user.id, owner_type=owner_type, initial_balance=new_user.coins)
+
             return redirect(url_for("login"))
         return render_template("register.html")
 
@@ -51,6 +134,7 @@ def create_app():
                     "id": str(user.id),
                     "fullname": user.fullname,
                     "coins": user.coins,
+                    "role": user.role
                 }
                 return redirect(url_for("home"))
             else:
@@ -63,6 +147,7 @@ def create_app():
         return redirect(url_for("home"))
 
     @app.route("/posts")
+    @refresh_user_session
     def posts():
         db = SessionLocal()
         repo = PostSQLRepository(db)
@@ -76,7 +161,7 @@ def create_app():
             posts = repo.get_all()
 
         for post in posts:
-            preview = post.content[:300]  # 避免一整篇太重
+            preview = post.content[:300]
             post.content = markdown.markdown(preview, extensions=["nl2br"])
 
         return render_template("posts.html", posts=posts)
@@ -116,7 +201,6 @@ def create_app():
                 db.commit()
             return redirect(url_for("view_post", post_id=post_id))
 
-        # Markdown 處理
         post.content = markdown.markdown(post.content, extensions=["nl2br"])
         for r in post.replies:
             r["content"] = markdown.markdown(r["content"], extensions=["nl2br"])
@@ -127,23 +211,32 @@ def create_app():
     def new_post():
         if not session.get("user"):
             return redirect(url_for("login"))
+
         db = SessionLocal()
         repo = PostSQLRepository(db)
+
         if request.method == "POST":
             data = request.form
+            user_id = UUID(session["user"]["id"])
+            user_role = session["user"]["role"]
+            owner_type = map_role_to_owner_type(user_role)  # 加上這行！
+
             post = Post(
                 id=uuid4(),
                 title=data["title"],
                 category=data["category"],
                 content=data["content"],
                 created_at=datetime.utcnow(),
-                created_by=UUID(session["user"]["id"]),
+                created_by=user_id,
                 replies=[],
                 likes=[],
             )
-            repo.add(post)
+
+            repo.add(post, owner_id=user_id, owner_type=owner_type)  # 要傳入 owner_type
             return redirect(url_for("posts"))
+
         return render_template("new_post.html")
+
 
     @app.route("/api/posts/<string:post_id>/like", methods=["POST"])
     def like_post(post_id: str):

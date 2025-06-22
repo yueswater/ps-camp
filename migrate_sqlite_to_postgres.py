@@ -10,7 +10,7 @@ load_dotenv()
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "src")))
 
 from ps_camp.db.session import create_sqlite_engine, create_postgres_engine
-from ps_camp.sql_models.user_model import User
+from ps_camp.sql_models import User
 from ps_camp.sql_models.post_model import Post
 from ps_camp.sql_models.npc_model import NPC
 

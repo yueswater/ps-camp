@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- 直接在內容區塊引入 CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bank.css') }}">
+
+{% if not session.get("user") %}
+<div class="empty-state">
+    <i class="fas fa-sign-in-alt"></i>
+    <h3>請先登入</h3>
+    <p>登入後才能使用銀行服務！</p>
+</div>
+{% else %}
+
+<!-- 帳戶資訊卡片 -->
+<div class="account-card">
+    <div class="account-header">
+        <div class="account-title">
+            <i class="fas fa-university"></i>
+            我的銀行帳戶
+        </div>
+        <div class="account-status">
+            <span class="status-badge active">
+                <i class="fas fa-check-circle"></i>
+                正常
+            </span>
+        </div>
+    </div>
+    
+    <div class="account-details">
+        <div class="account-info">
+            <div class="info-row">
+                <span class="info-label">帳戶號碼</span>
+                <span class="info-value">{{ account.account_number }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">戶名</span>
+                <span class="info-value">{{ session.get("user").fullname }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">帳戶類型</span>
+                <span class="info-value">活期存款</span>
+            </div>
+        </div>
+        
+        <div class="balance-section">
+            <div class="balance-label">可用餘額</div>
+            <div class="account-balance" id="balance">
+                <span class="currency">NT$</span>
+                <span class="amount">{{ "{:,}".format(account.balance) }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="account-actions">
+        <button id="show-transfer" class="transfer-btn">
+            <i class="fas fa-exchange-alt"></i>
+            轉帳
+        </button>
+        <button class="btn-secondary">
+            <i class="fas fa-download"></i>
+            匯出明細
+        </button>
+    </div>
+</div>
+
+<!-- 交易紀錄區塊 -->
+<div class="transactions-section">
+    <div class="section-header">
+        <h3 class="section-title">
+            <i class="fas fa-list-ul"></i>
+            交易紀錄
+        </h3>
+        <div class="filter-controls">
+            <select class="filter-select">
+                <option value="all">全部交易</option>
+                <option value="transfer_in">轉入</option>
+                <option value="transfer_out">轉出</option>
+            </select>
+        </div>
+    </div>
+
+    {% if transactions %}
+    <div class="transactions-container">
+        <table class="transaction-table">
+            <thead>
+                <tr>
+                    <th>時間</th>
+                    <th>交易類型</th>
+                    <th>對象帳號</th>
+                    <th>金額</th>
+                    <th>備註</th>
+                    <th>狀態</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for tx in transactions %}
+                <tr class="transaction-row">
+                    <td class="tx-time">
+                        <div class="time-main">{{ tx.created_at.strftime('%m/%d') }}</div>
+                        <div class="time-detail">{{ tx.created_at.strftime('%H:%M') }}</div>
+                    </td>
+                    <td class="tx-type">
+                        {% if tx.from_account_id == account.id %}
+                            <span class="type-badge outgoing">
+                                <i class="fas fa-arrow-up"></i>
+                                轉出
+                            </span>
+                        {% else %}
+                            <span class="type-badge incoming">
+                                <i class="fas fa-arrow-down"></i>
+                                轉入
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td class="tx-account">
+                        {% if tx.from_account_id == account.id %}
+                            {{ tx.to_account_id[:8] }}...
+                        {% else %}
+                            {{ tx.from_account_id[:8] }}...
+                        {% endif %}
+                    </td>
+                    <td class="tx-amount {{ 'negative' if tx.from_account_id == account.id else 'positive' }}">
+                        <span class="amount-sign">{% if tx.from_account_id == account.id %}-{% else %}+{% endif %}</span>
+                        <span class="amount-value">{{ "{:,}".format(tx.amount) }}</span>
+                    </td>
+                    <td class="tx-note">
+                        <span class="transaction-note">{{ tx.note or '-' }}</span>
+                    </td>
+                    <td class="tx-status">
+                        <span class="status-badge success">
+                            <i class="fas fa-check"></i>
+                            完成
+                        </span>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-receipt"></i>
+            <h3>尚無交易紀錄</h3>
+            <p>您的帳戶目前沒有任何交易記錄</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- 轉帳 Modal -->
+<div id="transfer-modal" class="modal-overlay">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3>
+                <i class="fas fa-exchange-alt"></i>
+                轉帳
+            </h3>
+            <button type="button" class="modal-close" id="cancel-transfer">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <form id="transfer-form" class="transfer-form">
+                <div class="form-section">
+                    <div class="form-group">
+                        <label class="form-label">收款方帳號</label>
+                        <input type="text" name="to_account_number" class="form-input" required 
+                               placeholder="請輸入收款方帳號">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">轉帳金額</label>
+                        <div class="amount-input-container">
+                            <span class="currency-prefix">NT$</span>
+                            <input type="number" name="amount" class="form-input amount-input" 
+                                   min="1" max="{{ account.balance }}" required placeholder="0">
+                        </div>
+                        <div class="balance-hint">
+                            可用餘額：NT$ {{ "{:,}".format(account.balance) }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">備註 <span class="optional">(選填)</span></label>
+                        <input type="text" name="note" class="form-input" 
+                               maxlength="50" placeholder="轉帳備註說明">
+                    </div>
+                </div>
+
+                <div class="transfer-summary">
+                    <div class="summary-row">
+                        <span>轉帳手續費</span>
+                        <span class="fee-amount">NT$ 0</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>總計金額</span>
+                        <span class="total-amount">NT$ 0</span>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" id="cancel-transfer-btn">取消</button>
+                    <button type="submit" class="btn-confirm">
+                        <i class="fas fa-paper-plane"></i>
+                        確認轉帳
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endif %}
+
+<!-- 直接在內容區塊引入 JS -->
+<script src="{{ url_for('static', filename='js/bank.js') }}"></script>
+{% endblock %}
