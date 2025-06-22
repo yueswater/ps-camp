@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from ps_camp.db.base import Base
 
 # 預設使用 SQLite，如果有設定 DATABASE_URL 則使用該值（例如 PostgreSQL）
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///src/ps_camp/db/camp.db")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 # 建立 engine（future=True 是 SQLAlchemy 2.0 的標準寫法）
 engine = create_engine(
