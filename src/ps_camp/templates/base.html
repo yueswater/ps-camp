@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>沙政風暴</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>沙政風暴</h1>
+                    <span class="tagline">2025 NTU PS CAMP</span>
+                </div>
+                <nav class="navbar">
+                    <ul class="nav-links">
+                        <li><a href="/" class="nav-link">首頁</a></li>
+                        <li><a href="/posts" class="nav-link">貼文列表</a></li>
+                        <li><a href="/npcs" class="nav-link">NPC 列表</a></li>
+                        {% if not session.get("user") %}
+                            <li><a href="/register" class="nav-link">註冊</a></li>
+                            <li><a href="/login" class="nav-link">登入</a></li>
+                        {% else %}
+                            <li class="user-info">
+                                <span class="username">{{ session.user.fullname }}</span>
+                                <a href="/logout" class="nav-link logout">登出</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <h3>沙政風暴</h3>
+                    <p>這是一場專屬於你的模擬選戰！</p>
+                </div>
+                <div class="footer-right">
+                    <div class="contact-info">
+                        <p>聯絡我們</p>
+                        <div class="social-links">
+                            <a href="#" class="social-link"><i class="fas fa-envelope"></i></a>
+                            <a href="#" class="social-link"><i class="fas fa-phone"></i></a>
+                            <a href="#" class="social-link"><i class="fas fa-globe"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

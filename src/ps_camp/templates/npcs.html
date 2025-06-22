@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>NPC 列表</h2>
+<ul>
+    {% for npc in npcs %}
+    <li>
+        <h3>{{ npc.name }}</h3>
+        <p>{{ npc.description }}</p>
+        <p>所屬政黨：{{ npc.party }}</p>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

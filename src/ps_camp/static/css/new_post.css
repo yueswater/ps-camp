@@ -1,0 +1,55 @@
+.form-wrapper {
+    background: #ffffff;
+    padding: 2rem 2rem 2.5rem;
+    margin: 3rem auto;
+    max-width: 700px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.form-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.new-post-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.new-post-form .form-label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: block;
+    color: #495057;
+}
+
+.new-post-form .form-input,
+.new-post-form .form-textarea {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    transition: border-color 0.2s ease;
+}
+
+.new-post-form .form-input:focus,
+.new-post-form .form-textarea:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.new-post-form .form-actions {
+    text-align: right;
+}
+
+.new-post-form .btn {
+    padding: 0.75rem 1.75rem;
+    font-size: 1rem;
+    border-radius: 8px;
+}

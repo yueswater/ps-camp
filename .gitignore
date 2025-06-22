@@ -1,0 +1,23 @@
+# Python 編譯暫存
+__pycache__/
+*.py[cod]
+*.pyo
+
+# VS Code / IDE 設定
+.vscode/
+.idea/
+
+# 系統檔
+.DS_Store
+
+# SQLite DB（如果你不想 push sqlite，可移除此行）
+src/ps_camp/db/camp.db
+
+# poetry
+poetry.lock
+
+# alembic 暫存檔（選擇性，若你不想保留 pycache）
+alembic/versions/__pycache__/
+
+# Jupyter Notebook Checkpoints（如果有用 notebook）
+.ipynb_checkpoints/
