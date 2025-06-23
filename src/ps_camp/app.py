@@ -29,6 +29,7 @@ from ps_camp.utils.password_hasher import PasswordHasher
 from ps_camp.utils.session_helpers import refresh_user_session
 
 load_dotenv()
+ADMIN_ID = os.getenv("ADMIN_ID")
 
 
 def map_role_to_owner_type(role: str) -> OwnerType:

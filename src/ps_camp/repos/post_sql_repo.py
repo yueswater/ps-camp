@@ -29,11 +29,10 @@ class PostSQLRepository:
 
     def add(self, post: Post, owner_id: UUID, owner_type: OwnerType):
         user_account = self.bank_repo.get_account_by_owner(owner_id, owner_type)
-        admin_account = self.bank_repo.get_account_by_owner(
-            self.ADMIN_ID, OwnerType.admin
-        )
+        admin_account = self.bank_repo.get_account_by_owner(self.ADMIN_ID, OwnerType.admin)
 
         if not user_account or not admin_account:
+            print(f"[ERROR] 無法找到帳戶: user_id={owner_id}, type={owner_type}, admin_id={self.ADMIN_ID}")
             raise ValueError("找不到帳戶（政黨或中央）")
 
         self.bank_repo.create_transaction(

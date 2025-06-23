@@ -16,9 +16,10 @@ class BankSQLRepository:
         self.db = db
 
     def get_account_by_owner(self, owner_id: str, owner_type: OwnerType) -> BankAccount:
+        print(f"[DEBUG] 查詢帳戶: owner_id={owner_id}, owner_type={owner_type} ({type(owner_type)})")
         return (
             self.db.query(BankAccount)
-            .filter_by(owner_id=str(owner_id), owner_type=owner_type)
+            .filter_by(owner_id=str(owner_id), owner_type=owner_type.value)
             .first()
         )
 
