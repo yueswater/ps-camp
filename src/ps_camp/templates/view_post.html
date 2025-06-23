@@ -6,29 +6,33 @@
   <h2 class="post-title">{{ post.title }}</h2>
   <p class="category-tag">{{ post.category }}</p>
 
-  
   <div class="post-body markdown-body">
     {{ post.content|safe }}
   </div>
 
   <hr>
 
-  <h3 class="reply-heading">留言（{{ post.replies|length }}）</h3>
-  <ul class="reply-list">
-    {% for r in post.replies %}
-      <li class="reply-item">
-        <div class="reply-meta">
-          <strong class="reply-user">{{ r.user_name }}</strong>
-          <time datetime="{{ r.created_at }}" class="reply-time">
-            {{ r.created_at[:19].replace('T', ' ') }}
-          </time>
-        </div>
-        <div class="reply-content markdown-body">
-          {{ r.content|safe }}
-        </div>
-      </li>
-    {% endfor %}
-  </ul>
+  <h3 class="reply-heading">留言（{{ post.replies|length if post.replies else 0 }}）</h3>
+
+  {% if post.replies %}
+    <ul class="reply-list">
+      {% for r in post.replies %}
+        <li class="reply-item">
+          <div class="reply-meta">
+            <strong class="reply-user">{{ r.user_name or "匿名" }}</strong>
+            <time datetime="{{ r.created_at }}" class="reply-time">
+              {{ r.created_at[:19].replace('T', ' ') if r.created_at }}
+            </time>
+          </div>
+          <div class="reply-content markdown-body">
+            {{ r.content|safe }}
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="no-replies">目前還沒有留言，搶先留言吧！</p>
+  {% endif %}
 
   {% if session.get("user") %}
     <form method="post" class="reply-form">

@@ -3,6 +3,7 @@ from uuid import uuid4
 
 from sqlalchemy import JSON, Column, DateTime, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.orm import relationship
 
 from ps_camp.db.base import Base
@@ -18,5 +19,5 @@ class Post(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     created_by = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     user = relationship("User", back_populates="my_posts")
-    likes = Column(JSON, nullable=False, default=0)
-    replies = Column(JSON, nullable=False, default=list)
+    likes = Column(JSON, nullable=False, default=list)
+    replies = Column(MutableList.as_mutable(JSON), nullable=False, default=list)

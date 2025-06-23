@@ -442,38 +442,40 @@ def create_app():
 
             return render_template("distribute.html")
 
-    @app.route("/posts/<string:post_id>", methods=["GET", "POST"])
-    def view_post(post_id: str):
+    @app.route("/posts/<post_id>", methods=["GET", "POST"])
+    def view_post(post_id):
         with get_db_session() as db:
-            post_repo = PostSQLRepository(db)
-            try:
-                post_uuid = UUID(post_id)
-            except ValueError:
-                abort(404)
-            post = post_repo.get_by_id(post_uuid)
+            post = db.query(Post).filter_by(id=post_id).first()
             if not post:
                 abort(404)
 
+            # Parse replies JSON
+            if isinstance(post.replies, str):
+                try:
+                    replies = json.loads(post.replies)
+                except json.JSONDecodeError:
+                    replies = []
+            else:
+                replies = post.replies or []
+
             if request.method == "POST":
-                if not session.get("user"):
+                user = session.get("user")
+                if not user:
+                    flash("請先登入以留言", "warning")
                     return redirect(url_for("login"))
-                reply_content = request.form.get("reply", "").strip()
-                if reply_content:
-                    reply_obj = {
-                        "id": str(uuid4()),
-                        "user_id": session["user"]["id"],
-                        "user_name": session["user"]["fullname"],
-                        "content": reply_content,
-                        "created_at": datetime.utcnow().isoformat(),
-                    }
-                    post.replies.append(reply_obj)
-                    db.commit()
+
+                new_reply = {
+                    "user_name": user["fullname"],
+                    "created_at": datetime.now(UTC).isoformat(),
+                    "content": markdown.markdown(request.form["reply"]),
+                }
+                replies.append(new_reply)
+                post.replies = replies
+                db.commit()
+                flash("留言成功", "success")
                 return redirect(url_for("view_post", post_id=post_id))
 
-            post.content = markdown.markdown(post.content, extensions=["nl2br"])
-            for r in post.replies:
-                r["content"] = markdown.markdown(r["content"], extensions=["nl2br"])
-
+            post.replies = replies
             return render_template("view_post.html", post=post)
 
     @app.route("/posts/new", methods=["GET", "POST"])
@@ -534,11 +536,7 @@ def create_app():
 
 
 # TODO: change to guicorn
-# if __name__ == "__main__":
-#     app = create_app()
-#     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
-
 app = create_app()
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
+# if __name__ == "__main__":
+#     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
