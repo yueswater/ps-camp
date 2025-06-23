@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+
+<div class="profile-container">
+    <h2 style="text-align: center;">會員管理</h2>
+
+    <div class="avatar">
+        {{ session.user.fullname[0] }}
+    </div>
+
+    <div class="profile-field">
+        <label for="fullname">姓名</label>
+        <input type="text" id="fullname" value="{{ session.user.fullname }}" disabled>
+    </div>
+
+    <form id="profile-form" method="POST" action="{{ url_for('profile') }}">
+        <div class="profile-field">
+            <label for="old_password">舊密碼</label>
+            <input type="password" name="old_password" id="old_password" required>
+        </div>
+
+        <div class="profile-field">
+            <label for="new_password">新密碼</label>
+            <input type="password" name="new_password" id="new_password" required>
+        </div>
+
+        <div class="profile-field">
+            <label for="confirm_password">確認新密碼</label>
+            <input type="password" name="confirm_password" id="confirm_password" required>
+        </div>
+
+        <button type="submit" class="save-button">儲存</button>
+    </form>
+</div>
+
+<script src="{{ url_for('static', filename='js/profile.js') }}" defer></script>
+{% endblock %}

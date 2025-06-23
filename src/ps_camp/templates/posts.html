@@ -1,11 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- 直接在內容區塊引入 CSS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/posts.css') }}">
 
 {% if session.get("user") and posts %}
-<!-- Threads 風格的搜尋和篩選頭部 -->
+
 <div class="posts-header">
     <div class="posts-filter">
         <!-- 搜尋框 -->

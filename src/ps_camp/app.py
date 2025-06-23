@@ -210,6 +210,36 @@ def create_app():
     def logout():
         session.clear()
         return redirect(url_for("home"))
+    
+    @app.route("/profile", methods=["GET", "POST"])
+    def profile():
+        db = SessionLocal()
+        user_repo = UserSQLRepository(db)
+        hasher = PasswordHasher()
+
+        user = session.get("user")
+        user_obj = user_repo.get_by_id(UUID(user["id"]))
+
+        if request.method == "POST":
+            old_password = request.form["old_password"]
+            new_password = request.form["new_password"]
+            confirm_password = request.form["confirm_password"]
+
+            if not hasher.verify_password(old_password, user_obj.hashed_password):
+                flash("舊密碼錯誤")
+                return redirect(url_for("profile"))
+
+            if new_password != confirm_password:
+                flash("新密碼與確認不一致")
+                return redirect(url_for("profile"))
+
+            user_obj.hashed_password = hasher.hash_password(new_password)
+            db.commit()
+
+            session.clear()
+            return redirect(url_for("login"))
+
+        return render_template("profile.html")
 
     @app.route("/posts")
     @refresh_user_session
