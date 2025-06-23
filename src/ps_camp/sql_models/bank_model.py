@@ -1,6 +1,6 @@
 import enum
 
-from sqlalchemy import BigInteger, Column, DateTime, ForeignKey, String, Enum
+from sqlalchemy import BigInteger, Column, DateTime, Enum, ForeignKey, String
 from sqlalchemy.dialects.postgresql import ENUM as PG_ENUM
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -29,7 +29,9 @@ class BankAccount(Base):
 
     id = Column(String, primary_key=True)
     owner_id = Column(String, nullable=False)
-    owner_type = Column(PG_ENUM(OwnerType, name="owner_type", native_enum=True), nullable=False)
+    owner_type = Column(
+        PG_ENUM(OwnerType, name="owner_type", native_enum=True), nullable=False
+    )
     account_number = Column(String, unique=True, nullable=False)
     balance = Column(BigInteger, nullable=False, default=0)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

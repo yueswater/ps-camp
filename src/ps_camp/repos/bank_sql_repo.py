@@ -15,8 +15,18 @@ class BankSQLRepository:
     def __init__(self, db: Session):
         self.db = db
 
+    def get_account_by_id(self, account_id: str) -> BankAccount | None:
+        return self.db.query(BankAccount).filter(BankAccount.id == account_id).first()
+
+    def get_accounts_by_ids(self, ids: list[str]) -> list[BankAccount]:
+        if not ids:
+            return []
+        return self.db.query(BankAccount).filter(BankAccount.id.in_(ids)).all()
+
     def get_account_by_owner(self, owner_id: str, owner_type: OwnerType) -> BankAccount:
-        print(f"[DEBUG] 查詢帳戶: owner_id={owner_id}, owner_type={owner_type} ({type(owner_type)})")
+        print(
+            f"[DEBUG] 查詢帳戶: owner_id={owner_id}, owner_type={owner_type} ({type(owner_type)})"
+        )
         return (
             self.db.query(BankAccount)
             .filter_by(owner_id=str(owner_id), owner_type=owner_type.value)

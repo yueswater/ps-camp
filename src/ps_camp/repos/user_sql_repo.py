@@ -18,6 +18,11 @@ class UserSQLRepository:
     def get_by_id(self, user_id: str) -> User | None:
         return self.db.query(User).filter(User.id == user_id).first()
 
+    def get_users_by_ids(self, ids: list[str]) -> list[User]:
+        if not ids:
+            return []
+        return self.db.query(User).filter(User.id.in_(ids)).all()
+
     def get_by_username(self, username: str) -> User | None:
         return self.db.query(User).filter(User.username == username).first()
 

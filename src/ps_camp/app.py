@@ -10,12 +10,15 @@ from flask import (
     abort,
     flash,
     jsonify,
+    make_response,
     redirect,
     render_template,
+    render_template_string,
     request,
     session,
     url_for,
 )
+from weasyprint import HTML
 
 from ps_camp.db.session import get_db_session
 from ps_camp.repos.bank_sql_repo import BankSQLRepository
@@ -26,6 +29,7 @@ from ps_camp.sql_models.bank_model import OwnerType, TransactionType
 from ps_camp.sql_models.post_model import Post
 from ps_camp.sql_models.user_model import User
 from ps_camp.utils.password_hasher import PasswordHasher
+from ps_camp.utils.pdf_templates import bank_report_template
 from ps_camp.utils.session_helpers import refresh_user_session
 
 load_dotenv()
@@ -116,6 +120,56 @@ def create_app():
                 transactions=transactions,
                 affiliation_name=affiliation_name,
             )
+
+    @app.route("/bank/export")
+    def export_bank_report():
+        user = session.get("user")
+        if not user:
+            return redirect(url_for("login"))
+
+        with get_db_session() as db:
+            try:
+                bank_repo = BankSQLRepository(db)
+                user_repo = UserSQLRepository(db)
+
+                account = bank_repo.get_account_by_owner(
+                    user["id"], map_role_to_owner_type(user["role"])
+                )
+                transactions = bank_repo.get_transactions(account.id)
+
+                related_account_ids: set[str] = set()
+                for tx in transactions:
+                    related_account_ids.update([tx.from_account_id, tx.to_account_id])
+
+                related_accounts = bank_repo.get_accounts_by_ids(
+                    list(related_account_ids)
+                )
+                account_map = {acc.id: acc for acc in related_accounts}
+
+                owner_ids = [acc.owner_id for acc in related_accounts]
+                owners = user_repo.get_users_by_ids(owner_ids)
+                owner_map = {u.id: u.fullname for u in owners}
+
+                account_to_fullname = {
+                    acc_id: owner_map.get(acc.owner_id, "未知使用者")
+                    for acc_id, acc in account_map.items()
+                }
+
+                html = render_template_string(
+                    bank_report_template,
+                    account=account,
+                    transactions=transactions,
+                    account_to_fullname=account_to_fullname,
+                )
+                pdf = HTML(string=html).write_pdf()
+
+                filename = f"bank_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+                resp = make_response(pdf)
+                resp.headers["Content-Type"] = "application/pdf"
+                resp.headers["Content-Disposition"] = f"inline; filename={filename}"
+                return resp
+            except Exception as e:
+                flash(f"輸出明細發生錯誤：{e}")
 
     @app.route("/api/bank/transfer", methods=["POST"])
     def bank_transfer():
