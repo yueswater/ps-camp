@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from ps_camp.sql_models import User
+from ps_camp.sql_models.user_model import User
 
 
 class UserSQLRepository:

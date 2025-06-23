@@ -80,11 +80,19 @@
             </article>
             {% endfor %}
         {% else %}
+        {% if session.get("user") and session.user.role in ["party", "interest_group", "admin"] %}
         <div class="empty-state">
             <i class="fas fa-comments"></i>
             <h3>還沒有任何貼文</h3>
             <p>點擊右下角的 + 按鈕開始發表貼文吧！</p>
         </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-comments"></i>
+            <h3>還沒有任何貼文</h3>
+            <p>快跟夥伴一起討論吧！</p>
+        </div>
+        {% endif %}
         {% endif %}
     {% endif %}
 </div>

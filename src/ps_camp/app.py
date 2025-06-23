@@ -22,9 +22,9 @@ from ps_camp.repos.bank_sql_repo import BankSQLRepository
 from ps_camp.repos.npc_sql_repo import NPCSQLRepository
 from ps_camp.repos.post_sql_repo import PostSQLRepository
 from ps_camp.repos.user_sql_repo import UserSQLRepository
-from ps_camp.sql_models import User
 from ps_camp.sql_models.bank_model import OwnerType, TransactionType
 from ps_camp.sql_models.post_model import Post
+from ps_camp.sql_models.user_model import User
 from ps_camp.utils.password_hasher import PasswordHasher
 from ps_camp.utils.session_helpers import refresh_user_session
 
