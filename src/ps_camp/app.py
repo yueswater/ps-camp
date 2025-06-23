@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 from datetime import UTC, datetime
@@ -22,7 +23,6 @@ from weasyprint import HTML
 
 from ps_camp.db.session import get_db_session
 from ps_camp.repos.bank_sql_repo import BankSQLRepository
-from ps_camp.repos.npc_sql_repo import NPCSQLRepository
 from ps_camp.repos.post_sql_repo import PostSQLRepository
 from ps_camp.repos.user_sql_repo import UserSQLRepository
 from ps_camp.sql_models.bank_model import OwnerType, TransactionType
@@ -359,10 +359,21 @@ def create_app():
 
     @app.route("/npcs")
     def npcs():
-        with get_db_session() as db:
-            repo = NPCSQLRepository(db)
-            all_npcs = repo.get_all()
-            return render_template("npcs.html", npcs=all_npcs)
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        json_path = os.path.join(base_dir, "static", "data", "npcs.json")
+
+        with open(json_path, encoding="utf-8") as f:
+            npcs = json.load(f)
+
+        page = int(request.args.get("page", 1))
+        per_page = 9
+        start = (page - 1) * per_page
+        end = start + per_page
+        total_pages = (len(npcs) + per_page - 1) // per_page
+
+        return render_template(
+            "npc_gallery.html", npcs=npcs[start:end], page=page, total_pages=total_pages
+        )
 
     @app.route("/distribute", methods=["GET", "POST"])
     def distribute_money():
@@ -523,8 +534,7 @@ def create_app():
 #     app = create_app()
 #     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
 
-app = create_app()  # 讓 gunicorn 可以找到 app 變數
+app = create_app()
 
 if __name__ == "__main__":
-    # 僅本機測試用，部署不會執行這段
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))

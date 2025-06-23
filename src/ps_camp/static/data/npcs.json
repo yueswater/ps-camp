@@ -1,0 +1,98 @@
+[
+  {
+    "id": 1,
+    "name": "NPC 1",
+    "title": "部長",
+    "desc": "這是第 1 位 NPC，性格鮮明、立場堅定。",
+    "image": "/static/images/npc2.jpg",
+    "detail": "這位 NPC 的背景介紹：擁有多年政壇經驗，主要關注議題為第 1 項改革。"
+  },
+  {
+    "id": 2,
+    "name": "NPC 2",
+    "title": "教授",
+    "desc": "這是第 2 位 NPC，性格鮮明、立場堅定。",
+    "image": "/static/images/npc3.jpg",
+    "detail": "這位 NPC 的背景介紹：擁有多年政壇經驗，主要關注議題為第 2 項改革。"
+  },
+  {
+    "id": 3,
+    "name": "NPC 3",
+    "title": "評論員",
+    "desc": "這是第 3 位 NPC，性格鮮明、立場堅定。",
+    "image": "/static/images/npc4.jpg",
+    "detail": "這位 NPC 的背景介紹：擁有多年政壇經驗，主要關注議題為第 3 項改革。"
+  },
+  {
+    "id": 4,
+    "name": "NPC 4",
+    "title": "議員",
+    "desc": "這是第 4 位 NPC，性格鮮明、立場堅定。",
+    "image": "/static/images/npc5.jpg",
+    "detail": "這位 NPC 的背景介紹：擁有多年政壇經驗，主要關注議題為第 4 項改革。"
+  },
+  {
+    "id": 5,
+    "name": "NPC 5",
+    "title": "部長",
+    "desc": "這是第 5 位 NPC，性格鮮明、立場堅定。",
+    "image": "/static/images/npc6.jpg",
+    "detail": "這位 NPC 的背景介紹：擁有多年政壇經驗，主要關注議題為第 5 項改革。"
+  },
+  {
+    "id": 6,
+    "name": "NPC 6",
+    "title": "教授",
+    "desc": "這是第 6 位 NPC，性格鮮明、立場堅定。",
+    "image": "/static/images/npc1.jpg",
+    "detail": "這位 NPC 的背景介紹：擁有多年政壇經驗，主要關注議題為第 6 項改革。"
+  },
+  {
+    "id": 7,
+    "name": "NPC 7",
+    "title": "評論員",
+    "desc": "這是第 7 位 NPC，性格鮮明、立場堅定。",
+    "image": "/static/images/npc2.jpg",
+    "detail": "這位 NPC 的背景介紹：擁有多年政壇經驗，主要關注議題為第 7 項改革。"
+  },
+  {
+    "id": 8,
+    "name": "NPC 8",
+    "title": "議員",
+    "desc": "這是第 8 位 NPC，性格鮮明、立場堅定。",
+    "image": "/static/images/npc3.jpg",
+    "detail": "這位 NPC 的背景介紹：擁有多年政壇經驗，主要關注議題為第 8 項改革。"
+  },
+  {
+    "id": 9,
+    "name": "NPC 9",
+    "title": "部長",
+    "desc": "這是第 9 位 NPC，性格鮮明、立場堅定。",
+    "image": "/static/images/npc4.jpg",
+    "detail": "這位 NPC 的背景介紹：擁有多年政壇經驗，主要關注議題為第 9 項改革。"
+  },
+  {
+    "id": 10,
+    "name": "NPC 10",
+    "title": "教授",
+    "desc": "這是第 10 位 NPC，性格鮮明、立場堅定。",
+    "image": "/static/images/npc5.jpg",
+    "detail": "這位 NPC 的背景介紹：擁有多年政壇經驗，主要關注議題為第 10 項改革。"
+  },
+  {
+    "id": 11,
+    "name": "NPC 11",
+    "title": "評論員",
+    "desc": "這是第 11 位 NPC，性格鮮明、立場堅定。",
+    "image": "/static/images/npc6.jpg",
+    "detail": "這位 NPC 的背景介紹：擁有多年政壇經驗，主要關注議題為第 11 項改革。"
+  },
+  {
+    "id": 12,
+    "name": "NPC 12",
+    "title": "議員",
+    "desc": "這是第 12 位 NPC，性格鮮明、立場堅定。",
+    "image": "/static/images/npc1.jpg",
+    "detail": "這位 NPC 的背景介紹：擁有多年政壇經驗，主要關注議題為第 12 項改革。"
+  }
+]

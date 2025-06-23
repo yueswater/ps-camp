@@ -1,0 +1,110 @@
+/* -------- gallery -------- */
+.npc-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  /* always 3 columns */
+  gap: 2.5rem;
+  padding: 2.5rem 1.5rem;
+  justify-items: center;
+}
+
+.npc-card {
+  text-align: center;
+  cursor: pointer;
+}
+
+.npc-image {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: #ccc center/cover no-repeat;
+  margin: 0 auto 0.7rem;
+}
+
+.npc-name {
+  font-weight: 700;
+  font-size: 1.1rem
+}
+
+.npc-title {
+  font-size: 0.95rem;
+  color: #666
+}
+
+/* -------- pagination -------- */
+.pagination {
+  text-align: center;
+  margin: 2rem 0 4rem
+}
+
+.pagination a {
+  display: inline-block;
+  margin: 0 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: #eee;
+  color: #333;
+  text-decoration: none
+}
+
+.pagination a.active {
+  background: #6c63ff;
+  color: #fff;
+  font-weight: 700
+}
+
+/* -------- popup -------- */
+#npc-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  width: clamp(450px, 30vw, 600px);
+  max-height: 80vh;
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem 2rem 2.2rem;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, .25);
+  overflow-y: auto;
+  display: none;
+  opacity: 0;
+  transition: transform .25s ease, opacity .25s ease;
+  z-index: 9999;
+}
+
+#npc-popup.show {
+  display: block;
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1)
+}
+
+.popup-content {
+  position: relative
+}
+
+.popup-close {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.6rem;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: #888
+}
+
+#popup-name {
+  margin: 0 0 .4rem;
+  font-size: 1.6rem;
+  font-weight: 700
+}
+
+#popup-title {
+  margin: 0 0 1.2rem;
+  font-size: 1.05rem;
+  color: #666
+}
+
+#popup-detail {
+  white-space: pre-wrap;
+  line-height: 1.6;
+  font-size: 1rem
+}

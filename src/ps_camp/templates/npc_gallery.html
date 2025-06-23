@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/npcs.css') }}">
+
+<div class="npc-gallery">
+    {% for npc in npcs %}
+    <div class="npc-card" data-name="{{ npc.name }}" data-title="{{ npc.title }}" data-detail="{{ npc.detail }}"
+        onmouseenter="scheduleShowPopup(event)" onmouseleave="cancelShowPopup()">
+        <div class="npc-image" style="background-image:url('{{ npc.image }}')"></div>
+        <div class="npc-name">{{ npc.name }}</div>
+        <div class="npc-title">{{ npc.title }}</div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="pagination">
+    {% for p in range(1, total_pages + 1) %}
+    <a href="{{ url_for('npcs', page=p) }}" class="{{ 'active' if p == page else '' }}">{{ p }}</a>
+    {% endfor %}
+</div>
+
+<!-- popup -->
+<div id="npc-popup" onmouseenter="cancelAutoClose()" onmouseleave="closePopup()">
+    <div class="popup-content">
+        <span class="popup-close" onclick="closePopup()">×</span>
+        <h2 id="popup-name"></h2>
+        <h4 id="popup-title"></h4>
+        <div id="popup-detail"></div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/npcs.js') }}"></script>
+{% endblock %}
