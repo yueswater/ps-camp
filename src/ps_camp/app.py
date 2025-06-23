@@ -70,6 +70,10 @@ def create_app():
                 flash("找不到對應的銀行帳戶，請聯繫主辦方", "warning")
                 
         return render_template("index.html")
+    
+    @app.route("/ping")
+    def ping():
+        return "pong", 200
 
     @app.route("/bank")
     def bank():
