@@ -238,9 +238,10 @@ def create_app():
         all_npcs = repo.get_all()
         return render_template("npcs.html", npcs=all_npcs)
     
-    @app.route("/admin/distribute", methods=["GET", "POST"])
+    @app.route("/distribute", methods=["GET", "POST"])
     def distribute_money():
-        if session.get("user", {}).get("role") != "admin":
+        role = session.get("user", {}).get("role")
+        if role != "admin":
             flash("只有管理員可以發錢！", "danger")
             return redirect("/")
         
@@ -248,7 +249,7 @@ def create_app():
         user_repo = UserSQLRepository(db)
         bank_repo = BankSQLRepository(db)
 
-        admin_id = UUID(os.getenv("ADMIN_ID"))
+        admin_id = UUID(session["user"]["id"])
         admin_account = bank_repo.get_account_by_owner(admin_id, OwnerType.admin)
 
         if not admin_account:

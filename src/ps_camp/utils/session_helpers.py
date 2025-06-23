@@ -11,8 +11,11 @@ def refresh_user_session(func):
             user_repo = UserSQLRepository(db)
             user = user_repo.get_by_id(session["user"]["id"])
             if user:
-                session["user"]["coins"] = user.coins
-                session["user"]["fullname"] = user.fullname
+                session["user"].update({
+                    "fullname": user.fullname,
+                    "coins": user.coins,
+                    "role": user.role,
+                })
                 g.user = user
         return func(*args, **kwargs)
     return wrapper
