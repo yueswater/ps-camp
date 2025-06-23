@@ -1,10 +1,10 @@
 import os
 import logging
-from datetime import datetime
+from datetime import datetime, UTC
 from uuid import uuid4, UUID
 from flask import Flask, render_template, request, redirect, url_for, session, abort, jsonify, flash
 from dotenv import load_dotenv
-from ps_camp.db.session import SessionLocal
+from ps_camp.db.session import SessionLocal, get_db_session
 from ps_camp.sql_models import User
 from ps_camp.sql_models.post_model import Post
 from ps_camp.repos.user_sql_repo import UserSQLRepository
@@ -58,16 +58,16 @@ def create_app():
     @refresh_user_session
     def home():
         if session.get("user"):
-            db = SessionLocal()
-            bank_repo = BankSQLRepository(db)
+            with get_db_session() as db:
+                bank_repo = BankSQLRepository(db)
 
-            user = session["user"]
-            account, _ = get_account_by_user(user, bank_repo, db)
-            if account:
-                session["user"]["coins"] = account.balance
-            else:
-                session["user"]["coins"] = 0  # 或保留預設
-                flash("找不到對應的銀行帳戶，請聯繫主辦方", "warning")
+                user = session["user"]
+                account, _ = get_account_by_user(user, bank_repo, db)
+                if account:
+                    session["user"]["coins"] = account.balance
+                else:
+                    session["user"]["coins"] = 0  # 或保留預設
+                    flash("找不到對應的銀行帳戶，請聯繫主辦方", "warning")
                 
         return render_template("index.html")
     
@@ -84,16 +84,16 @@ def create_app():
         if not session.get("user"):
             return redirect(url_for("login"))
 
-        db = SessionLocal()
-        bank_repo = BankSQLRepository(db)
-        user = session["user"]
+        with get_db_session() as db:
+            bank_repo = BankSQLRepository(db)
+            user = session["user"]
 
-        account, affiliation_name = get_account_by_user(user, bank_repo, db)
-        if not account:
-            return "找不到您的銀行帳戶，請聯繫主辦方", 404
+            account, affiliation_name = get_account_by_user(user, bank_repo, db)
+            if not account:
+                return "找不到您的銀行帳戶，請聯繫主辦方", 404
 
-        transactions = bank_repo.get_transactions(account.id)
-        return render_template("bank.html", account=account, transactions=transactions, affiliation_name=affiliation_name)
+            transactions = bank_repo.get_transactions(account.id)
+            return render_template("bank.html", account=account, transactions=transactions, affiliation_name=affiliation_name)
 
     @app.route("/api/bank/transfer", methods=["POST"])
     def bank_transfer():
@@ -108,111 +108,111 @@ def create_app():
         if not to_account_number or amount <= 0:
             return jsonify(success=False, message="輸入不完整或金額不正確"), 400
 
-        db = SessionLocal()
-        bank_repo = BankSQLRepository(db)
+        with get_db_session() as db:
+            bank_repo = BankSQLRepository(db)
 
-        from_user_id = session["user"]["id"]
-        role = session["user"]["role"]
-        from_owner_type = map_role_to_owner_type(role)
+            from_user_id = session["user"]["id"]
+            role = session["user"]["role"]
+            from_owner_type = map_role_to_owner_type(role)
 
-        from_account = bank_repo.get_account_by_owner(from_user_id, from_owner_type)
-        to_account = bank_repo.get_account_by_number(to_account_number)
+            from_account = bank_repo.get_account_by_owner(from_user_id, from_owner_type)
+            to_account = bank_repo.get_account_by_number(to_account_number)
 
-        if not from_account or not to_account:
-            return jsonify(success=False, message="找不到帳戶"), 404
+            if not from_account or not to_account:
+                return jsonify(success=False, message="找不到帳戶"), 404
 
-        try:
-            bank_repo.create_transaction(
-                from_account=from_account,
-                to_account=to_account,
-                amount=amount,
-                note=note,
-                transaction_type=TransactionType.transfer
-            )
-        except ValueError as e:
-            return jsonify(success=False, message=str(e)), 400
+            try:
+                bank_repo.create_transaction(
+                    from_account=from_account,
+                    to_account=to_account,
+                    amount=amount,
+                    note=note,
+                    transaction_type=TransactionType.transfer
+                )
+            except ValueError as e:
+                return jsonify(success=False, message=str(e)), 400
 
-        return jsonify(success=True, new_balance=from_account.balance)
+            return jsonify(success=True, new_balance=from_account.balance)
 
     @app.route("/register", methods=["GET", "POST"])
     def register():
-        db = SessionLocal()
-        repo = UserSQLRepository(db)
-        hasher = PasswordHasher()
-        if request.method == "POST":
-            data = request.form
-            role = data["role"]
+        with get_db_session() as db:
+            repo = UserSQLRepository(db)
+            hasher = PasswordHasher()
+            if request.method == "POST":
+                data = request.form
+                role = data["role"]
 
-            affiliation_id = data.get("affiliation_id")
-            affiliation_type = data.get("affiliation_type")
+                affiliation_id = data.get("affiliation_id")
+                affiliation_type = data.get("affiliation_type")
 
-            if role == "member":
-                if not affiliation_id or not affiliation_type:
-                    flash("請選擇所屬政黨或利益團體")
-                    return redirect(url_for("register"))
+                if role == "member":
+                    if not affiliation_id or not affiliation_type:
+                        flash("請選擇所屬政黨或利益團體")
+                        return redirect(url_for("register"))
 
-            new_user = User(
-                id=str(uuid4()),
-                username=data["username"],
-                fullname=data["fullname"],
-                hashed_password=hasher.hash_password(data["password"]),
-                role=data["role"],
-                coins=10000,
-                affiliation_id=affiliation_id if role == "member" else None,
-                affiliation_type=affiliation_type if role == "member" else None
+                new_user = User(
+                    id=str(uuid4()),
+                    username=data["username"],
+                    fullname=data["fullname"],
+                    hashed_password=hasher.hash_password(data["password"]),
+                    role=data["role"],
+                    coins=10000,
+                    affiliation_id=affiliation_id if role == "member" else None,
+                    affiliation_type=affiliation_type if role == "member" else None
+                )
+
+                repo.add(new_user)
+
+                bank_repo = BankSQLRepository(db)
+
+                if role != "member":
+                    owner_type = map_role_to_owner_type(data["role"])
+                    bank_repo.create_account(owner_id=new_user.id, owner_type=owner_type, initial_balance=new_user.coins)
+
+                return redirect(url_for("login"))
+            
+            # TODO: list all role == "party" or role == "group"
+            all_users = repo.get_all()
+            parties = [p for p in all_users if p.role == "party"]
+            interest_groups = [g for g in all_users if g.role == "group"]
+
+            return render_template(
+                "register.html",
+                parties=parties,
+                interest_groups=interest_groups
             )
-
-            repo.add(new_user)
-
-            bank_repo = BankSQLRepository(db)
-
-            if role != "member":
-                owner_type = map_role_to_owner_type(data["role"])
-                bank_repo.create_account(owner_id=new_user.id, owner_type=owner_type, initial_balance=new_user.coins)
-
-            return redirect(url_for("login"))
-        
-        # TODO: list all role == "party" or role == "group"
-        all_users = repo.get_all()
-        parties = [p for p in all_users if p.role == "party"]
-        interest_groups = [g for g in all_users if g.role == "group"]
-
-        return render_template(
-            "register.html",
-            parties=parties,
-            interest_groups=interest_groups
-        )
 
     @app.route("/login", methods=["GET", "POST"])
     def login():
-        db = SessionLocal()
-        repo = UserSQLRepository(db)
-        hasher = PasswordHasher()
-        if request.method == "POST":
-            username = request.form["username"]
-            password = request.form["password"]
-            user = repo.get_by_username(username)
+        with get_db_session() as db:
+            repo = UserSQLRepository(db)
+            hasher = PasswordHasher()
+            if request.method == "POST":
+                username = request.form["username"]
+                password = request.form["password"]
+                user = repo.get_by_username(username)
 
-            affiliation_name = None
-            if user.role == "member" and user.affiliation_id and user.affiliation_type:
-                affiliation = repo.get_by_id(user.affiliation_id)
-                if affiliation:
-                    affiliation_name = affiliation.fullname
+                if user and hasher.verify_password(password, user.hashed_password):
+                    affiliation_name = None
+                    if user.role == "member" and user.affiliation_id and user.affiliation_type:
+                        affiliation = repo.get_by_id(user.affiliation_id)
+                        if affiliation:
+                            affiliation_name = affiliation.fullname
 
-            if user and hasher.verify_password(password, user.hashed_password):
-                session["user"] = {
-                    "id": str(user.id),
-                    "fullname": user.fullname,
-                    "coins": user.coins,
-                    "role": user.role,
-                    "affiliation_id": str(user.affiliation_id) if user.affiliation_id else None,
-                    "affiliation_type": str(user.affiliation_type.value) if user.affiliation_type else None,
-                    "affiliation_name": affiliation_name,
-                }
-                return redirect(url_for("home"))
-            else:
-                return render_template("login.html", error=True)
-        return render_template("login.html")
+                    session["user"] = {
+                        "id": str(user.id),
+                        "fullname": user.fullname,
+                        "coins": user.coins,
+                        "role": user.role,
+                        "affiliation_id": str(user.affiliation_id) if user.affiliation_id else None,
+                        "affiliation_type": str(user.affiliation_type.value) if user.affiliation_type else None,
+                        "affiliation_name": affiliation_name,
+                    }
+                    return redirect(url_for("home"))
+                else:
+                    return render_template("login.html", error=True)
+            return render_template("login.html")
 
     @app.route("/logout")
     def logout():
@@ -221,60 +221,60 @@ def create_app():
     
     @app.route("/profile", methods=["GET", "POST"])
     def profile():
-        db = SessionLocal()
-        user_repo = UserSQLRepository(db)
-        hasher = PasswordHasher()
+        with get_db_session() as db:
+            user_repo = UserSQLRepository(db)
+            hasher = PasswordHasher()
 
-        user = session.get("user")
-        user_obj = user_repo.get_by_id(UUID(user["id"]))
+            user = session.get("user")
+            user_obj = user_repo.get_by_id(UUID(user["id"]))
 
-        if request.method == "POST":
-            old_password = request.form["old_password"]
-            new_password = request.form["new_password"]
-            confirm_password = request.form["confirm_password"]
+            if request.method == "POST":
+                old_password = request.form["old_password"]
+                new_password = request.form["new_password"]
+                confirm_password = request.form["confirm_password"]
 
-            if not hasher.verify_password(old_password, user_obj.hashed_password):
-                flash("舊密碼錯誤")
-                return redirect(url_for("profile"))
+                if not hasher.verify_password(old_password, user_obj.hashed_password):
+                    flash("舊密碼錯誤")
+                    return redirect(url_for("profile"))
 
-            if new_password != confirm_password:
-                flash("新密碼與確認不一致")
-                return redirect(url_for("profile"))
+                if new_password != confirm_password:
+                    flash("新密碼與確認不一致")
+                    return redirect(url_for("profile"))
 
-            user_obj.hashed_password = hasher.hash_password(new_password)
-            db.commit()
+                user_obj.hashed_password = hasher.hash_password(new_password)
+                db.commit()
 
-            session.clear()
-            return redirect(url_for("login"))
+                session.clear()
+                return redirect(url_for("login"))
 
-        return render_template("profile.html")
+            return render_template("profile.html")
 
     @app.route("/posts")
     @refresh_user_session
     def posts():
-        db = SessionLocal()
-        repo = PostSQLRepository(db)
-        category = request.args.get("category", "").strip()
-        keyword = request.args.get("search", "").strip()
-        if keyword:
-            posts = repo.search(keyword)
-        elif category:
-            posts = repo.filter(category=category)
-        else:
-            posts = repo.get_all()
+        with get_db_session() as db:
+            repo = PostSQLRepository(db)
+            category = request.args.get("category", "").strip()
+            keyword = request.args.get("search", "").strip()
+            if keyword:
+                posts = repo.search(keyword)
+            elif category:
+                posts = repo.filter(category=category)
+            else:
+                posts = repo.get_all()
 
-        for post in posts:
-            preview = post.content[:300]
-            post.content = markdown.markdown(preview, extensions=["nl2br"])
+            for post in posts:
+                preview = post.content[:300]
+                post.content = markdown.markdown(preview, extensions=["nl2br"])
 
-        return render_template("posts.html", posts=posts)
+            return render_template("posts.html", posts=posts)
 
     @app.route("/npcs")
     def npcs():
-        db = SessionLocal()
-        repo = NPCSQLRepository(db)
-        all_npcs = repo.get_all()
-        return render_template("npcs.html", npcs=all_npcs)
+        with get_db_session() as db:
+            repo = NPCSQLRepository(db)
+            all_npcs = repo.get_all()
+            return render_template("npcs.html", npcs=all_npcs)
     
     @app.route("/distribute", methods=["GET", "POST"])
     def distribute_money():
@@ -283,141 +283,141 @@ def create_app():
             flash("只有管理員可以發錢！", "danger")
             return redirect("/")
         
-        db = SessionLocal()
-        user_repo = UserSQLRepository(db)
-        bank_repo = BankSQLRepository(db)
+        with get_db_session() as db:
+            user_repo = UserSQLRepository(db)
+            bank_repo = BankSQLRepository(db)
 
-        admin_id = UUID(session["user"]["id"])
-        admin_account = bank_repo.get_account_by_owner(admin_id, OwnerType.admin)
+            admin_id = UUID(session["user"]["id"])
+            admin_account = bank_repo.get_account_by_owner(admin_id, OwnerType.admin)
 
-        if not admin_account:
-            flash("找不到管理員銀行帳戶", "danger")
-            return redirect("/")
-
-        if request.method == "POST":
-            try:
-                amount = int(request.form["amount"])
-                if amount <= 0:
-                    raise ValueError("金額必須為正整數")
-                
-                users = db.query(user_repo.model).filter(user_repo.model.role != "admin").all()
-                count = 0
-
-                for user in users:
-                    if user.id == admin_id:
-                        continue
-                    user_account = bank_repo.get_account_by_owner(user.id, map_role_to_owner_type(user.role))
-                    if not user_account:
-                        continue
-
-                    logging.debug("發錢中...")
-                    bank_repo.create_transaction(
-                        from_account=admin_account,
-                        to_account=user_account,
-                        amount=amount,
-                        note="大撒幣",
-                        transaction_type=TransactionType.distribute
-                    )
-                    count += 1
-                
-                db.commit()
-                flash(f"成功發送 {amount * count} 政治幣給 {count} 位使用者", "success")
+            if not admin_account:
+                flash("找不到管理員銀行帳戶", "danger")
                 return redirect("/")
-            except Exception as e:
-                db.rollback()
-                flash(f"發送失敗：{str(e)}", "danger")
-                logging.error(f"發錢失敗：{str(e)}")
-            
-        return render_template("distribute.html")
+
+            if request.method == "POST":
+                try:
+                    amount = int(request.form["amount"])
+                    if amount <= 0:
+                        raise ValueError("金額必須為正整數")
+                    
+                    users = db.query(user_repo.model).filter(user_repo.model.role != "admin").all()
+                    count = 0
+
+                    for user in users:
+                        if user.id == admin_id:
+                            continue
+                        user_account = bank_repo.get_account_by_owner(user.id, map_role_to_owner_type(user.role))
+                        if not user_account:
+                            continue
+
+                        logging.debug("發錢中...")
+                        bank_repo.create_transaction(
+                            from_account=admin_account,
+                            to_account=user_account,
+                            amount=amount,
+                            note="大撒幣",
+                            transaction_type=TransactionType.distribute
+                        )
+                        count += 1
+                    
+                    db.commit()
+                    flash(f"成功發送 {amount * count} 政治幣給 {count} 位使用者", "success")
+                    return redirect("/")
+                except Exception as e:
+                    db.rollback()
+                    flash(f"發送失敗：{str(e)}", "danger")
+                    logging.error(f"發錢失敗：{str(e)}")
+                
+            return render_template("distribute.html")
 
     @app.route("/posts/<string:post_id>", methods=["GET", "POST"])
     def view_post(post_id: str):
-        db = SessionLocal()
-        post_repo = PostSQLRepository(db)
-        try:
-            post_uuid = UUID(post_id)
-        except ValueError:
-            abort(404)
-        post = post_repo.get_by_id(post_uuid)
-        if not post:
-            abort(404)
+        with get_db_session() as db:
+            post_repo = PostSQLRepository(db)
+            try:
+                post_uuid = UUID(post_id)
+            except ValueError:
+                abort(404)
+            post = post_repo.get_by_id(post_uuid)
+            if not post:
+                abort(404)
 
-        if request.method == "POST":
-            if not session.get("user"):
-                return redirect(url_for("login"))
-            reply_content = request.form.get("reply", "").strip()
-            if reply_content:
-                reply_obj = {
-                    "id": str(uuid4()),
-                    "user_id": session["user"]["id"],
-                    "user_name": session["user"]["fullname"],
-                    "content": reply_content,
-                    "created_at": datetime.utcnow().isoformat(),
-                }
-                post.replies.append(reply_obj)
-                db.commit()
-            return redirect(url_for("view_post", post_id=post_id))
+            if request.method == "POST":
+                if not session.get("user"):
+                    return redirect(url_for("login"))
+                reply_content = request.form.get("reply", "").strip()
+                if reply_content:
+                    reply_obj = {
+                        "id": str(uuid4()),
+                        "user_id": session["user"]["id"],
+                        "user_name": session["user"]["fullname"],
+                        "content": reply_content,
+                        "created_at": datetime.utcnow().isoformat(),
+                    }
+                    post.replies.append(reply_obj)
+                    db.commit()
+                return redirect(url_for("view_post", post_id=post_id))
 
-        post.content = markdown.markdown(post.content, extensions=["nl2br"])
-        for r in post.replies:
-            r["content"] = markdown.markdown(r["content"], extensions=["nl2br"])
+            post.content = markdown.markdown(post.content, extensions=["nl2br"])
+            for r in post.replies:
+                r["content"] = markdown.markdown(r["content"], extensions=["nl2br"])
 
-        return render_template("view_post.html", post=post)
+            return render_template("view_post.html", post=post)
 
     @app.route("/posts/new", methods=["GET", "POST"])
     def new_post():
         if not session.get("user"):
             return redirect(url_for("login"))
 
-        db = SessionLocal()
-        repo = PostSQLRepository(db)
+        with get_db_session() as db:
+            repo = PostSQLRepository(db)
 
-        if request.method == "POST":
-            data = request.form
-            user_id = UUID(session["user"]["id"])
-            user_role = session["user"]["role"]
-            owner_type = map_role_to_owner_type(user_role)  # 加上這行！
+            if request.method == "POST":
+                data = request.form
+                user_id = UUID(session["user"]["id"])
+                user_role = session["user"]["role"]
+                owner_type = map_role_to_owner_type(user_role)
 
-            post = Post(
-                id=uuid4(),
-                title=data["title"],
-                category=data["category"],
-                content=data["content"],
-                created_at=datetime.utcnow(),
-                created_by=user_id,
-                replies=[],
-                likes=[],
-            )
+                post = Post(
+                    id=uuid4(),
+                    title=data["title"],
+                    category=data["category"],
+                    content=data["content"],
+                    created_at=datetime.now(UTC),
+                    created_by=user_id,
+                    replies=[],
+                    likes=[],
+                )
 
-            repo.add(post, owner_id=user_id, owner_type=owner_type)  # 要傳入 owner_type
-            return redirect(url_for("posts"))
+                repo.add(post, owner_id=user_id, owner_type=owner_type)
+                return redirect(url_for("posts"))
 
-        return render_template("new_post.html")
+            return render_template("new_post.html")
 
 
     @app.route("/api/posts/<string:post_id>/like", methods=["POST"])
     def like_post(post_id: str):
         if not session.get("user"):
             return jsonify(success=False, message="請先登入"), 401
-        db = SessionLocal()
-        repo = PostSQLRepository(db)
-        try:
-            post_uuid = UUID(post_id)
-        except ValueError:
-            return jsonify(success=False, message="無效貼文 ID"), 400
+        with get_db_session() as db:
+            repo = PostSQLRepository(db)
+            try:
+                post_uuid = UUID(post_id)
+            except ValueError:
+                return jsonify(success=False, message="無效貼文 ID"), 400
 
-        post = repo.get_by_id(post_uuid)
-        if not post:
-            return jsonify(success=False, message="貼文不存在"), 404
+            post = repo.get_by_id(post_uuid)
+            if not post:
+                return jsonify(success=False, message="貼文不存在"), 404
 
-        user_id = session["user"]["id"]
-        if user_id in post.likes:
-            post.likes.remove(user_id)
-        else:
-            post.likes.append(user_id)
+            user_id = session["user"]["id"]
+            if user_id in post.likes:
+                post.likes.remove(user_id)
+            else:
+                post.likes.append(user_id)
 
-        db.commit()
-        return jsonify(success=True, likes=len(post.likes))
+            db.commit()
+            return jsonify(success=True, likes=len(post.likes))
 
     return app
 
