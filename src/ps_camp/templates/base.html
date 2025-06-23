@@ -39,7 +39,7 @@
                             {% endif %}
                             <li class="user-info">
                                 <a href="{{ url_for('profile') }}" class="nav-link username">{{ session.user.fullname }}</a>
-                                <!-- <span class="username">{{ session.user.fullname }}</span> -->
+                                
                                 <a href="/logout" class="nav-link logout">登出</a>
                             </li>
                         {% endif %}

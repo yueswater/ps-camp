@@ -6,7 +6,7 @@
   <h2 class="post-title">{{ post.title }}</h2>
   <p class="category-tag">{{ post.category }}</p>
 
-  <!-- 內容已在後端轉成 Markdown → HTML，這裡直接 safe 輸出 -->
+  
   <div class="post-body markdown-body">
     {{ post.content|safe }}
   </div>
