@@ -1,0 +1,14 @@
+# .github/workflows/keep-alive.yml
+name: Keep Neon Alive
+
+on:
+  schedule:
+    - cron: "*/4 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping-site:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping the site
+        run: curl -s -o /dev/null -w "%{http_code}" https://ps-camp.onrender.com
