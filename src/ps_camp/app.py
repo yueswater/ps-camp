@@ -1,9 +1,10 @@
-# app.py
 import os
+import logging
 from datetime import datetime
 from uuid import uuid4, UUID
-from flask import Flask, render_template, request, redirect, url_for, session, abort, jsonify
-from ps_camp.db.session import SessionLocal
+from flask import Flask, render_template, request, redirect, url_for, session, abort, jsonify, flash
+from dotenv import load_dotenv
+from ps_camp.db.session import SessionLocal, get_db
 from ps_camp.sql_models import User
 from ps_camp.sql_models.post_model import Post
 from ps_camp.sql_models.npc_model import NPC
@@ -15,6 +16,8 @@ from ps_camp.sql_models.bank_model import OwnerType, TransactionType
 from ps_camp.utils.password_hasher import PasswordHasher
 from ps_camp.utils.session_helpers import refresh_user_session
 import markdown
+
+load_dotenv()
 
 def map_role_to_owner_type(role: str) -> OwnerType:
     if role == "admin":
@@ -33,6 +36,19 @@ def create_app():
     @app.route("/")
     @refresh_user_session
     def home():
+        if session.get("user"):
+            db = SessionLocal()
+            bank_repo = BankSQLRepository(db)
+
+            user = session["user"]
+            user_id = user["id"]
+            role = user["role"]
+            owner_type = map_role_to_owner_type(role)
+
+            account = bank_repo.get_account_by_owner(user_id, owner_type)
+            if account:
+                session["user"]["coins"] = account.balance
+                
         return render_template("index.html")
 
     @app.route("/bank")
@@ -172,6 +188,59 @@ def create_app():
         repo = NPCSQLRepository(db)
         all_npcs = repo.get_all()
         return render_template("npcs.html", npcs=all_npcs)
+    
+    @app.route("/admin/distribute", methods=["GET", "POST"])
+    def distribute_money():
+        if session.get("user", {}).get("role") != "admin":
+            flash("只有管理員可以發錢！", "danger")
+            return redirect("/")
+        
+        db = SessionLocal()
+        user_repo = UserSQLRepository(db)
+        bank_repo = BankSQLRepository(db)
+
+        admin_id = UUID(os.getenv("ADMIN_ID"))
+        admin_account = bank_repo.get_account_by_owner(admin_id, OwnerType.admin)
+
+        if not admin_account:
+            flash("找不到管理員銀行帳戶", "danger")
+            return redirect("/")
+
+        if request.method == "POST":
+            try:
+                amount = int(request.form["amount"])
+                if amount <= 0:
+                    raise ValueError("金額必須為正整數")
+                
+                users = db.query(user_repo.model).filter(user_repo.model.role != "admin").all()
+                count = 0
+
+                for user in users:
+                    if user.id == admin_id:
+                        continue
+                    user_account = bank_repo.get_account_by_owner(user.id, map_role_to_owner_type(user.role))
+                    if not user_account:
+                        continue
+
+                    logging.debug("發錢中...")
+                    bank_repo.create_transaction(
+                        from_account=admin_account,
+                        to_account=user_account,
+                        amount=amount,
+                        note="大撒幣",
+                        transaction_type=TransactionType.distribute
+                    )
+                    count += 1
+                
+                db.commit()
+                flash(f"成功發送 {amount * count} 政治幣給 {count} 位使用者", "success")
+                return redirect("/")
+            except Exception as e:
+                db.rollback()
+                flash(f"發送失敗：{str(e)}", "danger")
+                logging.error(f"發錢失敗：{str(e)}")
+            
+        return render_template("distribute.html")
 
     @app.route("/posts/<string:post_id>", methods=["GET", "POST"])
     def view_post(post_id: str):
@@ -264,6 +333,7 @@ def create_app():
 
     return app
 
+# TODO: change to guicorn
 if __name__ == "__main__":
     app = create_app()
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))

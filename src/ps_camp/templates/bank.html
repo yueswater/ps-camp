@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- 直接在內容區塊引入 CSS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/bank.css') }}">
 
 {% if not session.get("user") %}
@@ -213,6 +212,5 @@
 
 {% endif %}
 
-<!-- 直接在內容區塊引入 JS -->
 <script src="{{ url_for('static', filename='js/bank.js') }}"></script>
 {% endblock %}

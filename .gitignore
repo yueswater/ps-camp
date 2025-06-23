@@ -1,24 +1,57 @@
-# Python 編譯暫存
+# Python bytecode cache
 __pycache__/
 *.py[cod]
 *.pyo
+
+# Python virtual environments
+.venv/
+env/
+venv/
+
+# Environment variables
 .env
 
-# VS Code / IDE 設定
+# VSCode / JetBrains IDE settings
 .vscode/
 .idea/
 
-# 系統檔
+# macOS system files
 .DS_Store
 
-# SQLite DB（如果你不想 push sqlite，可移除此行）
+# SQLite database (remove this line if you want to track the DB file)
 src/ps_camp/db/camp.db
 
-# poetry
+# Poetry lock file (optional if using `requirements.txt`)
 poetry.lock
 
-# alembic 暫存檔（選擇性，若你不想保留 pycache）
+# Alembic version cache (compiled migration scripts)
 alembic/versions/__pycache__/
 
-# Jupyter Notebook Checkpoints（如果有用 notebook）
+# Jupyter notebook checkpoints (if applicable)
 .ipynb_checkpoints/
+
+# Coverage and test reports
+htmlcov/
+.coverage
+coverage.xml
+*.cover
+*.py,cover
+
+# pytest cache
+.pytest_cache/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# __init__.pyc etc.
+*.cpython-*.pyc

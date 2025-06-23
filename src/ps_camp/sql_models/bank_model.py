@@ -16,6 +16,7 @@ class OwnerType(enum.Enum):
 class TransactionType(enum.Enum):
     post_cost = "post_cost"
     transfer = "transfer"
+    distribute = "distribute"
     post_penalty = "post_penalty"
     initial_grant = "initial_grant"
     system_adjustment = "system_adjustment"

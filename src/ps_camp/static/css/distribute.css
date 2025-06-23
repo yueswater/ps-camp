@@ -1,0 +1,10 @@
+/* distribute.css - 可選擴充 */
+.form h2.card-title {
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #212529;
+}
+
+input#amount {
+  text-align: center;
+}

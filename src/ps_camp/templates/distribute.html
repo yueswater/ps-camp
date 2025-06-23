@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bank.css') }}">
+
+<div class="main-content">
+  <div class="form">
+    <h2 class="card-title"><i class="fas fa-hand-holding-usd"></i> 發錢給所有使用者</h2>
+    <form method="POST">
+      <div class="form-group">
+        <label class="form-label" for="amount">發送金額：</label>
+        <input type="number" name="amount" id="amount" class="form-input" required min="1">
+      </div>
+      <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> 發錢</button>
+    </form>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/distribute.js') }}"></script>
+{% endblock %}
