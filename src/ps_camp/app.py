@@ -418,6 +418,13 @@ def create_app():
     return app
 
 # TODO: change to guicorn
+# if __name__ == "__main__":
+#     app = create_app()
+#     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
+
+app = create_app()  # 讓 gunicorn 可以找到 app 變數
+
 if __name__ == "__main__":
-    app = create_app()
+    # 僅本機測試用，部署不會執行這段
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
+
