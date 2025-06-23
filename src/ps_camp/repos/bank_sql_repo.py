@@ -1,3 +1,4 @@
+import logging
 import uuid
 
 from sqlalchemy import or_
@@ -24,8 +25,8 @@ class BankSQLRepository:
         return self.db.query(BankAccount).filter(BankAccount.id.in_(ids)).all()
 
     def get_account_by_owner(self, owner_id: str, owner_type: OwnerType) -> BankAccount:
-        print(
-            f"[DEBUG] 查詢帳戶: owner_id={owner_id}, owner_type={owner_type} ({type(owner_type)})"
+        logging.debug(
+            f"查詢帳戶: owner_id={owner_id}, owner_type={owner_type} ({type(owner_type)})"
         )
         return (
             self.db.query(BankAccount)

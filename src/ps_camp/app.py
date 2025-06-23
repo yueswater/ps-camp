@@ -2,7 +2,7 @@ import json
 import logging
 import os
 from datetime import UTC, datetime
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import markdown
 from dotenv import load_dotenv
@@ -356,10 +356,26 @@ def create_app():
                 posts = repo.get_all()
 
             for post in posts:
-                preview = post.content[:300]
-                post.content = markdown.markdown(preview, extensions=["nl2br"])
-
+                post.preview = markdown.markdown(
+                    post.content[:300], extensions=["nl2br"]
+                )
             return render_template("posts.html", posts=posts)
+
+    @app.route("/api/posts/<string:post_id>", methods=["GET"])
+    def get_post_content(post_id: str):
+        try:
+            post_uuid = UUID(post_id)
+        except ValueError:
+            return jsonify(success=False, message="無效貼文 ID"), 400
+
+        with get_db_session() as db:
+            repo = PostSQLRepository(db)
+            post = repo.get_by_id(post_uuid)
+            if not post:
+                return jsonify(success=False, message="貼文不存在"), 404
+
+            html_content = markdown.markdown(post.content, extensions=["nl2br"])
+            return jsonify(success=True, content=html_content)
 
     @app.route("/npcs")
     def npcs():
@@ -508,10 +524,13 @@ def create_app():
 
             return render_template("new_post.html")
 
+    from uuid import UUID
+
     @app.route("/api/posts/<string:post_id>/like", methods=["POST"])
     def like_post(post_id: str):
         if not session.get("user"):
             return jsonify(success=False, message="請先登入"), 401
+
         with get_db_session() as db:
             repo = PostSQLRepository(db)
             try:
@@ -523,14 +542,21 @@ def create_app():
             if not post:
                 return jsonify(success=False, message="貼文不存在"), 404
 
-            user_id = session["user"]["id"]
+            user_id = str(session["user"]["id"])
+            logging.debug("現在 likes:", post.likes)
+
             if user_id in post.likes:
                 post.likes.remove(user_id)
+                action = "unlike"
             else:
                 post.likes.append(user_id)
+                action = "like"
 
+            logging.debug("更新後 likes:", post.likes)
             db.commit()
-            return jsonify(success=True, likes=len(post.likes))
+            logging.debug("commit 完成")
+
+            return jsonify(success=True, action=action, likes=len(post.likes))
 
     return app
 
@@ -538,5 +564,5 @@ def create_app():
 # TODO: change to guicorn
 app = create_app()
 
-# if __name__ == "__main__":
-#     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))

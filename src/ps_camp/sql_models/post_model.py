@@ -19,5 +19,5 @@ class Post(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     created_by = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     user = relationship("User", back_populates="my_posts")
-    likes = Column(JSON, nullable=False, default=list)
+    likes = Column(MutableList.as_mutable(JSON), default=list, nullable=False)
     replies = Column(MutableList.as_mutable(JSON), nullable=False, default=list)

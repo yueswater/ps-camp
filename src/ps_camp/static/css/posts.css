@@ -240,13 +240,9 @@
 
 /* 貼文操作按鈕 */
 .post-actions {
-    display: flex;
-    align-items: center;
-    gap: 0;
-    padding: 0.5rem 0 0 0;
-    border: none;
-    margin: 0.75rem 0 0 0;
-    justify-content: flex-start;
+    justify-content: flex-start !important;
+    margin-left: -0.7rem !important;
+    padding-left: -0.7rem !important;
 }
 
 .action-btn {
@@ -589,6 +585,8 @@
     padding: 1.5rem;
     border-top: 1px solid #e9ecef;
 }
+
+.hidden { display: none !important; }
 
 /* 隱藏的貼文動畫 */
 .post-card.hidden {

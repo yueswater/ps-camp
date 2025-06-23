@@ -1,63 +1,86 @@
-// 貼文頁面專用 JavaScript - Threads 風格互動
+//JavaScript for post pages -Threads style interaction
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     initPostInteractions();
     initInfiniteScroll();
     initPostAnimations();
     initCategoryStyles();
-    markActiveCategory();  // 加入這行：標記被選中的分類
+    markActiveCategory();  //Add to this line: mark the selected category
 
     console.log("貼文頁面功能載入完成");
 });
 
+document.addEventListener("click", function (e) {
+    if (e.target.classList.contains("read-more")) {
+        e.preventDefault();
+        const postId = e.target.dataset.postId;
+        fetch(`/api/posts/${postId}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const previewEl = document.querySelector(`.preview[data-post-id="${postId}"]`);
+                    previewEl.innerHTML = data.content;
+                }
+            });
+    }
+});
+
 function initPostInteractions() {
-    // 喜歡按鈕功能
+    //Like button function
     document.querySelectorAll('.like-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const postId = btn.closest('.post-card').dataset.postId;
-        
-        fetch(`/api/posts/${postId}/like`, {
-        method: 'POST',  // ✅ 一定要是 POST
-        headers: {
-            'Content-Type': 'application/json'
-        }
-        })
-        .then(res => res.json())
-        .then(data => {
-        if (data.success) {
-            btn.querySelector('span').innerText = data.likes;
-            btn.classList.toggle('liked');
-        }
+        btn.addEventListener('click', () => {
+            const postId = btn.closest('.post-card').dataset.postId;
+
+            fetch(`/api/posts/${postId}/like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        btn.querySelector('span').innerText = data.likes;
+                        btn.classList.toggle('liked');
+
+                        const postCard = btn.closest('.post-card');
+                        const statsItems = postCard.querySelectorAll('.stats-item');
+                        statsItems.forEach(item => {
+                            if (item.textContent.includes('個讚')) {
+                                item.textContent = `${data.likes} 個讚`;
+                            }
+                        });
+                    }
+                });
         });
     });
-    });
 
 
-    // 回覆按鈕功能
+    //Reply button function
     document.querySelectorAll('.comment-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
+        btn.addEventListener('click', function (e) {
             e.preventDefault();
             showCommentModal(this);
         });
     });
 
-    // 分享按鈕功能
+    //Share button function
     document.querySelectorAll('.share-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
+        btn.addEventListener('click', function (e) {
             e.preventDefault();
             sharePost(this);
         });
     });
 
-    // 收藏按鈕功能
+    //Favorite button function
     document.querySelectorAll('.bookmark-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
+        btn.addEventListener('click', function (e) {
             e.preventDefault();
             toggleBookmark(this);
         });
     });
 
-    // 篩選分類按鈕功能（動態改網址）
+    //Filter classification button function (change URL dynamically)
     document.querySelectorAll('.filter-tag').forEach(button => {
         button.addEventListener('click', function () {
             const category = this.dataset.category;
@@ -65,7 +88,7 @@ function initPostInteractions() {
             const current = url.searchParams.get('category');
 
             if (current === category) {
-                url.searchParams.delete('category'); // 取消篩選
+                url.searchParams.delete('category'); //Cancel filter
             } else {
                 url.searchParams.set('category', category);
             }
@@ -98,50 +121,50 @@ function toggleLike(button) {
             'Content-Type': 'application/json'
         }
     }).then(res => res.json())
-      .then(data => {
-        if (data.success) {
-            const icon = button.querySelector('i');
-            const text = button.querySelector('span');
-            const statsItem = postCard.querySelector('.stats-item');
+        .then(data => {
+            if (data.success) {
+                const icon = button.querySelector('i');
+                const text = button.querySelector('span');
+                const statsItem = postCard.querySelector('.stats-item');
 
-            button.classList.toggle('active');
-            icon.className = isLiked ? 'far fa-heart' : 'fas fa-heart';
+                button.classList.toggle('active');
+                icon.className = isLiked ? 'far fa-heart' : 'fas fa-heart';
 
-            if (text) {
-                text.textContent = data.likes;
-            }
-            if (statsItem) {
-                statsItem.textContent = `${data.likes} 個讚`;
-            }
+                if (text) {
+                    text.textContent = data.likes;
+                }
+                if (statsItem) {
+                    statsItem.textContent = `${data.likes} 個讚`;
+                }
 
-            if (!isLiked) {
-                button.classList.add('animating');
-                setTimeout(() => {
-                    button.classList.remove('animating');
-                }, 300);
+                if (!isLiked) {
+                    button.classList.add('animating');
+                    setTimeout(() => {
+                        button.classList.remove('animating');
+                    }, 300);
+                }
+            } else {
+                showNotification(data.message || '操作失敗', 'error');
             }
-        } else {
-            showNotification(data.message || '操作失敗', 'error');
-        }
-    }).catch(() => {
-        showNotification('無法連線到伺服器', 'error');
-    });
+        }).catch(() => {
+            showNotification('無法連線到伺服器', 'error');
+        });
 }
 
 function updateLikeCount(statsElement, change) {
     if (!statsElement) return;
-    
+
     const currentText = statsElement.textContent;
     const currentCount = parseInt(currentText.match(/\d+/)[0]) || 0;
     const newCount = Math.max(0, currentCount + change);
-    
+
     statsElement.textContent = `${newCount} 個讚`;
 }
 
 function toggleBookmark(button) {
     const isBookmarked = button.classList.contains('active');
     const icon = button.querySelector('i');
-    
+
     if (isBookmarked) {
         button.classList.remove('active');
         icon.className = 'far fa-bookmark';
@@ -156,7 +179,7 @@ function toggleBookmark(button) {
 function showCommentModal(button) {
     const postCard = button.closest('.post-card');
     const postTitle = postCard.querySelector('.post-title').textContent;
-    
+
     const modal = document.createElement('div');
     modal.className = 'comment-modal';
     modal.innerHTML = `
@@ -181,13 +204,13 @@ function showCommentModal(button) {
             </div>
         </div>
     `;
-    
+
     document.body.appendChild(modal);
-    
+
     setTimeout(() => {
         modal.classList.add('show');
     }, 10);
-    
+
     modal.querySelector('.modal-close').addEventListener('click', () => closeModal(modal));
     modal.querySelector('.modal-cancel').addEventListener('click', () => closeModal(modal));
     modal.querySelector('.modal-overlay').addEventListener('click', (e) => {
@@ -195,7 +218,7 @@ function showCommentModal(button) {
             closeModal(modal);
         }
     });
-    
+
     modal.querySelector('.comment-submit').addEventListener('click', () => {
         const comment = modal.querySelector('.comment-input').value.trim();
         if (comment) {
@@ -205,7 +228,7 @@ function showCommentModal(button) {
                 const currentCount = parseInt(commentSpan.textContent) || 0;
                 commentSpan.textContent = currentCount + 1;
             }
-            
+
             const statsItems = postCard.querySelectorAll('.stats-item');
             statsItems.forEach(item => {
                 if (item.textContent.includes('回覆')) {
@@ -213,14 +236,14 @@ function showCommentModal(button) {
                     item.textContent = `${currentCount + 1} 則回覆`;
                 }
             });
-            
+
             showNotification('回覆已發送', 'success');
             closeModal(modal);
         } else {
             showNotification('請輸入回覆內容', 'warning');
         }
     });
-    
+
     modal.querySelector('.comment-input').focus();
 }
 
@@ -235,13 +258,13 @@ function sharePost(button) {
     const postCard = button.closest('.post-card');
     const postTitle = postCard.querySelector('.post-title').textContent;
     const postContent = postCard.querySelector('.post-text').textContent;
-    
+
     const shareSpan = button.querySelector('span');
     if (shareSpan) {
         const currentCount = parseInt(shareSpan.textContent) || 0;
         shareSpan.textContent = currentCount + 1;
     }
-    
+
     const statsItems = postCard.querySelectorAll('.stats-item');
     statsItems.forEach(item => {
         if (item.textContent.includes('分享')) {
@@ -249,7 +272,7 @@ function sharePost(button) {
             item.textContent = `${currentCount + 1} 次分享`;
         }
     });
-    
+
     if (navigator.share) {
         navigator.share({
             title: postTitle,
@@ -279,36 +302,60 @@ function sharePost(button) {
 
 function initInfiniteScroll() {
     const loadMoreBtn = document.querySelector('.load-more-btn');
-    
-    if (loadMoreBtn) {
-        loadMoreBtn.addEventListener('click', function() {
-            loadMorePosts(this);
-        });
-        
-        window.addEventListener('scroll', debounce(() => {
-            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 1000) {
+    if (!loadMoreBtn) return;
+
+    const hasNextPage = document.body.dataset.hasNextPage === 'true';
+    if (!hasNextPage) {
+        loadMoreBtn.remove();              // 沒下一頁→整顆按鈕不顯示
+        return;
+    }
+
+    // 讓按鈕先顯示（出現在畫面下方）
+    loadMoreBtn.classList.remove('hidden');
+
+    loadMoreBtn.addEventListener('click', () => loadMorePosts(loadMoreBtn));
+
+    window.addEventListener(
+        'scroll',
+        debounce(() => {
+            // 捲到離底 800px 內就自動觸發一次
+            if (
+                window.innerHeight + window.scrollY >=
+                document.body.offsetHeight - 800
+            ) {
                 loadMorePosts(loadMoreBtn);
             }
-        }, 250));
-    }
+        }, 250)
+    );
 }
 
 function loadMorePosts(button) {
-    if (button.classList.contains('loading')) return;
-    
-    button.classList.add('loading');
-    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 載入中...';
-    
-    setTimeout(() => {
-        showNotification('已載入更多貼文', 'info');
-        button.classList.remove('loading');
-        button.innerHTML = '<i class="fas fa-chevron-down"></i> 載入更多貼文';
-    }, 1500);
+  if (button.classList.contains('loading')) return;
+
+  button.classList.add('loading');
+  button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 載入中…';
+
+  // 這裡用 fetch 真的去撈下一頁（範例以 setTimeout 假裝）
+  setTimeout(() => {
+    /* ===== 這裡換成你實際插入新貼文的程式 ===== */
+    // 假設從伺服器得知「已經沒有下一頁」
+    const noMore = true; // ← 把這判斷改成你的 API 回傳
+
+    if (noMore) {
+      button.remove();                // 移除按鈕，不再顯示
+    } else {
+      button.classList.remove('loading');
+      button.innerHTML =
+        '<i class="fas fa-chevron-down"></i> 載入更多貼文';
+    }
+
+    showNotification('已載入更多貼文', 'info');
+  }, 1500);
 }
 
 function initPostAnimations() {
     const posts = document.querySelectorAll('.post-card');
-    
+
     const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry, index) => {
             if (entry.isIntersecting) {
@@ -322,7 +369,7 @@ function initPostAnimations() {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
     });
-    
+
     posts.forEach((post, index) => {
         post.style.opacity = '0';
         post.style.transform = 'translateY(10px)';
@@ -334,7 +381,7 @@ function initPostAnimations() {
 function initCategoryStyles() {
     document.querySelectorAll('.category-tag').forEach(tag => {
         const category = tag.textContent.toLowerCase().trim();
-        
+
         if (category.includes('政治') || category.includes('政策')) {
             tag.classList.add('politics');
         } else if (category.includes('經濟') || category.includes('財政')) {

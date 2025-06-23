@@ -1,3 +1,4 @@
+import logging
 import os
 from uuid import UUID
 
@@ -34,8 +35,8 @@ class PostSQLRepository:
         )
 
         if not user_account or not admin_account:
-            print(
-                f"[ERROR] 無法找到帳戶: user_id={owner_id}, type={owner_type}, admin_id={self.ADMIN_ID}"
+            logging.error(
+                f"無法找到帳戶: user_id={owner_id}, type={owner_type}, admin_id={self.ADMIN_ID}"
             )
             raise ValueError("找不到帳戶（政黨或中央）")
 

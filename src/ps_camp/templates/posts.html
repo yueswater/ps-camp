@@ -73,9 +73,30 @@
                 <div class="post-content">
                     <h3 class="post-title" style="font-weight: bold;">{{ post.title }}</h3>
                     <div class="post-text">
-                        {{ post.content|safe }}
-                        <a href="{{ url_for('view_post', post_id=post.id) }}" class="read-more">顯示更多</a>
+                        <div class="preview" data-post-id="{{ post.id|string }}">
+                            {{ post.preview|safe }}
+                            <a href="#" class="read-more" data-post-id="{{ post.id|string }}">顯示更多</a>
+                        </div>
                     </div>
+                </div>
+
+                <div class="post-actions">
+                    <button class="action-btn like-btn">
+                        <i class="far fa-heart"></i>
+                        <span>{{ post.likes|length }}</span>
+                    </button>
+                    <button class="action-btn comment-btn">
+                        <i class="far fa-comment"></i>
+                        <span>{{ post.replies|length }}</span>
+                    </button>
+                    <button class="action-btn bookmark-btn">
+                        <i class="far fa-bookmark"></i>
+                    </button>
+                </div>
+                
+                <div class="post-stats">
+                    <span class="stats-item">{{ post.likes|length }} 個讚</span>
+                    <span class="stats-item">{{ post.replies|length }} 則回覆</span>
                 </div>
             </article>
             {% endfor %}
@@ -100,7 +121,7 @@
 
 {% if session.get("user") and posts %}
 <div class="load-more-container">
-    <button class="btn btn-outline load-more-btn">
+    <button class="btn btn-outline load-more-btn hidden">
         <i class="fas fa-chevron-down"></i>
         載入更多貼文
     </button>
