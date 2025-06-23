@@ -1,0 +1,18 @@
+{% set hide_navbar = True %}
+{% set hide_footer = True %}
+{% set hide_container = True %}
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/404.css') }}">
+<div class="error-page" data-redirect-url="{{ url_for('home') }}">
+    <h1>你已墜入虛無之地</h1>
+    <p>這不是你該來的地方，這裡只有錯誤、迷惘與黑暗。</p>
+    <p class="redirect-message">虛無將在 <span id="countdown">5</span> 秒後吞噬你，並把你送回文明世界...</p>
+    <a href="{{ url_for('home') }}" class="btn">逃出生天</a>
+    <p style="margin-top: 1rem;">
+        <marquee behavior="alternate" direction="left">虛無正在崩壞中...請立刻離開</marquee>
+    </p>
+</div>
+<script src="{{ url_for('static', filename='js/404.js') }}" defer></script>
+{% endblock %}

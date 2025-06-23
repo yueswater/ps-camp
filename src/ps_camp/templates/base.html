@@ -15,6 +15,7 @@
             <p class="loading-text">沙政風暴啟動中...</p>
         </div>
     </div>
+    {% if not hide_navbar %}
     <header class="header">
         <div class="container">
             <div class="header-content">
@@ -22,6 +23,7 @@
                     <h1>沙政風暴</h1>
                     <span class="tagline">2025 NTU PS CAMP</span>
                 </div>
+                {% if not hide_navbar %}
                 <nav class="navbar">
                     <ul class="nav-links">
                         <li><a href="/" class="nav-link">首頁</a></li>
@@ -43,16 +45,19 @@
                         {% endif %}
                     </ul>
                 </nav>
+                {% endif %}
             </div>
         </div>
     </header>
+    {% endif %}
 
     <main class="main-content">
-        <div class="container">
+        <div class="{% if not hide_container %}container{% endif %}">
             {% block content %}{% endblock %}
         </div>
     </main>
 
+    {% if not hide_footer %}
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
@@ -74,6 +79,7 @@
             </div>
         </div>
     </footer>
+    {% endif %}
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
