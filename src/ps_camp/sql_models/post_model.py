@@ -1,9 +1,12 @@
-from sqlalchemy import Column, Integer, String, JSON, DateTime, ForeignKey, Text
-from sqlalchemy.orm import relationship
 from datetime import datetime
-from ps_camp.db.base import Base
 from uuid import uuid4
+
+from sqlalchemy import JSON, Column, DateTime, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
+
+from ps_camp.db.base import Base
+
 
 class Post(Base):
     __tablename__ = "posts"

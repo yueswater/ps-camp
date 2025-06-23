@@ -1,7 +1,8 @@
-from sqlalchemy import Column, BigInteger, String, ForeignKey, DateTime, Enum
+import enum
+
+from sqlalchemy import BigInteger, Column, DateTime, Enum, ForeignKey, String
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-import enum
 
 from ps_camp.db.base import Base
 
@@ -32,8 +33,16 @@ class BankAccount(Base):
     balance = Column(BigInteger, nullable=False, default=0)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    outgoing_transactions = relationship("Transaction", back_populates="from_account", foreign_keys="Transaction.from_account_id")
-    incoming_transactions = relationship("Transaction", back_populates="to_account", foreign_keys="Transaction.to_account_id")
+    outgoing_transactions = relationship(
+        "Transaction",
+        back_populates="from_account",
+        foreign_keys="Transaction.from_account_id",
+    )
+    incoming_transactions = relationship(
+        "Transaction",
+        back_populates="to_account",
+        foreign_keys="Transaction.to_account_id",
+    )
 
 
 class Transaction(Base):
@@ -47,5 +56,13 @@ class Transaction(Base):
     transaction_type = Column(Enum(TransactionType), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    from_account = relationship("BankAccount", foreign_keys=[from_account_id], back_populates="outgoing_transactions")
-    to_account = relationship("BankAccount", foreign_keys=[to_account_id], back_populates="incoming_transactions")
+    from_account = relationship(
+        "BankAccount",
+        foreign_keys=[from_account_id],
+        back_populates="outgoing_transactions",
+    )
+    to_account = relationship(
+        "BankAccount",
+        foreign_keys=[to_account_id],
+        back_populates="incoming_transactions",
+    )

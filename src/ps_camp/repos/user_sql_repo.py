@@ -1,11 +1,11 @@
 from sqlalchemy.orm import Session
+
 from ps_camp.sql_models import User
-from uuid import UUID
 
 
 class UserSQLRepository:
     model = User
-    
+
     def __init__(self, db: Session):
         self.db = db
 

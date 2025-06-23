@@ -1,9 +1,12 @@
 from uuid import uuid4
-from sqlalchemy.orm import relationship
-from sqlalchemy import Column, String, BigInteger, Enum
-from ps_camp.db.base import Base
+
+from sqlalchemy import BigInteger, Column, Enum, String
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
+
+from ps_camp.db.base import Base
 from ps_camp.sql_models.bank_model import OwnerType
+
 
 class User(Base):
     __tablename__ = "users"

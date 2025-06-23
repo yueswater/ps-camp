@@ -1,11 +1,13 @@
 import os
 from uuid import UUID
+
+from dotenv import load_dotenv
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
-from ps_camp.sql_models.post_model import Post
+
 from ps_camp.repos.bank_sql_repo import BankSQLRepository
 from ps_camp.sql_models.bank_model import OwnerType, TransactionType
-from dotenv import load_dotenv
+from ps_camp.sql_models.post_model import Post
 
 load_dotenv()
 
@@ -27,7 +29,9 @@ class PostSQLRepository:
 
     def add(self, post: Post, owner_id: UUID, owner_type: OwnerType):
         user_account = self.bank_repo.get_account_by_owner(owner_id, owner_type)
-        admin_account = self.bank_repo.get_account_by_owner(self.ADMIN_ID, OwnerType.admin)
+        admin_account = self.bank_repo.get_account_by_owner(
+            self.ADMIN_ID, OwnerType.admin
+        )
 
         if not user_account or not admin_account:
             raise ValueError("找不到帳戶（政黨或中央）")
@@ -42,8 +46,6 @@ class PostSQLRepository:
 
         self.db.add(post)
         self.db.commit()
-
-
 
     def get_by_id(self, post_id: UUID) -> Post | None:
         if isinstance(post_id, str):

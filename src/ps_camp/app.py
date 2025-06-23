@@ -1,22 +1,35 @@
-import os
 import logging
-from datetime import datetime, UTC
-from uuid import uuid4, UUID
-from flask import Flask, render_template, request, redirect, url_for, session, abort, jsonify, flash
+import os
+from datetime import UTC, datetime
+from uuid import UUID, uuid4
+
+import markdown
 from dotenv import load_dotenv
-from ps_camp.db.session import SessionLocal, get_db_session
-from ps_camp.sql_models import User
-from ps_camp.sql_models.post_model import Post
-from ps_camp.repos.user_sql_repo import UserSQLRepository
-from ps_camp.repos.post_sql_repo import PostSQLRepository
-from ps_camp.repos.npc_sql_repo import NPCSQLRepository
+from flask import (
+    Flask,
+    abort,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
+
+from ps_camp.db.session import get_db_session
 from ps_camp.repos.bank_sql_repo import BankSQLRepository
+from ps_camp.repos.npc_sql_repo import NPCSQLRepository
+from ps_camp.repos.post_sql_repo import PostSQLRepository
+from ps_camp.repos.user_sql_repo import UserSQLRepository
+from ps_camp.sql_models import User
 from ps_camp.sql_models.bank_model import OwnerType, TransactionType
+from ps_camp.sql_models.post_model import Post
 from ps_camp.utils.password_hasher import PasswordHasher
 from ps_camp.utils.session_helpers import refresh_user_session
-import markdown
 
 load_dotenv()
+
 
 def map_role_to_owner_type(role: str) -> OwnerType:
     if role == "admin":
@@ -27,6 +40,7 @@ def map_role_to_owner_type(role: str) -> OwnerType:
         return OwnerType.group
     else:
         return OwnerType.user
+
 
 def get_account_by_user(user, bank_repo, db):
     role = user["role"]
@@ -39,7 +53,9 @@ def get_account_by_user(user, bank_repo, db):
             return None, None
         owner_type = OwnerType(owner_type_str)
 
-        affiliation = db.query(User).filter_by(id=owner_id, role=owner_type.value).first()
+        affiliation = (
+            db.query(User).filter_by(id=owner_id, role=owner_type.value).first()
+        )
         if affiliation:
             affiliation_name = affiliation.fullname
     else:
@@ -68,13 +84,13 @@ def create_app():
                 else:
                     session["user"]["coins"] = 0  # 或保留預設
                     flash("找不到對應的銀行帳戶，請聯繫主辦方", "warning")
-                
+
         return render_template("index.html")
-    
+
     @app.route("/ping")
     def ping():
         return "pong", 200
-    
+
     @app.errorhandler(404)
     def page_not_found(e):
         return render_template("404.html"), 404
@@ -93,7 +109,12 @@ def create_app():
                 return "找不到您的銀行帳戶，請聯繫主辦方", 404
 
             transactions = bank_repo.get_transactions(account.id)
-            return render_template("bank.html", account=account, transactions=transactions, affiliation_name=affiliation_name)
+            return render_template(
+                "bank.html",
+                account=account,
+                transactions=transactions,
+                affiliation_name=affiliation_name,
+            )
 
     @app.route("/api/bank/transfer", methods=["POST"])
     def bank_transfer():
@@ -127,7 +148,7 @@ def create_app():
                     to_account=to_account,
                     amount=amount,
                     note=note,
-                    transaction_type=TransactionType.transfer
+                    transaction_type=TransactionType.transfer,
                 )
             except ValueError as e:
                 return jsonify(success=False, message=str(e)), 400
@@ -159,7 +180,7 @@ def create_app():
                     role=data["role"],
                     coins=10000,
                     affiliation_id=affiliation_id if role == "member" else None,
-                    affiliation_type=affiliation_type if role == "member" else None
+                    affiliation_type=affiliation_type if role == "member" else None,
                 )
 
                 repo.add(new_user)
@@ -168,19 +189,21 @@ def create_app():
 
                 if role != "member":
                     owner_type = map_role_to_owner_type(data["role"])
-                    bank_repo.create_account(owner_id=new_user.id, owner_type=owner_type, initial_balance=new_user.coins)
+                    bank_repo.create_account(
+                        owner_id=new_user.id,
+                        owner_type=owner_type,
+                        initial_balance=new_user.coins,
+                    )
 
                 return redirect(url_for("login"))
-            
+
             # TODO: list all role == "party" or role == "group"
             all_users = repo.get_all()
             parties = [p for p in all_users if p.role == "party"]
             interest_groups = [g for g in all_users if g.role == "group"]
 
             return render_template(
-                "register.html",
-                parties=parties,
-                interest_groups=interest_groups
+                "register.html", parties=parties, interest_groups=interest_groups
             )
 
     @app.route("/login", methods=["GET", "POST"])
@@ -195,7 +218,11 @@ def create_app():
 
                 if user and hasher.verify_password(password, user.hashed_password):
                     affiliation_name = None
-                    if user.role == "member" and user.affiliation_id and user.affiliation_type:
+                    if (
+                        user.role == "member"
+                        and user.affiliation_id
+                        and user.affiliation_type
+                    ):
                         affiliation = repo.get_by_id(user.affiliation_id)
                         if affiliation:
                             affiliation_name = affiliation.fullname
@@ -205,8 +232,14 @@ def create_app():
                         "fullname": user.fullname,
                         "coins": user.coins,
                         "role": user.role,
-                        "affiliation_id": str(user.affiliation_id) if user.affiliation_id else None,
-                        "affiliation_type": str(user.affiliation_type.value) if user.affiliation_type else None,
+                        "affiliation_id": (
+                            str(user.affiliation_id) if user.affiliation_id else None
+                        ),
+                        "affiliation_type": (
+                            str(user.affiliation_type.value)
+                            if user.affiliation_type
+                            else None
+                        ),
                         "affiliation_name": affiliation_name,
                     }
                     return redirect(url_for("home"))
@@ -218,7 +251,7 @@ def create_app():
     def logout():
         session.clear()
         return redirect(url_for("home"))
-    
+
     @app.route("/profile", methods=["GET", "POST"])
     def profile():
         with get_db_session() as db:
@@ -275,14 +308,14 @@ def create_app():
             repo = NPCSQLRepository(db)
             all_npcs = repo.get_all()
             return render_template("npcs.html", npcs=all_npcs)
-    
+
     @app.route("/distribute", methods=["GET", "POST"])
     def distribute_money():
         role = session.get("user", {}).get("role")
         if role != "admin":
             flash("只有管理員可以發錢！", "danger")
             return redirect("/")
-        
+
         with get_db_session() as db:
             user_repo = UserSQLRepository(db)
             bank_repo = BankSQLRepository(db)
@@ -299,14 +332,20 @@ def create_app():
                     amount = int(request.form["amount"])
                     if amount <= 0:
                         raise ValueError("金額必須為正整數")
-                    
-                    users = db.query(user_repo.model).filter(user_repo.model.role != "admin").all()
+
+                    users = (
+                        db.query(user_repo.model)
+                        .filter(user_repo.model.role != "admin")
+                        .all()
+                    )
                     count = 0
 
                     for user in users:
                         if user.id == admin_id:
                             continue
-                        user_account = bank_repo.get_account_by_owner(user.id, map_role_to_owner_type(user.role))
+                        user_account = bank_repo.get_account_by_owner(
+                            user.id, map_role_to_owner_type(user.role)
+                        )
                         if not user_account:
                             continue
 
@@ -316,18 +355,21 @@ def create_app():
                             to_account=user_account,
                             amount=amount,
                             note="大撒幣",
-                            transaction_type=TransactionType.distribute
+                            transaction_type=TransactionType.distribute,
                         )
                         count += 1
-                    
+
                     db.commit()
-                    flash(f"成功發送 {amount * count} 政治幣給 {count} 位使用者", "success")
+                    flash(
+                        f"成功發送 {amount * count} 政治幣給 {count} 位使用者",
+                        "success",
+                    )
                     return redirect("/")
                 except Exception as e:
                     db.rollback()
                     flash(f"發送失敗：{str(e)}", "danger")
                     logging.error(f"發錢失敗：{str(e)}")
-                
+
             return render_template("distribute.html")
 
     @app.route("/posts/<string:post_id>", methods=["GET", "POST"])
@@ -394,7 +436,6 @@ def create_app():
 
             return render_template("new_post.html")
 
-
     @app.route("/api/posts/<string:post_id>/like", methods=["POST"])
     def like_post(post_id: str):
         if not session.get("user"):
@@ -421,6 +462,7 @@ def create_app():
 
     return app
 
+
 # TODO: change to guicorn
 # if __name__ == "__main__":
 #     app = create_app()
@@ -431,4 +473,3 @@ app = create_app()  # 讓 gunicorn 可以找到 app 變數
 if __name__ == "__main__":
     # 僅本機測試用，部署不會執行這段
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
-

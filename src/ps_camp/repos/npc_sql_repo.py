@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+
 from ps_camp.sql_models.npc_model import NPC
 
 

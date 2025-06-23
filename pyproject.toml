@@ -26,4 +26,5 @@ pytest = "^8.4.1"
 alembic = "^1.16.2"
 black = "^25.1.0"
 flake8 = "^7.3.0"
+autoflake = "^2.3.1"
 

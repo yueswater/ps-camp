@@ -1,6 +1,8 @@
-from sqlalchemy import Column, String
-from ps_camp.db.base import Base
 import uuid
+
+from sqlalchemy import Column, String
+
+from ps_camp.db.base import Base
 
 
 class NPC(Base):
