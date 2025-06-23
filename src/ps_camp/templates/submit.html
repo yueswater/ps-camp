@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+<div class="submit-form">
+    <h1>提交 {{ '候選人' if role == 'party' else '公投案' }}</h1>
+    <form method="POST">
+        {% if role == 'party' %}
+            <label>候選人姓名</label>
+            <input type="text" name="name" required>
+            <label>簡介</label>
+            <textarea name="description"></textarea>
+        {% else %}
+            <label>公投案標題</label>
+            <input type="text" name="title" required>
+            <label>公投案說明</label>
+            <textarea name="description"></textarea>
+        {% endif %}
+        <button type="submit" class="btn btn-primary">提交</button>
+    </form>
+</div>
+{% endblock %}

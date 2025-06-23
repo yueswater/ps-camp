@@ -24,13 +24,16 @@ from weasyprint import HTML
 
 from ps_camp.db.session import get_db_session
 from ps_camp.repos.bank_sql_repo import BankSQLRepository
+from ps_camp.repos.candidate_sql_repo import CandidateSQLRepository
 from ps_camp.repos.post_sql_repo import PostSQLRepository
 from ps_camp.repos.referendum_sql_repo import ReferendumSQLRepository
 from ps_camp.repos.referendum_vote_sql_repo import ReferendumVoteSQLRepository
 from ps_camp.repos.user_sql_repo import UserSQLRepository
 from ps_camp.repos.vote_sql_repo import VoteSQLRepository
 from ps_camp.sql_models.bank_model import OwnerType, TransactionType
+from ps_camp.sql_models.candidate_model import Candidate
 from ps_camp.sql_models.post_model import Post
+from ps_camp.sql_models.proposal_model import Proposal
 from ps_camp.sql_models.user_model import User
 from ps_camp.utils.password_hasher import PasswordHasher
 from ps_camp.utils.pdf_templates import bank_report_template
@@ -580,6 +583,7 @@ def create_app():
         with get_db_session() as db:
             vote_repo = VoteSQLRepository(db)
             ref_repo = ReferendumVoteSQLRepository(db)
+            cand_repo = CandidateSQLRepository(db)  # ← 加這行
 
             if request.method == "POST":
                 # Process form submission
@@ -593,38 +597,66 @@ def create_app():
                     if key.startswith("referendum_")
                 }
 
-                # Prevent repeated voting
                 if vote_repo.has_voted(user_id):
                     flash("你已經投過票囉")
                     return redirect(url_for("vote"))
 
-                # Save party tickets
                 vote_repo.add_vote(user_id, party_id)
 
-                # Store every vote
                 for ref_id, choice in referendum_votes.items():
                     ref_repo.add_vote(user_id, ref_id, choice)
 
                 flash("投票成功！")
                 return redirect(url_for("home"))
 
-            # Fake information (will be captured from the database later)
-            parties = [
-                {"id": "party1", "name": "太陽黨"},
-                {"id": "party2", "name": "月亮黨"},
-            ]
+            candidates = cand_repo.get_all()
 
             ref_repo = ReferendumSQLRepository(db)
             referendums = ref_repo.get_active_referendums()
 
-            # Check if the vote has been voted (avoid direct GET avoid duplication)
             if vote_repo.has_voted(user_id):
                 flash("你已完成投票")
                 return render_template("vote_success.html")
 
             return render_template(
-                "vote.html", parties=parties, referendums=referendums
+                "vote.html", parties=candidates, referendums=referendums
             )
+
+    @app.route("/submit", methods=["GET", "POST"])
+    @refresh_user_session
+    def submit():
+        user = session.get("user")
+        if not user or user["role"] not in ["party", "group"]:
+            abort(403)
+
+        with get_db_session() as db:
+            if request.method == "POST":
+                data = request.form
+                if user["role"] == "party":
+                    candidate = Candidate(
+                        id=str(uuid4()),
+                        party_id=user["id"],
+                        name=data["name"],
+                        description=data.get("description", ""),
+                        created_at=datetime.now(UTC),
+                    )
+                    db.add(candidate)
+
+                elif user["role"] == "group":
+                    proposal = Proposal(
+                        id=str(uuid4()),
+                        group_id=user["id"],
+                        title=data["title"],
+                        description=data.get("description", ""),
+                        created_at=datetime.now(UTC),
+                    )
+                    db.add(proposal)
+
+                db.commit()
+                flash("提交成功！", "success")
+                return redirect(url_for("home"))
+
+        return render_template("submit.html", role=user["role"])
 
     return app
 
