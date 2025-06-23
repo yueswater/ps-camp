@@ -100,6 +100,10 @@ def create_app():
     def page_not_found(e):
         return render_template("404.html"), 404
 
+    @app.route("/map")
+    def map_page():
+        return render_template("map.html")
+
     @app.route("/bank")
     def bank():
         if not session.get("user"):
