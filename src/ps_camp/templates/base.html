@@ -35,7 +35,7 @@
                         {% else %}
                             <li><a href="/bank" class="nav-link">銀行</a></li>
                             {% if session.get("user", {}).get("role") == "admin" %}
-                                <li><a href="{{ url_for('distribute_money') }}" class="nav-link">管理員發錢</a></li>
+                                <li><a href="{{ url_for('distribute_money') }}" class="nav-link">大撒幣</a></li>
                             {% endif %}
                             <li class="user-info">
                                 <a href="{{ url_for('profile') }}" class="nav-link username">{{ session.user.fullname }}</a>
