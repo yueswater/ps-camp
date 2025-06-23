@@ -9,6 +9,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
+    <div id="loading-screen">
+        <div class="loading-mask">
+            <img src="{{ url_for('static', filename='assets/voting.gif') }}" alt="載入中" class="loading-image">
+            <p class="loading-text">沙政風暴啟動中...</p>
+        </div>
+    </div>
     <header class="header">
         <div class="container">
             <div class="header-content">

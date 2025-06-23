@@ -446,3 +446,28 @@ body {
         padding: 1.5rem;
     }
 }
+
+#loading-screen {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 9999;
+}
+
+.loading-image {
+  width: 120px;
+  height: auto;
+  margin-bottom: 1rem;
+}
+
+.loading-text {
+  font-size: 1.2rem;
+  color: #333;
+  font-weight: bold;
+}

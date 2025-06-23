@@ -3,6 +3,14 @@ console.log("沙政風暴網站載入完畢");
 
 // DOM 載入完成後執行
 document.addEventListener('DOMContentLoaded', function() {
+
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen) {
+        setTimeout(() => {
+            loadingScreen.style.display = 'none';
+        }, 400);
+    }
+
     
     // 初始化功能
     initSmoothScrolling();

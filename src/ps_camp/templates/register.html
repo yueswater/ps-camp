@@ -5,11 +5,20 @@
 
 <div class="form-container">
     <h2 class="form-title">註冊新帳號</h2>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul class="flash-messages">
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    {% endwith %}
     <form method="post" class="auth-form">
         <label for="username">帳號</label>
         <input type="text" id="username" name="username" required>
 
-        <label for="fullname">政黨/利團名稱</label>
+        <label for="fullname">政黨/利團名稱/姓名</label>
         <input type="text" id="fullname" name="fullname" required>
 
         <label for="password">密碼</label>
@@ -18,13 +27,31 @@
         <label for="role">身分</label>
         <select id="role" name="role" required>
             <option value="" disabled selected>請選擇身份</option>
+            <!-- <option value="admin">管理員</option> -->
             <option value="party">政黨</option>
             <option value="group">利益團體</option>
+            <option value="member">個人</option>
         </select>
+
+        <div id="affiliation-fields" style="display: none;">
+            <div class="form-group">
+                <label for="affiliation_id">所屬政黨/利團名稱</label>
+                <select name="affiliation_id" id="affiliation_id">
+                    <option value="">請選擇</option>
+                    {% for p in parties %}
+                        <option value="{{ p.id }}" data-type="party">{{ p.fullname }}</option>
+                    {% endfor %}
+                    {% for g in interest_groups %}
+                        <option value="{{ g.id }}" data-type="group">{{ g.fullname }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <input type="hidden" name="affiliation_type" id="affiliation_type">
+        </div>
 
         <button type="submit" class="submit-btn">註冊</button>
     </form>
 </div>
 
-<script src="{{ url_for('static', filename='js/regisgter.js') }}"></script>
+<script src="{{ url_for('static', filename='js/register.js') }}"></script>
 {% endblock %}

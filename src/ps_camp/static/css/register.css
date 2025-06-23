@@ -56,3 +56,15 @@
 .submit-btn:hover {
     background-color: #1a242f;
 }
+
+
+.form-group {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}

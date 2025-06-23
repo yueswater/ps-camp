@@ -46,13 +46,15 @@
 .status-badge {
     background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(10px);
-    padding: 0.5rem 1rem;
+    padding: 0.4rem 0.6rem;
     border-radius: 20px;
     font-size: 0.85rem;
     font-weight: 500;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
+    justify-content: center;
+    gap: 0.3rem;
+    line-height: 1;
 }
 
 .status-badge.active {

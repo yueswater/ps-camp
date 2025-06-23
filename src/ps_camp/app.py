@@ -4,10 +4,9 @@ from datetime import datetime
 from uuid import uuid4, UUID
 from flask import Flask, render_template, request, redirect, url_for, session, abort, jsonify, flash
 from dotenv import load_dotenv
-from ps_camp.db.session import SessionLocal, get_db
+from ps_camp.db.session import SessionLocal
 from ps_camp.sql_models import User
 from ps_camp.sql_models.post_model import Post
-from ps_camp.sql_models.npc_model import NPC
 from ps_camp.repos.user_sql_repo import UserSQLRepository
 from ps_camp.repos.post_sql_repo import PostSQLRepository
 from ps_camp.repos.npc_sql_repo import NPCSQLRepository
@@ -22,12 +21,34 @@ load_dotenv()
 def map_role_to_owner_type(role: str) -> OwnerType:
     if role == "admin":
         return OwnerType.admin
-    elif role == "政黨":
+    elif role == "party":
         return OwnerType.party
-    elif role == "利益團體":
+    elif role == "group":
         return OwnerType.group
     else:
         return OwnerType.user
+
+def get_account_by_user(user, bank_repo, db):
+    role = user["role"]
+    affiliation_name = user["fullname"]
+
+    if role == "member":
+        owner_id = user.get("affiliation_id")
+        owner_type_str = user.get("affiliation_type")
+        if not owner_id or not owner_type_str:
+            return None, None
+        owner_type = OwnerType(owner_type_str)
+
+        affiliation = db.query(User).filter_by(id=owner_id, role=owner_type.value).first()
+        if affiliation:
+            affiliation_name = affiliation.fullname
+    else:
+        owner_id = user["id"]
+        owner_type = map_role_to_owner_type(role)
+
+    account = bank_repo.get_account_by_owner(owner_id, owner_type)
+    return account, affiliation_name
+
 
 def create_app():
     app = Flask(__name__)
@@ -41,13 +62,12 @@ def create_app():
             bank_repo = BankSQLRepository(db)
 
             user = session["user"]
-            user_id = user["id"]
-            role = user["role"]
-            owner_type = map_role_to_owner_type(role)
-
-            account = bank_repo.get_account_by_owner(user_id, owner_type)
+            account, _ = get_account_by_user(user, bank_repo, db)
             if account:
                 session["user"]["coins"] = account.balance
+            else:
+                session["user"]["coins"] = 0  # 或保留預設
+                flash("找不到對應的銀行帳戶，請聯繫主辦方", "warning")
                 
         return render_template("index.html")
 
@@ -58,18 +78,14 @@ def create_app():
 
         db = SessionLocal()
         bank_repo = BankSQLRepository(db)
-
         user = session["user"]
-        user_id = user["id"]
-        role = user["role"]
-        owner_type = map_role_to_owner_type(role)
 
-        account = bank_repo.get_account_by_owner(user_id, owner_type)
+        account, affiliation_name = get_account_by_user(user, bank_repo, db)
         if not account:
             return "找不到您的銀行帳戶，請聯繫主辦方", 404
 
         transactions = bank_repo.get_transactions(account.id)
-        return render_template("bank.html", account=account, transactions=transactions)
+        return render_template("bank.html", account=account, transactions=transactions, affiliation_name=affiliation_name)
 
     @app.route("/api/bank/transfer", methods=["POST"])
     def bank_transfer():
@@ -117,6 +133,15 @@ def create_app():
         hasher = PasswordHasher()
         if request.method == "POST":
             data = request.form
+            role = data["role"]
+
+            affiliation_id = data.get("affiliation_id")
+            affiliation_type = data.get("affiliation_type")
+
+            if role == "member":
+                if not affiliation_id or not affiliation_type:
+                    flash("請選擇所屬政黨或利益團體")
+                    return redirect(url_for("register"))
 
             new_user = User(
                 id=str(uuid4()),
@@ -124,17 +149,31 @@ def create_app():
                 fullname=data["fullname"],
                 hashed_password=hasher.hash_password(data["password"]),
                 role=data["role"],
-                coins=500
+                coins=10000,
+                affiliation_id=affiliation_id if role == "member" else None,
+                affiliation_type=affiliation_type if role == "member" else None
             )
 
             repo.add(new_user)
 
             bank_repo = BankSQLRepository(db)
-            owner_type = map_role_to_owner_type(data["role"])
-            bank_repo.create_account(owner_id=new_user.id, owner_type=owner_type, initial_balance=new_user.coins)
+
+            if role != "member":
+                owner_type = map_role_to_owner_type(data["role"])
+                bank_repo.create_account(owner_id=new_user.id, owner_type=owner_type, initial_balance=new_user.coins)
 
             return redirect(url_for("login"))
-        return render_template("register.html")
+        
+        # TODO: list all role == "party" or role == "group"
+        all_users = repo.get_all()
+        parties = [p for p in all_users if p.role == "party"]
+        interest_groups = [g for g in all_users if g.role == "group"]
+
+        return render_template(
+            "register.html",
+            parties=parties,
+            interest_groups=interest_groups
+        )
 
     @app.route("/login", methods=["GET", "POST"])
     def login():
@@ -145,12 +184,22 @@ def create_app():
             username = request.form["username"]
             password = request.form["password"]
             user = repo.get_by_username(username)
+
+            affiliation_name = None
+            if user.role == "member" and user.affiliation_id and user.affiliation_type:
+                affiliation = repo.get_by_id(user.affiliation_id)
+                if affiliation:
+                    affiliation_name = affiliation.fullname
+
             if user and hasher.verify_password(password, user.hashed_password):
                 session["user"] = {
                     "id": str(user.id),
                     "fullname": user.fullname,
                     "coins": user.coins,
-                    "role": user.role
+                    "role": user.role,
+                    "affiliation_id": str(user.affiliation_id) if user.affiliation_id else None,
+                    "affiliation_type": str(user.affiliation_type.value) if user.affiliation_type else None,
+                    "affiliation_name": affiliation_name,
                 }
                 return redirect(url_for("home"))
             else:
