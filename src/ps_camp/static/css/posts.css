@@ -675,7 +675,7 @@
     color: #007bff;
     text-decoration: none;
     font-weight: 500;
-    margin-left: 0.5rem;
+    margin-left: 0rem !important;
     font-size: 0.85rem;
 }
 .read-more:hover {
