@@ -1,10 +1,11 @@
 import json
 import logging
 import os
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timezone
 from uuid import uuid4
 
 import markdown
+from dateutil.parser import isoparse
 from dotenv import load_dotenv
 from flask import (
     Flask,
@@ -24,7 +25,10 @@ from weasyprint import HTML
 from ps_camp.db.session import get_db_session
 from ps_camp.repos.bank_sql_repo import BankSQLRepository
 from ps_camp.repos.post_sql_repo import PostSQLRepository
+from ps_camp.repos.referendum_sql_repo import ReferendumSQLRepository
+from ps_camp.repos.referendum_vote_sql_repo import ReferendumVoteSQLRepository
 from ps_camp.repos.user_sql_repo import UserSQLRepository
+from ps_camp.repos.vote_sql_repo import VoteSQLRepository
 from ps_camp.sql_models.bank_model import OwnerType, TransactionType
 from ps_camp.sql_models.post_model import Post
 from ps_camp.sql_models.user_model import User
@@ -34,6 +38,8 @@ from ps_camp.utils.session_helpers import refresh_user_session
 
 load_dotenv()
 ADMIN_ID = os.getenv("ADMIN_ID")
+VOTE_OPEN_TIME = isoparse(os.getenv("VOTE_OPEN_TIME"))
+VOTE_CLOSE_TIME = isoparse(os.getenv("VOTE_CLOSE_TIME"))
 
 
 def map_role_to_owner_type(role: str) -> OwnerType:
@@ -78,6 +84,7 @@ def create_app():
     @app.route("/")
     @refresh_user_session
     def home():
+        current_time = datetime.now(timezone.utc)
         if session.get("user"):
             with get_db_session() as db:
                 bank_repo = BankSQLRepository(db)
@@ -87,10 +94,15 @@ def create_app():
                 if account:
                     session["user"]["coins"] = account.balance
                 else:
-                    session["user"]["coins"] = 0  # 或保留預設
+                    session["user"]["coins"] = 0  # or keep the presets
                     flash("找不到對應的銀行帳戶，請聯繫主辦方", "warning")
 
-        return render_template("index.html")
+        return render_template(
+            "index.html",
+            current_time=current_time,
+            vote_open_time=VOTE_OPEN_TIME,
+            vote_close_time=VOTE_CLOSE_TIME,
+        )
 
     @app.route("/ping")
     def ping():
@@ -557,6 +569,62 @@ def create_app():
             logging.debug("commit 完成")
 
             return jsonify(success=True, action=action, likes=len(post.likes))
+
+    @app.route("/vote", methods=["GET", "POST"])
+    def vote():
+        if "user" not in session:
+            flash("請先登入")
+            return redirect(url_for("login"))
+
+        user_id = session["user"]["id"]
+        with get_db_session() as db:
+            vote_repo = VoteSQLRepository(db)
+            ref_repo = ReferendumVoteSQLRepository(db)
+
+            if request.method == "POST":
+                # Process form submission
+                party_id = request.form.get("party")
+                if not party_id:
+                    flash("請選擇一個政黨才能投票！")
+                    return redirect(url_for("vote"))
+                referendum_votes = {
+                    key.replace("referendum_", ""): value
+                    for key, value in request.form.items()
+                    if key.startswith("referendum_")
+                }
+
+                # Prevent repeated voting
+                if vote_repo.has_voted(user_id):
+                    flash("你已經投過票囉")
+                    return redirect(url_for("vote"))
+
+                # Save party tickets
+                vote_repo.add_vote(user_id, party_id)
+
+                # Store every vote
+                for ref_id, choice in referendum_votes.items():
+                    ref_repo.add_vote(user_id, ref_id, choice)
+
+                flash("投票成功！")
+                return redirect(url_for("home"))
+
+            # Fake information (will be captured from the database later)
+            parties = [
+                {"id": "party1", "name": "太陽黨"},
+                {"id": "party2", "name": "月亮黨"},
+            ]
+
+            ref_repo = ReferendumSQLRepository(db)
+            referendums = ref_repo.get_active_referendums()
+
+            # Check if the vote has been voted (avoid direct GET avoid duplication)
+            if vote_repo.has_voted(user_id):
+                flash("你已完成投票")
+                return render_template("vote_success.html")
+
+            return render_template(
+                "vote.html", parties=parties, referendums=referendums
+            )
 
     return app
 

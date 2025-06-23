@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/vote.css') }}">
+
+<div class="vote-success" style="text-align: center; margin-top: 3rem;">
+    <img src="{{ url_for('static', filename='assets/voting.gif') }}" alt="投票成功" style="max-width: 300px; margin-bottom: 2rem;">
+    <h1>投票成功！</h1>
+    <p>感謝你的參與，5 秒後將自動返回首頁。</p>
+</div>
+
+<script>
+    setTimeout(() => {
+        window.location.href = "{{ url_for('home') }}";
+    }, 5000);
+</script>
+{% endblock %}

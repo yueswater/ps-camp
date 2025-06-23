@@ -64,7 +64,13 @@
         <p class="card-content">
             體驗真實的選舉過程，從政策制定到選民溝通，感受政治的複雜性。
         </p>
-        <span class="btn btn-outline" style="margin-top: 1rem; opacity: 0.6;">即將推出</span>
+        {% if current_time < vote_open_time %}
+            <span class="btn btn-outline" style="margin-top: 1rem; opacity: 0.6;">尚未開放</span>
+        {% elif current_time > vote_close_time %}
+            <span class="btn btn-outline" style="margin-top: 1rem; opacity: 0.6;">投票已截止</span>
+        {% else %}
+            <a href="{{ url_for('vote') }}" class="btn btn-outline" style="margin-top: 1rem;">立即投票</a>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

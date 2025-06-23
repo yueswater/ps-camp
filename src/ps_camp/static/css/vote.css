@@ -1,0 +1,56 @@
+.vote-page {
+    padding: 2rem;
+}
+
+.horizontal-scroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 1rem;
+    padding: 1rem 0;
+    margin-bottom: 2rem;
+}
+
+.party-card,
+.referendum-card {
+    flex: 0 0 auto;
+    width: 220px;
+    border: 2px solid #ccc;
+    border-radius: 12px;
+    padding: 1rem;
+    background-color: white;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.party-card:hover,
+.referendum-card:hover {
+    border-color: #444;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+}
+
+.party-card input:checked + .card-content {
+    border: 2px solid #007bff;
+}
+
+.card-content {
+    text-align: center;
+}
+
+.choices {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.submit-button {
+    display: block;
+    margin: 0 auto;
+    padding: 0.75rem 2rem;
+    font-size: 1.1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
