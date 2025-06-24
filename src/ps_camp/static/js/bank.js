@@ -104,9 +104,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                 const result = jsQR(imageData.data, canvas.width, canvas.height);
                 if (result) {
+                    scanStream.getTracks().forEach(track => track.stop());
+                    scanModal.style.display = 'none';
+
                     accountInput.value = result.data;
                     scanModal.style.display = 'none';
-                    scanStream.getTracks().forEach(track => track.stop());
+
+                    document.getElementById('show-transfer')?.click();
+                    setTimeout(() => {
+                        document.querySelector('input[name="amount"]')?.focus();
+                    }, 200);
+                    
                     return;
                 }
             }
