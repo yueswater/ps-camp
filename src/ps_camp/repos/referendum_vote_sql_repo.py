@@ -1,5 +1,6 @@
 import uuid
 
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from ps_camp.sql_models.referendum_vote_model import ReferendumVote
@@ -31,3 +32,11 @@ class ReferendumVoteSQLRepository:
             .first()
             is not None
         )
+
+    def get_vote_counts(self) -> dict[str, int]:
+        results = (
+            self.db.query(ReferendumVote.vote, func.count())
+            .group_by(ReferendumVote.vote)
+            .all()
+        )
+        return {vote.lower(): count for vote, count in results}

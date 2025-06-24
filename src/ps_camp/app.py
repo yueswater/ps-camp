@@ -912,6 +912,40 @@ def create_app():
                     proposal=proposal_dict,
                 )
 
+    @app.route("/api/live_votes")
+    def live_votes():
+        with get_db_session() as db:
+            vote_repo = VoteSQLRepository(db)
+            ref_repo = ReferendumVoteSQLRepository(db)
+            user_repo = UserSQLRepository(db)
+
+            party_counts = vote_repo.get_party_vote_counts()
+            ref_counts = ref_repo.get_vote_counts()
+
+            # 拿到政黨清單（user.role = "party"）
+            all_parties = user_repo.get_all()
+            party_name_map = {
+                str(p.id): p.fullname for p in all_parties if p.role == "party"
+            }
+
+            return jsonify(
+                {
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "votes": {
+                        "party_votes": party_counts,
+                        "referendum_votes": {
+                            "yes": ref_counts.get("yes", 0),
+                            "no": ref_counts.get("no", 0),
+                        },
+                        "party_names": party_name_map,
+                    },
+                }
+            )
+
+    @app.route("/results")
+    def vote_results():
+        return render_template("results.html")
+
     return app
 
 
