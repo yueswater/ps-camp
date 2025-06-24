@@ -38,6 +38,7 @@ from ps_camp.sql_models.proposal_model import Proposal
 from ps_camp.sql_models.user_model import User
 from ps_camp.utils.password_hasher import PasswordHasher
 from ps_camp.utils.pdf_templates import bank_report_template
+from ps_camp.utils.resolve_owner_name import resolve_owner_name
 from ps_camp.utils.session_helpers import refresh_user_session
 
 load_dotenv()
@@ -175,7 +176,7 @@ def create_app():
                 owner_map = {u.id: u.fullname for u in owners}
 
                 account_to_fullname = {
-                    acc_id: owner_map.get(acc.owner_id, "未知使用者")
+                    acc_id: resolve_owner_name(acc.owner_id, db)
                     for acc_id, acc in account_map.items()
                 }
 
@@ -184,6 +185,7 @@ def create_app():
                     account=account,
                     transactions=transactions,
                     account_to_fullname=account_to_fullname,
+                    generated_at=datetime.now(),
                 )
                 pdf = HTML(string=html).write_pdf()
 
@@ -194,6 +196,8 @@ def create_app():
                 return resp
             except Exception as e:
                 flash(f"輸出明細發生錯誤：{e}")
+                logging.debug(f"輸出明細發生錯誤：{e}")
+                return redirect(url_for("bank"))
 
     @app.route("/api/bank/transfer", methods=["POST"])
     def bank_transfer():

@@ -34,6 +34,10 @@ bank_report_template = """
 </head>
 <body>
   <h1>銀行交易明細</h1>
+  <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; font-size: 0.9rem; color: #666;">
+    <div>帳戶名稱：{{ account_to_fullname.get(account.id, "未知使用者") }}</div>
+    <div>匯出時間：{{ generated_at.strftime('%Y-%m-%d %H:%M:%S') }}</div>
+  </div>
   <p class="balance">可用餘額：<strong>NT$ {{ "{:,}".format(account.balance) }}</strong></p>
 
   <table>
