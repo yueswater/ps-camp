@@ -45,6 +45,9 @@ ADMIN_ID = os.getenv("ADMIN_ID")
 VOTE_OPEN_TIME = isoparse(os.getenv("VOTE_OPEN_TIME"))
 VOTE_CLOSE_TIME = isoparse(os.getenv("VOTE_CLOSE_TIME"))
 
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
 
 def map_role_to_owner_type(role: str) -> OwnerType:
     if role == "admin":
@@ -405,7 +408,7 @@ def create_app():
 
             npc_list = []
             for filename in os.listdir(region_path):
-                # 處理副檔名
+                # Process the sub-file name
                 if not filename.lower().endswith((".jpg", ".jpeg", ".png")):
                     continue
                 name = os.path.splitext(filename)[0].replace("NPC-", "").strip()
@@ -414,8 +417,8 @@ def create_app():
                 npc_list.append(
                     {
                         "name": name,
-                        "title": "",  # 角色稱號
-                        "detail": "",  # 細節描述
+                        "title": "",  # Character title
+                        "detail": "",  # Details description
                         "image": image_url,
                     }
                 )
@@ -655,14 +658,49 @@ def create_app():
             abort(403)
 
         with get_db_session() as db:
-            if request.method == "POST":
-                data = request.form
-                photo = request.files.get("photo")
-                photo_url = None
+            if user["role"] == "party":
+                # Check the status of political party members and nominations
+                all_members = (
+                    db.query(User).filter(User.affiliation_id == user["id"]).all()
+                )
+                existing_candidates = (
+                    db.query(Candidate).filter(Candidate.party_id == user["id"]).all()
+                )
+                candidate_user_ids = {
+                    c.user_id for c in existing_candidates if c.user_id
+                }
+                remaining_slots = 6 - len(existing_candidates)
 
-                # 若為政黨上傳候選人
-                if user["role"] == "party":
-                    # 儲存圖片
+                from src.ps_camp.sql_models.party_document_model import PartyDocument
+
+                party_doc = (
+                    db.query(PartyDocument).filter_by(party_id=user["id"]).first()
+                )
+
+                if request.method == "POST":
+                    form = request.form
+                    photo = request.files.get("photo")
+                    cabinet_pdf = request.files.get("cabinet_pdf")
+                    alliance_pdf = request.files.get("alliance_pdf")
+
+                    # Handle candidate nominations
+                    selected_user_id = form.get("selected_member")
+                    description = form.get("description", "")
+
+                    if remaining_slots <= 0:
+                        flash("您已提名 6 位候選人，無法再新增", "danger")
+                        return redirect(url_for("submit"))
+
+                    if not selected_user_id:
+                        flash("請選擇一位小隊員作為候選人", "warning")
+                        return redirect(url_for("submit"))
+
+                    if selected_user_id in candidate_user_ids:
+                        flash("此小隊員已被提名", "warning")
+                        return redirect(url_for("submit"))
+
+                    # Save candidate photos
+                    photo_url = None
                     if photo and photo.filename:
                         filename = f"{uuid4().hex}_{photo.filename}"
                         upload_dir = os.path.join(
@@ -673,32 +711,129 @@ def create_app():
                         photo.save(photo_path)
                         photo_url = f"/static/uploads/candidates/{filename}"
 
+                    selected_user = (
+                        db.query(User).filter(User.id == selected_user_id).first()
+                    )
+                    if not selected_user or selected_user.affiliation_id != user["id"]:
+                        flash("無效的小隊員", "danger")
+                        return redirect(url_for("submit"))
+
                     candidate = Candidate(
                         id=str(uuid4()),
+                        user_id=selected_user.id,
                         party_id=user["id"],
-                        name=data["name"],
-                        description=data.get("description", ""),
+                        name=selected_user.fullname,
+                        description=description,
                         created_at=datetime.now(UTC),
                         photo_url=photo_url,
                     )
                     db.add(candidate)
 
-                # 若為利益團體上傳公投案
-                elif user["role"] == "group":
-                    proposal = Proposal(
-                        id=str(uuid4()),
-                        group_id=user["id"],
-                        title=data["title"],
-                        description=data.get("description", ""),
-                        created_at=datetime.now(UTC),
-                    )
-                    db.add(proposal)
+                    # Handle party archives
+                    if not party_doc:
+                        party_doc = PartyDocument(
+                            id=str(uuid4()),
+                            party_id=user["id"],
+                            created_at=datetime.now(UTC),
+                        )
 
-                db.commit()
-                flash("提交成功！", "success")
-                return redirect(url_for("home"))
+                    if cabinet_pdf and cabinet_pdf.filename:
+                        filename = f"{uuid4().hex}_{cabinet_pdf.filename}"
+                        path = os.path.join(
+                            "src", "ps_camp", "static", "uploads", "cabinet"
+                        )
+                        os.makedirs(path, exist_ok=True)
+                        cabinet_pdf.save(os.path.join(path, filename))
+                        party_doc.cabinet_url = f"/static/uploads/cabinet/{filename}"
 
-        return render_template("submit.html", role=user["role"], user=user)
+                    if alliance_pdf and alliance_pdf.filename:
+                        filename = f"{uuid4().hex}_{alliance_pdf.filename}"
+                        path = os.path.join(
+                            "src", "ps_camp", "static", "uploads", "alliance"
+                        )
+                        os.makedirs(path, exist_ok=True)
+                        alliance_pdf.save(os.path.join(path, filename))
+                        party_doc.alliance_url = f"/static/uploads/alliance/{filename}"
+
+                    db.merge(party_doc)
+                    db.commit()
+
+                    flash("候選人提名與檔案上傳成功！", "success")
+                    return redirect(url_for("submit"))
+
+                return render_template(
+                    "submit.html",
+                    role="party",
+                    user=user,
+                    members=all_members,
+                    existing_candidates=existing_candidates,
+                    remaining_slots=remaining_slots,
+                    party_doc=party_doc,
+                )
+
+            elif user["role"] == "group":
+                proposal_obj = db.query(Proposal).filter_by(group_id=user["id"]).first()
+
+                if request.method == "POST":
+                    logger.debug("[SUBMIT] 公投案 POST 被觸發了")
+                    title = request.form.get("title")
+                    description = request.form.get("description", "")
+                    proposal_pdf = request.files.get("proposal_pdf")
+
+                    if proposal_pdf:
+                        logging.debug(
+                            f"[UPLOAD] 檢查上傳：filename={proposal_pdf.filename}, content_type={proposal_pdf.content_type}"
+                        )
+                    else:
+                        logging.debug("[UPLOAD] proposal_pdf 為 None（表單未附帶檔案）")
+
+                    if not proposal_obj:
+                        logger.debug("[SUBMIT] 尚無舊案，準備建立 Proposal 物件")
+                        proposal_obj = Proposal(
+                            id=str(uuid4()),
+                            group_id=user["id"],
+                            title=title,
+                            description=description,
+                            created_at=datetime.now(UTC),
+                        )
+                    else:
+                        logger.debug("[SUBMIT] 有舊案，進行更新 title/description")
+                        proposal_obj.title = title
+                        proposal_obj.description = description
+
+                    if proposal_pdf and proposal_pdf.filename:
+                        fullname = user.get("fullname", "unknown")
+                        filename = f"{fullname}_{proposal_pdf.filename}"
+                        path = os.path.join(
+                            "src", "ps_camp", "static", "uploads", "proposals"
+                        )
+                        os.makedirs(path, exist_ok=True)
+                        proposal_pdf.save(os.path.join(path, filename))
+                        proposal_obj.file_url = f"/static/uploads/proposals/{filename}"
+
+                    db.merge(proposal_obj)
+                    db.commit()
+                    flash("公投案提交成功！", "success")
+                    return redirect(url_for("submit"))
+
+                # Make sure the proposal is pure dict
+                proposal_dict = None
+                if proposal_obj:
+                    proposal_dict = {
+                        "title": proposal_obj.title,
+                        "description": proposal_obj.description,
+                        "file_url": proposal_obj.file_url,
+                    }
+
+                # Make sure that the user is also pure dict and avoid triggering lazyload
+                user_dict = {k: user[k] for k in ("id", "fullname", "role")}
+
+                return render_template(
+                    "submit.html",
+                    role="group",
+                    user=user_dict,
+                    proposal=proposal_dict,
+                )
 
     return app
 

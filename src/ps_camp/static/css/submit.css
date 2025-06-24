@@ -1,78 +1,263 @@
 .submit-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 70vh;
-    background-color: #f5f7fa;
-    padding: 2rem;
-    animation: fadeInUp 0.6s ease;
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
 }
 
-.submit-card {
-    background-color: white;
-    padding: 2rem 2.5rem;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-    width: 100%;
-    max-width: 500px;
+.submit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: none !important;
 }
 
-.submit-title {
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-    text-align: center;
-    color: #333;
+.limit-warning {
+  color: #d33;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 1.5rem;
 }
 
-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    margin-top: 1rem;
-    font-weight: 500;
-    color: #444;
+/* 小隊員卡片樣式（如未來要回復卡片選擇時） */
+.member-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
-input[type="text"],
-textarea {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 1rem;
-    resize: vertical;
-    transition: border-color 0.3s;
+.member-card {
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 1rem;
+  background-color: #fafafa;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
 }
 
-input:focus,
-textarea:focus {
-    border-color: #3f8efc;
-    outline: none;
+.member-card input[type="radio"] {
+  display: none;
 }
 
+.member-card:hover {
+  border-color: #007bff;
+}
+
+.member-card input[type="radio"]:checked + .member-info {
+  border-left: 5px solid #007bff;
+  padding-left: 0.5rem;
+}
+
+.member-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.username {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* 表單欄位統一樣式 */
+.submit-form input[type="file"],
+.submit-form input[type="text"],
+.submit-form input[type="email"],
+.submit-form input[type="number"] {
+  width: 100%;
+  margin: 0.75rem 0 1rem;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.submit-form textarea {
+  width: 100%;
+  height: 180px;
+  padding: 1rem;
+  font-size: 1rem;
+  border: 1.5px solid #ced4da;
+  border-radius: 10px;
+  resize: none;
+  background-color: #fff;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.submit-form textarea:focus {
+  outline: none;
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.1rem rgba(0,123,255,.25);
+}
+
+
+/* 提交按鈕 */
 .submit-button {
-    margin-top: 1.5rem;
-    width: 100%;
-    padding: 0.75rem;
-    font-size: 1rem;
-    background-color: #3f8efc;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  display: block;
+  width: 100%;
+  margin: 2rem auto;
+  padding: 0.75rem 2rem;
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #495057;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.25s ease, transform 0.2s ease;
 }
 
 .submit-button:hover {
-    background-color: #306bd8;
+  background-color: #212529;
+  transform: translateY(-2px);
 }
 
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.submit-button:active {
+  background-color: #212529;
+  transform: translateY(1px);
+}
+
+.submit-button:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+/* 顯示已提名名單 */
+.existing-section {
+  margin-top: 2rem;
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+}
+
+.existing-list {
+  list-style: none;
+  padding: 0;
+}
+
+.existing-list li {
+  margin: 0.25rem 0;
+}
+
+/* 小隊員表格樣式（政黨提名使用） */
+.member-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+}
+
+.member-table th,
+.member-table td {
+  border: 1px solid #ddd;
+  padding: 0.75rem;
+  text-align: center;
+}
+
+.member-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+.member-table input[type="radio"] {
+  transform: scale(1.2);
+}
+
+/* 下載連結樣式 */
+a[target="_blank"] {
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+a[target="_blank"]:hover {
+  text-decoration: underline;
+}
+
+.submit-form label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #212529;
+  display: block;
+  margin: 1.25rem 0 0.5rem;
+}
+
+.file-dropzone {
+  position: relative;
+  border: 2px dashed #adb5bd;
+  border-radius: 12px;
+  padding: 5rem 2rem;
+  text-align: center;
+  background-color: #f8f9fa;
+  color: #adb5bd;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.file-dropzone:hover {
+  background-color: #e9ecef;
+}
+
+.file-dropzone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+.file-dropzone.loading {
+  background: linear-gradient(to right, #adb5bd 0%, #f8f9fa 100%);
+  background-size: 200% 100%;
+  animation: loadingBar 1.2s linear infinite;
+  color: white;
+}
+
+@keyframes loadingBar {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+.file-dropzone.error {
+  border-color: #dc3545;
+  background-color: #fff0f1;
+  color: #dc3545;
+}
+
+.flash-messages {
+  max-width: 800px;
+  margin: 1rem auto;
+}
+
+.alert {
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
+
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.alert-warning {
+  background-color: #fff3cd;
+  color: #856404;
 }

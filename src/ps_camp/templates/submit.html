@@ -4,29 +4,96 @@
 <script src="{{ url_for('static', filename='js/submit.js') }}"></script>
 
 <div class="submit-container">
-    <div class="submit-card">
-        <h2 class="submit-title">提交{{ '候選人' if role == 'party' else '公投案' }}</h2>
-        <form method="POST" enctype="multipart/form-data">
-            {% if role == 'party' %}
-                <label>候選人姓名</label>
-                <input type="text" name="name" required>
+  {% if role == "party" %}
+  <div class="submit-header">
+    <h2>候選人提名</h2>
+    <p>剩餘名額：<span id="remaining">{{ remaining_slots }}</span> / 6</p>
+  </div>
 
-                <label>所屬政黨</label>
-                <input type="text" value="{{ user.affiliation_name or user.fullname }}" disabled>
+  {% if remaining_slots == 0 %}
+  <p class="limit-warning">您已提名 6 位候選人，無法再新增。</p>
+  {% endif %}
 
-                <label>政見</label>
-                <textarea name="description" rows="4"></textarea>
+  <form method="POST" enctype="multipart/form-data" class="submit-form">
+    <table class="member-table">
+      <thead>
+        <tr>
+          <th>選擇</th>
+          <th>姓名</th>
+          <th>帳號</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for member in members %}
+        {% if member.id not in existing_candidates | map(attribute='user_id') | list %}
+        <tr>
+          <td><input type="radio" name="selected_member" value="{{ member.id }}" required></td>
+          <td>{{ member.fullname }}</td>
+          <td>{{ member.username }}</td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
 
-                <label>上傳候選人照片</label>
-                <input type="file" name="photo" accept="image/*">
-            {% else %}
-                <label for="title">公投案標題</label>
-                <input type="text" id="title" name="title" required>
-                <label for="description">公投案說明</label>
-                <textarea id="description" name="description" rows="4"></textarea>
-            {% endif %}
-            <button type="submit" class="submit-button">提交</button>
-        </form>
+    <label for="description">政見（選填）</label>
+    <textarea name="description" rows="4" placeholder="請輸入該候選人的政見..."></textarea>
+
+    <label>上傳候選人照片（選填）</label>
+    <input type="file" name="photo" accept="image/*">
+
+    <label>上傳建設性內閣名單（PDF）</label>
+    <input type="file" name="cabinet_pdf" accept="application/pdf">
+    {% if party_doc and party_doc.cabinet_url %}
+    <p><a href="{{ party_doc.cabinet_url }}" target="_blank">📎 已上傳：點我下載</a></p>
+    {% endif %}
+
+    <label>上傳政黨聯盟協定書（PDF）</label>
+    <input type="file" name="alliance_pdf" accept="application/pdf">
+    {% if party_doc and party_doc.alliance_url %}
+    <p><a href="{{ party_doc.alliance_url }}" target="_blank">📎 已上傳：點我下載</a></p>
+    {% endif %}
+
+    <button type="submit" class="submit-button" {% if remaining_slots==0 %}disabled{% endif %}>
+      提名候選人與上傳檔案
+    </button>
+  </form>
+
+  {% if existing_candidates %}
+  <div class="existing-section">
+    <h3>已提名候選人</h3>
+    <ul class="existing-list">
+      {% for c in existing_candidates %}
+      <li>{{ c.name }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  {% elif role == "group" %}
+  <div class="submit-header">
+    <h2>提交公投案</h2>
+  </div>
+
+  <form method="POST" enctype="multipart/form-data" class="submit-form">
+    <label for="title">公投案標題</label>
+    <input type="text" id="title" name="title" required placeholder="請輸入清楚明確的標題，例如：反對貪污特赦法案">
+
+    <label for="description">公投案說明</label>
+    <textarea id="description" name="description" rows="4" placeholder="請簡要說明此公投案的背景、目的或影響..."></textarea>
+
+    <label>上傳公投案 PDF</label>
+    <div class="file-dropzone" id="dropzone">
+      <p id="fileLabel" style="color: #ced4da;">點擊或拖曳上傳 PDF 檔案</p>
+      <input type="file" id="proposal_pdf" name="proposal_pdf" accept="application/pdf" hidden>
     </div>
+
+    {% if proposal and proposal.file_url %}
+    <p><a href="{{ proposal.file_url }}" target="_blank">📎 已上傳：點我下載</a></p>
+    {% endif %}
+
+    <button type="submit" class="submit-button">提交公投案</button>
+  </form>
+  {% endif %}
 </div>
 {% endblock %}

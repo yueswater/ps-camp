@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy import Column, DateTime, ForeignKey, String, Text
 
@@ -10,7 +10,8 @@ class Candidate(Base):
 
     id = Column(String, primary_key=True)
     party_id = Column(String, ForeignKey("users.id"), nullable=False)
+    user_id = Column(String, ForeignKey("users.id"), nullable=True)  # ⬅ 新增這行
     name = Column(String, nullable=False)
     description = Column(Text, nullable=True)
     photo_url = Column(String, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(UTC))
