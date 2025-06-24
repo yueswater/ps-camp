@@ -759,7 +759,7 @@ def create_app():
                     db.commit()
 
                     flash("候選人提名與檔案上傳成功！", "success")
-                    return redirect(url_for("submit"))
+                    return redirect(url_for("home"))
 
                 return render_template(
                     "submit.html",
@@ -814,7 +814,7 @@ def create_app():
                     db.merge(proposal_obj)
                     db.commit()
                     flash("公投案提交成功！", "success")
-                    return redirect(url_for("submit"))
+                    return redirect(url_for("home"))
 
                 # Make sure the proposal is pure dict
                 proposal_dict = None

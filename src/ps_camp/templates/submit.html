@@ -40,18 +40,33 @@
     <textarea name="description" rows="4" placeholder="請輸入該候選人的政見..."></textarea>
 
     <label>上傳候選人照片（選填）</label>
-    <input type="file" name="photo" accept="image/*">
+    <div class="file-dropzone" data-input-id="photo_input" data-label-id="photo_label">
+      <p id="photo_label" style="color: #ced4da;">點擊或拖曳上傳圖片</p>
+      <input type="file" id="photo_input" name="photo" accept="image/*" hidden>
+    </div>
 
     <label>上傳建設性內閣名單（PDF）</label>
-    <input type="file" name="cabinet_pdf" accept="application/pdf">
+    <div class="file-dropzone" data-input-id="cabinet_input" data-label-id="cabinet_label">
+      <p id="cabinet_label" style="color: #ced4da;">點擊或拖曳上傳 PDF 檔案</p>
+      <input type="file" id="cabinet_input" name="cabinet_pdf" accept="application/pdf" hidden>
+    </div>
     {% if party_doc and party_doc.cabinet_url %}
-    <p><a href="{{ party_doc.cabinet_url }}" target="_blank">📎 已上傳：點我下載</a></p>
+    <p>
+      <i class="fas fa-paperclip" style="margin-right: 4px;"></i>
+      <a href="{{ party_doc.cabinet_url }}" target="_blank">已上傳：點我下載</a>
+    </p>
     {% endif %}
 
     <label>上傳政黨聯盟協定書（PDF）</label>
-    <input type="file" name="alliance_pdf" accept="application/pdf">
+    <div class="file-dropzone" data-input-id="alliance_input" data-label-id="alliance_label">
+      <p id="alliance_label" style="color: #ced4da;">點擊或拖曳上傳 PDF 檔案</p>
+      <input type="file" id="alliance_input" name="alliance_pdf" accept="application/pdf" hidden>
+    </div>
     {% if party_doc and party_doc.alliance_url %}
-    <p><a href="{{ party_doc.alliance_url }}" target="_blank">📎 已上傳：點我下載</a></p>
+    <p>
+      <i class="fas fa-paperclip" style="margin-right: 4px;"></i>
+      <a href="{{ party_doc.alliance_url }}" target="_blank">已上傳：點我下載</a>
+    </p>
     {% endif %}
 
     <button type="submit" class="submit-button" {% if remaining_slots==0 %}disabled{% endif %}>
@@ -89,7 +104,10 @@
     </div>
 
     {% if proposal and proposal.file_url %}
-    <p><a href="{{ proposal.file_url }}" target="_blank">📎 已上傳：點我下載</a></p>
+    <p>
+      <i class="fas fa-paperclip" style="margin-right: 4px;"></i>
+      <a href="{{ proposal.file_url }}" target="_blank">已上傳：點我下載</a>
+    </p>
     {% endif %}
 
     <button type="submit" class="submit-button">提交公投案</button>

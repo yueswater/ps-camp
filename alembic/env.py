@@ -13,8 +13,8 @@ from sqlalchemy import engine_from_config, pool
 
 from alembic import context
 from ps_camp.db.base import Base
+from ps_camp.sql_models import bank_model  # party_document_model
 from ps_camp.sql_models import (
-    bank_model,  # party_document_model
     candidate_model,
     npc_model,
     post_model,

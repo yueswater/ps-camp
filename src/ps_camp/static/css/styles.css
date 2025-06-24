@@ -7,6 +7,9 @@
 
 html {
     font-size: 16px;
+    /* 防止iOS縮放 */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
 body {
@@ -14,6 +17,10 @@ body {
     line-height: 1.6;
     color: #333;
     background-color: #f8f9fa;
+    /* 防止水平滾動 */
+    overflow-x: hidden;
+    /* 改善觸控體驗 */
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* 容器樣式 */
@@ -21,6 +28,7 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
+    width: 100%;
 }
 
 /* 頁首樣式 */
@@ -31,12 +39,16 @@ body {
     position: sticky;
     top: 0;
     z-index: 1000;
+    /* 避免iOS Safari底部邊界問題 */
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
 }
 
 .header-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .logo h1 {
@@ -63,6 +75,69 @@ body {
     list-style: none;
     gap: 2rem;
     align-items: center;
+    flex-wrap: wrap;
+}
+
+/* 漢堡選單按鈕 */
+.mobile-menu-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 44px;
+    height: 44px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+    z-index: 1001;
+}
+
+.mobile-menu-toggle:hover {
+    background-color: #f8f9fa;
+}
+
+.hamburger-line {
+    width: 24px;
+    height: 3px;
+    background-color: #495057;
+    margin: 3px 0;
+    transition: all 0.3s ease;
+    transform-origin: center;
+}
+
+/* 漢堡選單動畫 - 打開狀態 */
+.mobile-menu-toggle.active .hamburger-line:nth-child(1) {
+    transform: rotate(45deg) translate(6px, 6px);
+}
+
+.mobile-menu-toggle.active .hamburger-line:nth-child(2) {
+    opacity: 0;
+}
+
+.mobile-menu-toggle.active .hamburger-line:nth-child(3) {
+    transform: rotate(-45deg) translate(6px, -6px);
+}
+
+/* 手機版遮罩層 */
+.mobile-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.mobile-overlay.active {
+    display: block;
+    opacity: 1;
 }
 
 .nav-link {
@@ -73,6 +148,10 @@ body {
     padding: 0.5rem 1rem;
     border-radius: 6px;
     transition: all 0.2s ease;
+    /* 增大觸控目標 */
+    min-height: 44px;
+    display: flex;
+    align-items: center;
 }
 
 .nav-link:hover {
@@ -84,16 +163,21 @@ body {
     display: flex;
     align-items: center;
     gap: 1rem;
+    flex-wrap: wrap;
 }
 
 .username {
     color: #495057;
     font-weight: 600;
+    font-size: 1rem;
 }
 
 .logout {
     background-color: #dc3545;
     color: white !important;
+    /* 增大觸控目標 */
+    min-height: 44px;
+    min-width: 44px;
 }
 
 .logout:hover {
@@ -104,6 +188,8 @@ body {
 .main-content {
     min-height: calc(100vh - 200px);
     padding: 3rem 0;
+    /* 避免內容貼邊 */
+    padding-bottom: env(safe-area-inset-bottom, 3rem);
 }
 
 /* 卡片樣式 */
@@ -114,6 +200,7 @@ body {
     margin-bottom: 2rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
 }
 
 .card:hover {
@@ -126,6 +213,7 @@ body {
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
     margin-top: 2rem;
+    width: 100%;
 }
 
 .card-title {
@@ -133,6 +221,7 @@ body {
     font-weight: 600;
     color: #212529;
     margin-bottom: 1rem;
+    word-wrap: break-word;
 }
 
 .card-category {
@@ -148,6 +237,7 @@ body {
 .card-content {
     color: #6c757d;
     line-height: 1.6;
+    word-wrap: break-word;
 }
 
 .card-author {
@@ -164,6 +254,7 @@ body {
     text-align: center;
     margin-bottom: 3rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
 }
 
 .hero h1 {
@@ -171,12 +262,14 @@ body {
     font-weight: 700;
     color: #212529;
     margin-bottom: 1rem;
+    word-wrap: break-word;
 }
 
 .hero p {
     font-size: 1.25rem;
     color: #6c757d;
     margin-bottom: 2rem;
+    word-wrap: break-word;
 }
 
 .hero-info {
@@ -199,6 +292,8 @@ body {
     align-items: center;
     padding: 0.75rem 0;
     border-bottom: 1px solid #e9ecef;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
 .info-item:last-child {
@@ -208,11 +303,14 @@ body {
 .info-label {
     font-weight: 600;
     color: #495057;
+    flex-shrink: 0;
 }
 
 .info-value {
     color: #212529;
     font-weight: 500;
+    text-align: right;
+    word-wrap: break-word;
 }
 
 /* 按鈕樣式 */
@@ -227,6 +325,13 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
     font-size: 1rem;
+    /* 增大觸控目標 */
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
 }
 
 .btn-primary {
@@ -258,6 +363,7 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     max-width: 500px;
     margin: 0 auto;
+    width: 100%;
 }
 
 .form-group {
@@ -279,6 +385,11 @@ body {
     border-radius: 8px;
     font-size: 1rem;
     transition: border-color 0.2s ease;
+    /* 改善iOS表單樣式 */
+    -webkit-appearance: none;
+    appearance: none;
+    /* 增大觸控目標 */
+    min-height: 44px;
 }
 
 .form-input:focus,
@@ -304,6 +415,7 @@ body {
     margin-bottom: 1rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease;
+    width: 100%;
 }
 
 .list-item:hover {
@@ -315,6 +427,7 @@ body {
     font-weight: 600;
     color: #212529;
     margin-bottom: 0.5rem;
+    word-wrap: break-word;
 }
 
 .list-meta {
@@ -326,6 +439,7 @@ body {
 .list-description {
     color: #495057;
     line-height: 1.6;
+    word-wrap: break-word;
 }
 
 /* 頁尾樣式 */
@@ -334,12 +448,16 @@ body {
     color: #adb5bd;
     padding: 2rem 0;
     margin-top: 4rem;
+    /* 支援iPhone底部安全區域 */
+    padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
 }
 
 .footer-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
 .footer-left h3 {
@@ -359,6 +477,7 @@ body {
 .social-links {
     display: flex;
     gap: 0.5rem;
+    flex-wrap: wrap;
 }
 
 .social-link {
@@ -368,6 +487,12 @@ body {
     text-decoration: none;
     border-radius: 6px;
     transition: background-color 0.2s ease;
+    /* 增大觸控目標 */
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .social-link:hover {
@@ -376,7 +501,7 @@ body {
 
 /* Font Awesome 圖標樣式 */
 .fas, .far, .fab {
-    margin-right: 0.rem;
+    margin-right: 0.5rem;
 }
 
 .card-title .fas {
@@ -398,76 +523,548 @@ body {
     margin-left: 0.25rem;
     margin-right: 0;
 }
-@media (max-width: 768px) {
-    .header-content {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .nav-links {
-        gap: 1rem;
-        flex-wrap: wrap;
-        justify-content: center;
+
+/* Loading Screen */
+#loading-screen {
+    position: fixed;
+    top: 0; 
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 9999;
+    /* 支援iPhone安全區域 */
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.loading-image {
+    width: 120px;
+    height: auto;
+    margin-bottom: 1rem;
+}
+
+.loading-text {
+    font-size: 1.2rem;
+    color: #333;
+    font-weight: bold;
+}
+
+/* ================================
+   響應式設計 - 手機優化
+   ================================ */
+
+/* 大型平板 (iPad Pro, 大型Android平板) */
+@media (max-width: 1024px) {
+    .container {
+        padding: 0 16px;
     }
     
     .hero h1 {
-        font-size: 2rem;
+        font-size: 2.5rem;
+    }
+    
+    .card-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+}
+
+/* 小型平板 (iPad, 中型Android平板) */
+@media (max-width: 768px) {
+    html {
+        font-size: 15px;
+    }
+    
+    .header {
+        padding: 0.75rem 0;
+    }
+    
+    .header-content {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        text-align: left;
+    }
+    
+    .logo h1 {
+        font-size: 1.6rem;
+    }
+    
+    /* 顯示漢堡選單按鈕 */
+    .mobile-menu-toggle {
+        display: flex;
+        order: 3;
+    }
+    
+    /* 手機版導航樣式 */
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 280px;
+        height: 100vh;
+        background-color: #fff;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        transition: left 0.3s ease;
+        overflow-y: auto;
+        padding-top: env(safe-area-inset-top, 0px);
+    }
+    
+    .navbar.active {
+        left: 0;
+    }
+    
+    .nav-links {
+        flex-direction: column;
+        gap: 0;
+        width: 100%;
+        padding: 2rem 0 1rem;
+        align-items: stretch;
+    }
+    
+    .nav-links li {
+        width: 100%;
+        border-bottom: 1px solid #f1f3f4;
+    }
+    
+    .nav-links li:last-child {
+        border-bottom: none;
+    }
+    
+    .nav-link {
+        width: 100%;
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+        text-align: left;
+        border-radius: 0;
+        justify-content: flex-start;
+        transition: background-color 0.2s ease;
+    }
+    
+    .nav-link:hover {
+        background-color: #f8f9fa;
+        color: #212529;
+    }
+    
+    .user-info {
+        flex-direction: column;
+        width: 100%;
+        gap: 0;
+        align-items: stretch;
+    }
+    
+    .user-info .nav-link {
+        border-bottom: 1px solid #f1f3f4;
+    }
+    
+    .username {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        color: #495057 !important;
+    }
+    
+    .logout {
+        background-color: #dc3545 !important;
+        color: white !important;
+        margin: 1rem 1.5rem;
+        border-radius: 6px;
+        text-align: center;
+        width: calc(100% - 3rem);
+    }
+    
+    .logout:hover {
+        background-color: #c82333 !important;
+    }
+    
+    .hero {
+        padding: 3rem 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .hero h1 {
+        font-size: 2.2rem;
+        line-height: 1.2;
     }
     
     .hero p {
         font-size: 1.1rem;
     }
     
-    .card-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .footer-content {
-        flex-direction: column;
-        gap: 1rem;
-        text-align: center;
-    }
-    
-    .container {
-        padding: 0 15px;
-    }
-}
-
-@media (max-width: 480px) {
-    .hero {
-        padding: 2rem 1rem;
+    .hero-info {
+        padding: 1.5rem;
     }
     
     .card {
         padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .card-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .card-title {
+        font-size: 1.3rem;
+    }
+    
+    .main-content {
+        padding: 2rem 0;
+    }
+    
+    .footer-content {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+    }
+    
+    .social-links {
+        justify-content: center;
+    }
+    
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+    
+    .info-value {
+        text-align: left;
+        width: 100%;
+    }
+}
+
+/* iPhone 14 Pro Max, iPhone 14 Plus, Galaxy S23 Ultra */
+@media (max-width: 430px) {
+    html {
+        font-size: 14px;
+    }
+    
+    .container {
+        padding: 0 12px;
+    }
+    
+    .header {
+        padding: 0.5rem 0;
+    }
+    
+    .logo h1 {
+        font-size: 1.4rem;
+    }
+    
+    .tagline {
+        font-size: 0.7rem;
+    }
+    
+    /* 調整手機版導航寬度 */
+    .navbar {
+        width: 260px;
+    }
+    
+    .nav-links {
+        padding: 1.5rem 0 1rem;
+    }
+    
+    .nav-link {
+        padding: 0.875rem 1.25rem;
+        font-size: 0.95rem;
+    }
+    
+    .logout {
+        margin: 0.75rem 1.25rem;
+        width: calc(100% - 2.5rem);
+    }
+    
+    .hero {
+        padding: 2rem 1rem;
+        border-radius: 8px;
+    }
+    
+    .hero h1 {
+        font-size: 1.8rem;
+        line-height: 1.1;
+        margin-bottom: 0.75rem;
+    }
+    
+    .hero p {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .hero-info {
+        padding: 1rem;
+        border-radius: 6px;
+    }
+    
+    .hero-info h2 {
+        font-size: 1.2rem;
+    }
+    
+    .card {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+    
+    .card-title {
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .card-content {
+        font-size: 0.9rem;
+    }
+    
+    .card-category {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.5rem;
     }
     
     .form {
-        padding: 1.5rem;
+        padding: 1rem;
+        border-radius: 8px;
+    }
+    
+    .form-input,
+    .form-textarea {
+        padding: 0.6rem;
+        font-size: 16px; /* 防止iOS縮放 */
+        border-radius: 6px;
+    }
+    
+    .btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+        border-radius: 6px;
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .list-item {
+        padding: 1rem;
+        border-radius: 6px;
+    }
+    
+    .list-title {
+        font-size: 1.1rem;
+    }
+    
+    .list-description {
+        font-size: 0.9rem;
+    }
+    
+    .main-content {
+        padding: 1.5rem 0;
+    }
+    
+    .footer {
+        padding: 1.5rem 0;
+        margin-top: 2rem;
+    }
+    
+    .loading-image {
+        width: 80px;
+    }
+    
+    .loading-text {
+        font-size: 1rem;
     }
 }
 
-#loading-screen {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  z-index: 9999;
+/* iPhone SE, iPhone 12 mini, Galaxy S23 */
+@media (max-width: 375px) {
+    .hero h1 {
+        font-size: 1.6rem;
+    }
+    
+    .hero p {
+        font-size: 0.95rem;
+    }
+    
+    .card-title {
+        font-size: 1rem;
+    }
+    
+    .card-content {
+        font-size: 0.85rem;
+    }
+    
+    .nav-link {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.85rem;
+    }
+    
+    .hero-info h2 {
+        font-size: 1.1rem;
+    }
+    
+    .info-label,
+    .info-value {
+        font-size: 0.9rem;
+    }
 }
 
-.loading-image {
-  width: 120px;
-  height: auto;
-  margin-bottom: 1rem;
+/* iPhone 12 mini, 舊款小螢幕Android */
+@media (max-width: 320px) {
+    html {
+        font-size: 13px;
+    }
+    
+    .container {
+        padding: 0 8px;
+    }
+    
+    .hero {
+        padding: 1.5rem 0.75rem;
+    }
+    
+    .hero h1 {
+        font-size: 1.4rem;
+    }
+    
+    .hero p {
+        font-size: 0.9rem;
+    }
+    
+    .card {
+        padding: 0.75rem;
+    }
+    
+    .card-title {
+        font-size: 0.95rem;
+    }
+    
+    .form {
+        padding: 0.75rem;
+    }
+    
+    .btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+    }
+    
+    .loading-image {
+        width: 60px;
+    }
+    
+    .loading-text {
+        font-size: 0.9rem;
+    }
 }
 
-.loading-text {
-  font-size: 1.2rem;
-  color: #333;
-  font-weight: bold;
+/* ================================
+   特殊iPhone型號優化
+   ================================ */
+
+/* iPhone 14 Pro Max / iPhone 15 Pro Max */
+@media (max-width: 430px) and (min-height: 932px) {
+    .main-content {
+        min-height: calc(100vh - 180px);
+        padding-top: env(safe-area-inset-top, 2rem);
+    }
+}
+
+/* iPhone 14 Pro / iPhone 15 Pro */
+@media (max-width: 393px) and (min-height: 852px) {
+    .hero {
+        margin-top: 1rem;
+    }
+}
+
+/* iPhone SE (第3代) */
+@media (max-width: 375px) and (max-height: 667px) {
+    .hero {
+        padding: 1.5rem 1rem;
+    }
+    
+    .hero h1 {
+        font-size: 1.5rem;
+    }
+    
+    .main-content {
+        padding: 1rem 0;
+    }
+}
+
+/* ================================
+   Android特殊優化
+   ================================ */
+
+/* Galaxy S系列大螢幕 */
+@media (max-width: 412px) and (min-height: 915px) {
+    .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background-color: rgba(255, 255, 255, 0.95);
+    }
+    
+    .main-content {
+        margin-top: 80px;
+    }
+}
+
+/* Pixel 7 Pro / Galaxy Note系列 */
+@media (max-width: 412px) and (min-height: 824px) {
+    .card-grid {
+        gap: 1rem;
+    }
+    
+    .hero {
+        margin-bottom: 1.5rem;
+    }
+}
+
+/* ================================
+   橫屏模式優化
+   ================================ */
+
+@media (max-height: 500px) and (orientation: landscape) {
+    .hero {
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: auto;
+    }
+    
+    .hero h1 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .hero p {
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+    
+    .hero-info {
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .main-content {
+        padding: 1rem 0;
+    }
+    
+    .header {
+        padding: 0.25rem 0;
+    }
+    
+    .nav-links {
+        flex-direction: row;
+        gap: 0.5rem;
+    }
+    
+    .nav-link {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
 }

@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initFormValidation();
     initCardAnimations();
     initNavigation();
+    initMobileMenu();
     
     console.log("所有功能初始化完成");
 });
@@ -144,15 +145,104 @@ function initNavigation() {
             link.style.color = '#212529';
         }
     });
+}
+
+// 手機版選單功能
+function initMobileMenu() {
+    const menuToggle = document.querySelector('.mobile-menu-toggle');
+    const navbar = document.querySelector('.navbar');
+    const overlay = document.querySelector('.mobile-overlay');
+    const navLinks = document.querySelectorAll('.nav-link');
     
-    // 行動裝置導航切換
-    const navToggle = document.querySelector('.nav-toggle');
-    const navMenu = document.querySelector('.nav-links');
+    if (!menuToggle || !navbar || !overlay) {
+        return; // 如果元素不存在就直接返回
+    }
     
-    if (navToggle && navMenu) {
-        navToggle.addEventListener('click', function() {
-            navMenu.classList.toggle('active');
+    // 切換選單狀態
+    function toggleMenu() {
+        const isActive = navbar.classList.contains('active');
+        
+        if (isActive) {
+            closeMenu();
+        } else {
+            openMenu();
+        }
+    }
+    
+    // 打開選單
+    function openMenu() {
+        navbar.classList.add('active');
+        overlay.classList.add('active');
+        menuToggle.classList.add('active');
+        document.body.style.overflow = 'hidden'; // 防止背景滾動
+    }
+    
+    // 關閉選單
+    function closeMenu() {
+        navbar.classList.remove('active');
+        overlay.classList.remove('active');
+        menuToggle.classList.remove('active');
+        document.body.style.overflow = ''; // 恢復滾動
+    }
+    
+    // 點擊漢堡選單按鈕
+    menuToggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        toggleMenu();
+    });
+    
+    // 點擊遮罩關閉選單
+    overlay.addEventListener('click', closeMenu);
+    
+    // 點擊導航連結後關閉選單
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            // 延遲關閉，讓頁面跳轉效果更順暢
+            setTimeout(closeMenu, 150);
         });
+    });
+    
+    // 窗口大小變化時的處理
+    window.addEventListener('resize', debounce(function() {
+        if (window.innerWidth > 768) {
+            // 大螢幕時關閉手機選單
+            closeMenu();
+        }
+    }, 250));
+    
+    // ESC 鍵關閉選單
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && navbar.classList.contains('active')) {
+            closeMenu();
+        }
+    });
+    
+    // 防止選單內部點擊事件冒泡
+    navbar.addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
+    
+    // 觸控手勢支援（簡單的左滑關閉）
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    navbar.addEventListener('touchstart', function(e) {
+        touchStartX = e.changedTouches[0].screenX;
+    });
+    
+    navbar.addEventListener('touchend', function(e) {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    });
+    
+    function handleSwipe() {
+        const swipeDistance = touchEndX - touchStartX;
+        const minSwipeDistance = 50;
+        
+        // 左滑關閉選單
+        if (swipeDistance < -minSwipeDistance && navbar.classList.contains('active')) {
+            closeMenu();
+        }
     }
 }
 
