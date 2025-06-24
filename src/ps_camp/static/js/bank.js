@@ -11,6 +11,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const amountInput = document.querySelector('input[name="amount"]');
     const feeAmountSpan = document.querySelector('.fee-amount');
     const totalAmountSpan = document.querySelector('.total-amount');
+    const qrModal = document.getElementById('qr-modal');
+    const openQrBtn = document.getElementById('generate-qr');
+    const closeQrBtn = document.getElementById('close-qr-modal');
+    const scanModal = document.getElementById('qr-scan-modal');
+    const scanBtn = document.getElementById('scan-qr');
+    const closeScanBtn = document.getElementById('close-qr-scan');
+    const video = document.getElementById('qr-video');
+    let scanStream;
 
     // === 開啟 modal ===
     showBtn?.addEventListener('click', () => {
@@ -48,21 +56,69 @@ document.addEventListener('DOMContentLoaded', () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         })
-        .then(r => r.json())
-        .then(res => {
-            SandstormApp.hideLoading();
-            if (res.success) {
-                SandstormApp.showNotification('轉帳成功', 'success');
-                if (balanceDom) balanceDom.textContent = res.new_balance;
-                setTimeout(() => location.reload(), 800);
-            } else {
-                SandstormApp.showNotification(res.message || '轉帳失敗', 'error');
-            }
-        })
-        .catch(() => {
-            SandstormApp.hideLoading();
-            SandstormApp.showNotification('伺服器錯誤，請稍後再試', 'error');
+            .then(r => r.json())
+            .then(res => {
+                SandstormApp.hideLoading();
+                if (res.success) {
+                    SandstormApp.showNotification('轉帳成功', 'success');
+                    if (balanceDom) balanceDom.textContent = res.new_balance;
+                    setTimeout(() => location.reload(), 800);
+                } else {
+                    SandstormApp.showNotification(res.message || '轉帳失敗', 'error');
+                }
+            })
+            .catch(() => {
+                SandstormApp.hideLoading();
+                SandstormApp.showNotification('伺服器錯誤，請稍後再試', 'error');
+            });
+    });
+
+    openQrBtn?.addEventListener('click', () => {
+        const qrTarget = document.getElementById('qr-code');
+        qrTarget.innerHTML = '';
+        new QRCode(qrTarget, {
+            text: '{{ account.account_number }}',
+            width: 180,
+            height: 180
         });
+        qrModal.style.display = 'flex';
+    });
+
+    closeQrBtn?.addEventListener('click', () => {
+        qrModal.style.display = 'none';
+    });
+
+    scanBtn?.addEventListener('click', async () => {
+        scanModal.style.display = 'flex';
+        scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        video.srcObject = scanStream;
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        const scanLoop = () => {
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const result = jsQR(imageData.data, canvas.width, canvas.height);
+                if (result) {
+                    accountInput.value = result.data;
+                    scanModal.style.display = 'none';
+                    scanStream.getTracks().forEach(track => track.stop());
+                    return;
+                }
+            }
+            requestAnimationFrame(scanLoop);
+        };
+
+        scanLoop();
+    });
+
+    closeScanBtn?.addEventListener('click', () => {
+        scanModal.style.display = 'none';
+        if (scanStream) scanStream.getTracks().forEach(track => track.stop());
     });
 
     // === 自動補全搜尋 ===

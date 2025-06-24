@@ -725,3 +725,8 @@
     background-color: #f1f5ff;
     color: #1e293b;
 }
+
+#qr-code {
+    display: inline-block;
+    margin: 0 auto;
+}
