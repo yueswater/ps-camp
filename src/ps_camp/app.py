@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from flask import (
     Flask,
     abort,
+    current_app,
     flash,
     jsonify,
     make_response,
@@ -394,21 +395,45 @@ def create_app():
 
     @app.route("/npcs")
     def npcs():
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        json_path = os.path.join(base_dir, "static", "data", "npcs.json")
+        base_path = os.path.join(current_app.static_folder, "images/NPCs")
+        grouped_npcs = {}
 
-        with open(json_path, encoding="utf-8") as f:
-            npcs = json.load(f)
+        for region in os.listdir(base_path):
+            region_path = os.path.join(base_path, region)
+            if not os.path.isdir(region_path):
+                continue
 
-        page = int(request.args.get("page", 1))
-        per_page = 9
-        start = (page - 1) * per_page
-        end = start + per_page
-        total_pages = (len(npcs) + per_page - 1) // per_page
+            npc_list = []
+            for filename in os.listdir(region_path):
+                # 處理副檔名
+                if not filename.lower().endswith((".jpg", ".jpeg", ".png")):
+                    continue
+                name = os.path.splitext(filename)[0].replace("NPC-", "").strip()
+                image_url = f"/static/images/NPCs/{region}/{filename}"
 
-        return render_template(
-            "npc_gallery.html", npcs=npcs[start:end], page=page, total_pages=total_pages
-        )
+                npc_list.append(
+                    {
+                        "name": name,
+                        "title": "",  # 角色稱號
+                        "detail": "",  # 細節描述
+                        "image": image_url,
+                    }
+                )
+
+            grouped_npcs[region] = npc_list
+
+        return render_template("npcs.html", grouped_npcs=grouped_npcs)
+
+    @app.route("/npc/<name>")
+    def npc_detail(name):
+        npcs_path = os.path.join(app.static_folder, "data", "npcs.json")
+        with open(npcs_path, "r", encoding="utf-8") as f:
+            npc_data = json.load(f)
+
+        for npc in npc_data:
+            if npc["name"] == name:
+                return render_template("npc_detail.html", npc=npc)
+        return abort(404)
 
     @app.route("/distribute", methods=["GET", "POST"])
     def distribute_money():

@@ -1,110 +1,123 @@
-/* -------- gallery -------- */
-.npc-gallery {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  /* always 3 columns */
-  gap: 2.5rem;
-  padding: 2.5rem 1.5rem;
-  justify-items: center;
+/* 區域標題 */
+.region-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin: 2rem 0 1rem 0;
+  border-bottom: 2px solid #ccc;
+  padding-bottom: 0.5rem;
 }
 
+/* 橫向 NPC 畫廊 */
+.npc-gallery {
+  display: flex;
+  overflow-x: auto;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  scroll-snap-type: x mandatory;
+}
+
+.npc-gallery::-webkit-scrollbar {
+  height: 8px;
+}
+
+.npc-gallery::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
+}
+
+/* NPC 卡片 */
 .npc-card {
+  flex: 0 0 auto;
+  width: 200px;
+  scroll-snap-align: start;
+  background-color: #fff;
+  border-radius: 12px;
+  overflow: hidden;
   text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.npc-card:hover {
+  background-color: #f3f3f3;
 }
 
 .npc-image {
-  width: 160px;
-  height: 160px;
-  border-radius: 50%;
-  background: #ccc center/cover no-repeat;
-  margin: 0 auto 0.7rem;
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
 }
 
 .npc-name {
-  font-weight: 700;
-  font-size: 1.1rem
+  font-weight: bold;
+  padding: 0.5rem;
+  font-size: 1.1rem;
 }
 
 .npc-title {
-  font-size: 0.95rem;
-  color: #666
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.5rem;
 }
 
-/* -------- pagination -------- */
-.pagination {
-  text-align: center;
-  margin: 2rem 0 4rem
+/* NPC 詳細頁：橫向排版 */
+.npc-detail-container {
+  display: flex;
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 1rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
 }
 
-.pagination a {
-  display: inline-block;
-  margin: 0 6px;
-  padding: 6px 12px;
-  border-radius: 6px;
-  background: #eee;
-  color: #333;
-  text-decoration: none
+.npc-detail-image-wrapper {
+  flex: 0 0 40%;
+  max-width: 400px;
 }
 
-.pagination a.active {
-  background: #6c63ff;
-  color: #fff;
-  font-weight: 700
-}
-
-/* -------- popup -------- */
-#npc-popup {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0.8);
-  width: clamp(450px, 30vw, 600px);
-  max-height: 80vh;
-  background: #fff;
+.npc-detail-image {
+  width: 100%;
   border-radius: 16px;
-  padding: 2rem 2rem 2.2rem;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, .25);
-  overflow-y: auto;
-  display: none;
-  opacity: 0;
-  transition: transform .25s ease, opacity .25s ease;
-  z-index: 9999;
+  object-fit: cover;
+  aspect-ratio: 3 / 4;
 }
 
-#npc-popup.show {
-  display: block;
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1)
-}
-
-.popup-content {
-  position: relative
-}
-
-.popup-close {
-  position: absolute;
-  top: 0.4rem;
-  right: 0.6rem;
-  font-size: 1.4rem;
-  cursor: pointer;
-  color: #888
-}
-
-#popup-name {
-  margin: 0 0 .4rem;
-  font-size: 1.6rem;
-  font-weight: 700
-}
-
-#popup-title {
-  margin: 0 0 1.2rem;
-  font-size: 1.05rem;
-  color: #666
-}
-
-#popup-detail {
+.npc-detail-text {
+  flex: 1;
   white-space: pre-wrap;
-  line-height: 1.6;
-  font-size: 1rem
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.npc-detail-text h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.npc-detail-text h3 {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 1.2rem;
+}
+
+.npc-detail-text p {
+  font-size: 1.2rem;
+  line-height: 1.75;
+}
+
+.back-link {
+  display: inline-block;
+  margin-top: 2rem;
+  text-decoration: none;
+  color: #4b5563;
+}
+
+.back-link:hover {
+  color: #adadad;
+  text-decoration: none;
 }
