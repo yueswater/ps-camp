@@ -12,4 +12,5 @@ class Candidate(Base):
     party_id = Column(String, ForeignKey("users.id"), nullable=False)
     name = Column(String, nullable=False)
     description = Column(Text, nullable=True)
+    photo_url = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)

@@ -6,31 +6,33 @@
 <div class="vote-page">
     <form method="POST" action="{{ url_for('vote') }}">
         <h1>國會議員政黨投票</h1>
-        <div class="horizontal-scroll party-scroll">
+        <div class="party-grid">
             {% for party in parties %}
-            <label class="party-card">
+            <label class="party-box">
                 <input type="radio" name="party" value="{{ party.id }}" hidden>
-                <div class="card-content">
-                    <h3>{{ party.name }}</h3>
+                <div class="party-layout">
+                    <div class="stamp-area">
+                        <img src="{{ url_for('static', filename='assets/voting_stamp.svg') }}" class="stamp"
+                            alt="stamp">
+                    </div>
+                    <div class="party-section">
+                        <div class="ballot-number">{{ loop.index }}</div>
+                    </div>
+                    <div class="ballot-logo">
+                        {% if party.logo_url %}
+                        <img src="{{ party.logo_url }}" alt="{{ party.fullname }}">
+                        {% else %}
+                        <span class="party-initial">{{ party.fullname[0] }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="ballot-name-wrapper">
+                        <div class="ballot-name-vertical" data-name="{{ party.fullname }}"></div>
+                    </div>
+
                 </div>
             </label>
             {% endfor %}
         </div>
-
-        <h1>利益團體公投案投票</h1>
-        <div class="horizontal-scroll referendum-scroll">
-            {% for ref in referendums %}
-            <div class="referendum-card">
-                <h3>{{ ref.title }}</h3>
-                <div class="choices">
-                    <label><input type="radio" name="referendum_{{ ref.id }}" value="agree"> 同意</label>
-                    <label><input type="radio" name="referendum_{{ ref.id }}" value="disagree"> 不同意</label>
-                    <label><input type="radio" name="referendum_{{ ref.id }}" value="abstain"> 棄權</label>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-
         <button type="submit" class="submit-button">送出投票</button>
     </form>
 </div>

@@ -1,56 +1,164 @@
-.vote-page {
-    padding: 2rem;
+.party-grid {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
-.horizontal-scroll {
-    display: flex;
-    overflow-x: auto;
-    gap: 1rem;
-    padding: 1rem 0;
-    margin-bottom: 2rem;
+.party-box {
+  width: 100px;
+  height: 350px;
+  border: 2px solid red;
+  background-color: white;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  align-items: stretch;
+  padding: 0;
+  box-sizing: border-box;
+  transition: box-shadow 0.2s ease;
 }
 
-.party-card,
-.referendum-card {
-    flex: 0 0 auto;
-    width: 220px;
-    border: 2px solid #ccc;
-    border-radius: 12px;
-    padding: 1rem;
-    background-color: white;
-    cursor: pointer;
-    transition: border-color 0.2s, box-shadow 0.2s;
+.party-box:hover {
+  box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.4);
 }
 
-.party-card:hover,
-.referendum-card:hover {
-    border-color: #444;
-    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+.party-box.selected {
+  box-shadow: 0 0 0 3px red;
 }
 
-.party-card input:checked + .card-content {
-    border: 2px solid #007bff;
+/* 四區塊配置：蓋章、編號、logo、黨名 */
+.party-layout {
+  display: grid;
+  grid-template-rows: 25% 20% 25% 30%;
+  height: 100%;
+  align-items: center;
+  justify-items: center;
+  text-align: center;
+  border-collapse: collapse;
 }
 
-.card-content {
-    text-align: center;
+/* stamp 區 */
+.stamp-area {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  border-bottom: 2px solid red;
 }
 
-.choices {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-top: 1rem;
+.stamp {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 40px;
+  opacity: 0;
+  transform: scale(0.3);
+  pointer-events: none;
 }
 
+.party-box.selected .stamp {
+  animation: stampIn 0.4s ease forwards;
+  animation-delay: 0.5s;
+}
+
+/* 編號區 */
+.party-section {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 2px solid red;
+  box-sizing: border-box;
+}
+
+.ballot-number {
+  font-size: 20px;
+  font-weight: bold;
+  color: black;
+}
+
+/* logo 區 */
+.ballot-logo {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 2px solid red;
+}
+
+.ballot-logo img,
+.ballot-logo .party-initial {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: contain;
+  background: #eee;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+/* 政黨名稱：直書 */
+.ballot-name-vertical {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  font-size: 12.5px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.ballot-name-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+/* 動畫 */
+@keyframes stampIn {
+  0% {
+    opacity: 0;
+    transform: scale(2.2) rotate(-15deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(0.85) rotate(3deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* 投票按鈕 */
 .submit-button {
-    display: block;
-    margin: 0 auto;
-    padding: 0.75rem 2rem;
-    font-size: 1.1rem;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
+  display: block;
+  margin: 2rem auto;
+  padding: 0.75rem 2rem;
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #495057;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.25s ease, transform 0.2s ease;
+}
+
+.submit-button:hover {
+  background-color: #212529;
+  transform: translateY(-2px);
+}
+
+.submit-button:active {
+  background-color: #212529;
+  transform: translateY(1px);
 }

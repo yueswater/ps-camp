@@ -608,7 +608,7 @@ def create_app():
         with get_db_session() as db:
             vote_repo = VoteSQLRepository(db)
             ref_repo = ReferendumVoteSQLRepository(db)
-            cand_repo = CandidateSQLRepository(db)  # ← 加這行
+            CandidateSQLRepository(db)
 
             if request.method == "POST":
                 # Process form submission
@@ -634,8 +634,8 @@ def create_app():
                 flash("投票成功！")
                 return redirect(url_for("home"))
 
-            candidates = cand_repo.get_all()
-
+            user_repo = UserSQLRepository(db)
+            parties = [u for u in user_repo.get_all() if u.role == "party"]
             ref_repo = ReferendumSQLRepository(db)
             referendums = ref_repo.get_active_referendums()
 
@@ -644,7 +644,7 @@ def create_app():
                 return render_template("vote_success.html")
 
             return render_template(
-                "vote.html", parties=candidates, referendums=referendums
+                "vote.html", parties=parties, referendums=referendums
             )
 
     @app.route("/submit", methods=["GET", "POST"])
@@ -657,16 +657,33 @@ def create_app():
         with get_db_session() as db:
             if request.method == "POST":
                 data = request.form
+                photo = request.files.get("photo")
+                photo_url = None
+
+                # 若為政黨上傳候選人
                 if user["role"] == "party":
+                    # 儲存圖片
+                    if photo and photo.filename:
+                        filename = f"{uuid4().hex}_{photo.filename}"
+                        upload_dir = os.path.join(
+                            "src", "ps_camp", "static", "uploads", "candidates"
+                        )
+                        os.makedirs(upload_dir, exist_ok=True)
+                        photo_path = os.path.join(upload_dir, filename)
+                        photo.save(photo_path)
+                        photo_url = f"/static/uploads/candidates/{filename}"
+
                     candidate = Candidate(
                         id=str(uuid4()),
                         party_id=user["id"],
                         name=data["name"],
                         description=data.get("description", ""),
                         created_at=datetime.now(UTC),
+                        photo_url=photo_url,
                     )
                     db.add(candidate)
 
+                # 若為利益團體上傳公投案
                 elif user["role"] == "group":
                     proposal = Proposal(
                         id=str(uuid4()),
@@ -681,7 +698,7 @@ def create_app():
                 flash("提交成功！", "success")
                 return redirect(url_for("home"))
 
-        return render_template("submit.html", role=user["role"])
+        return render_template("submit.html", role=user["role"], user=user)
 
     return app
 
