@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const scanBtn = document.getElementById('scan-qr');
     const closeScanBtn = document.getElementById('close-qr-scan');
     const video = document.getElementById('qr-video');
+
     let scanStream;
 
     // === 開啟 modal ===
@@ -69,18 +70,21 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     });
 
-    // === 產生 QR Code ===
+    // === 產生 QR Code（只放 account_number） ===
     openQrBtn?.addEventListener('click', () => {
         const qrTarget = document.getElementById('qr-code');
         qrTarget.innerHTML = '';
+
+        const accountNumber = openQrBtn.dataset.account;
+
+        console.log("🚀 產生 QR 內容（純帳號）：", accountNumber);
+
         new QRCode(qrTarget, {
-            text: JSON.stringify({
-                account_number: '{{ account.account_number }}',
-                fullname: '{{ session.user.fullname }}'
-            }),
+            text: accountNumber,
             width: 180,
             height: 180
         });
+
         qrModal.style.display = 'flex';
     });
 
@@ -88,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
         qrModal.style.display = 'none';
     });
 
-    // === 掃描 QR Code ===
+    // === 掃描 QR Code（讀帳號＋自動補人名）===
     scanBtn?.addEventListener('click', async () => {
         scanModal.style.display = 'flex';
         scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
@@ -109,21 +113,46 @@ document.addEventListener('DOMContentLoaded', () => {
                     scanStream.getTracks().forEach(track => track.stop());
                     scanModal.style.display = 'none';
 
-                    try {
-                        const data = JSON.parse(result.data);
-                        accountInput.value = data.account_number || '';
-                        searchInput.value = data.fullname || '';
+                    const scannedAccount = result.data;
+                    console.log("📦 掃描帳號：", scannedAccount);
 
-                        document.getElementById('show-transfer')?.click();
-                        setTimeout(() => {
-                            document.querySelector('input[name="amount"]')?.focus();
-                        }, 200);
-                    } catch (err) {
-                        SandstormApp.showNotification('無效的 QR Code 資料', 'error');
-                    }
+                    document.getElementById('show-transfer')?.click();  // 開 modal
+
+                    setTimeout(() => {
+                        const accountInput = document.querySelector('input[name="to_account_number"]');
+                        const searchInput = document.getElementById('recipient-search');
+
+                        console.log("🧪 accountInput 是否抓到？", accountInput);
+                        console.log("🧪 searchInput 是否抓到？", searchInput);
+
+                        if (accountInput) {
+                            accountInput.value = scannedAccount;
+                            console.log("✅ 已寫入收款帳號欄位");
+                        } else {
+                            console.warn("❌ 找不到收款帳號 input");
+                        }
+
+                        if (searchInput) {
+                            fetch(`/api/lookup-user-by-account?q=${encodeURIComponent(scannedAccount)}`)
+                                .then(r => r.json())
+                                .then(res => {
+                                    console.log("📋 查詢 API 回傳：", res);
+                                    const fullname = res?.fullname;
+                                    if (fullname) {
+                                        searchInput.value = fullname;
+                                        console.log("✅ 已寫入戶名：", fullname);
+                                    } else {
+                                        console.warn("⚠️ 查無 fullname 資料");
+                                    }
+                                });
+                        }
+
+                        amountInput?.focus();
+                    }, 400);
 
                     return;
                 }
+
             }
             requestAnimationFrame(scanLoop);
         };

@@ -66,9 +66,13 @@
             <button id="scan-qr" class="btn-secondary">
                 <i class="fas fa-camera"></i> 掃碼轉帳
             </button>
-            <button id="generate-qr" class="btn-secondary">
+            <button id="generate-qr" 
+                class="btn-secondary" 
+                data-account="{{ account.account_number }}"
+                data-fullname="{{ session.user.fullname }}">
                 <i class="fas fa-qrcode"></i> 收款 QR Code
             </button>
+
         </div>
     </div>
 </div>
@@ -226,28 +230,28 @@
 </div>
 
 <div id="qr-modal" class="modal-overlay">
-  <div class="modal-container">
-    <div class="modal-header">
-      <h3><i class="fas fa-qrcode"></i> 我的收款碼</h3>
-      <button type="button" id="close-qr-modal" class="modal-close">×</button>
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3><i class="fas fa-qrcode"></i> 我的收款碼</h3>
+            <button type="button" id="close-qr-modal" class="modal-close">×</button>
+        </div>
+        <div class="modal-body" style="text-align: center;">
+            <div id="qr-code"></div>
+            <p style="margin-top: 1rem;">掃描付款至帳戶：<strong>{{ account.account_number }}</strong></p>
+        </div>
     </div>
-    <div class="modal-body" style="text-align: center;">
-      <div id="qr-code"></div>
-      <p style="margin-top: 1rem;">掃描付款至帳戶：<strong>{{ account.account_number }}</strong></p>
-    </div>
-  </div>
 </div>
 
 <div id="qr-scan-modal" class="modal-overlay">
-  <div class="modal-container">
-    <div class="modal-header">
-      <h3><i class="fas fa-camera"></i> 掃碼付款</h3>
-      <button type="button" id="close-qr-scan" class="modal-close">×</button>
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3><i class="fas fa-camera"></i> 掃碼付款</h3>
+            <button type="button" id="close-qr-scan" class="modal-close">×</button>
+        </div>
+        <div class="modal-body">
+            <video id="qr-video" width="100%" autoplay muted playsinline></video>
+        </div>
     </div>
-    <div class="modal-body">
-      <video id="qr-video" width="100%" autoplay muted playsinline></video>
-    </div>
-  </div>
 </div>
 
 

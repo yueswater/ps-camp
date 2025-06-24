@@ -650,6 +650,34 @@ def create_app():
 
             return jsonify(results)
 
+    @app.route("/api/lookup-user-by-account")
+    def lookup_user_by_account():
+        if not session.get("user"):
+            return jsonify({"error": "unauthorized"}), 401
+
+        account_number = request.args.get("q", "").strip()
+        if not account_number:
+            return jsonify({"error": "missing query"}), 400
+
+        with get_db_session() as db:
+            bank_repo = BankSQLRepository(db)
+            account = bank_repo.get_account_by_number(account_number)
+
+            if not account:
+                return jsonify({"error": "account not found"}), 404
+
+            user = db.query(User).filter_by(id=account.owner_id).first()
+            if not user:
+                return jsonify({"error": "user not found"}), 404
+
+            return jsonify(
+                {
+                    "fullname": user.fullname,
+                    "username": user.username,
+                    "account_number": account.account_number,
+                }
+            )
+
     @app.route("/vote", methods=["GET", "POST"])
     def vote():
         if "user" not in session:
