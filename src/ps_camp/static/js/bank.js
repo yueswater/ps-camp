@@ -11,9 +11,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const amountInput = document.querySelector('input[name="amount"]');
     const feeAmountSpan = document.querySelector('.fee-amount');
     const totalAmountSpan = document.querySelector('.total-amount');
+
     const qrModal = document.getElementById('qr-modal');
     const openQrBtn = document.getElementById('generate-qr');
     const closeQrBtn = document.getElementById('close-qr-modal');
+
     const scanModal = document.getElementById('qr-scan-modal');
     const scanBtn = document.getElementById('scan-qr');
     const closeScanBtn = document.getElementById('close-qr-scan');
@@ -35,16 +37,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // === 關閉 modal ===
-    cancelBtn?.addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
-
     modal?.addEventListener('click', e => {
         if (e.target === modal) modal.style.display = 'none';
     });
 
-    // === 提交表單 ===
     form?.addEventListener('submit', e => {
         e.preventDefault();
         const data = Object.fromEntries(new FormData(form).entries());
@@ -73,11 +69,15 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     });
 
+    // === 產生 QR Code ===
     openQrBtn?.addEventListener('click', () => {
         const qrTarget = document.getElementById('qr-code');
         qrTarget.innerHTML = '';
         new QRCode(qrTarget, {
-            text: '{{ account.account_number }}',
+            text: JSON.stringify({
+                account_number: '{{ account.account_number }}',
+                fullname: '{{ session.user.fullname }}'
+            }),
             width: 180,
             height: 180
         });
@@ -88,6 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
         qrModal.style.display = 'none';
     });
 
+    // === 掃描 QR Code ===
     scanBtn?.addEventListener('click', async () => {
         scanModal.style.display = 'flex';
         scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
@@ -103,18 +104,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
                 const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                 const result = jsQR(imageData.data, canvas.width, canvas.height);
+
                 if (result) {
                     scanStream.getTracks().forEach(track => track.stop());
                     scanModal.style.display = 'none';
 
-                    accountInput.value = result.data;
-                    scanModal.style.display = 'none';
+                    try {
+                        const data = JSON.parse(result.data);
+                        accountInput.value = data.account_number || '';
+                        searchInput.value = data.fullname || '';
 
-                    document.getElementById('show-transfer')?.click();
-                    setTimeout(() => {
-                        document.querySelector('input[name="amount"]')?.focus();
-                    }, 200);
-                    
+                        document.getElementById('show-transfer')?.click();
+                        setTimeout(() => {
+                            document.querySelector('input[name="amount"]')?.focus();
+                        }, 200);
+                    } catch (err) {
+                        SandstormApp.showNotification('無效的 QR Code 資料', 'error');
+                    }
+
                     return;
                 }
             }
@@ -131,17 +138,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // === 自動補全搜尋 ===
     let isComposing = false;
-
     if (searchInput && suggestionsBox && accountInput) {
-        searchInput.addEventListener('compositionstart', () => {
-            isComposing = true;
-        });
-
+        searchInput.addEventListener('compositionstart', () => { isComposing = true; });
         searchInput.addEventListener('compositionend', () => {
             isComposing = false;
             handleSearch();
         });
-
         searchInput.addEventListener('input', () => {
             if (!isComposing) handleSearch();
         });
@@ -198,16 +200,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // === 即時更新總計金額（含手續費） ===
+    // === 金額變動時更新總計 ===
     function updateTotalAmount() {
         const amount = parseInt(amountInput.value, 10) || 0;
-        const fee = 0;  // 若未來有手續費可改
+        const fee = 0;
         const total = amount + fee;
 
         if (feeAmountSpan) {
             feeAmountSpan.textContent = `NT$ ${fee.toLocaleString()}`;
         }
-
         if (totalAmountSpan) {
             totalAmountSpan.textContent = `NT$ ${total.toLocaleString()}`;
             totalAmountSpan.dataset.amount = total;
