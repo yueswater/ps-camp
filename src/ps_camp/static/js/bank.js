@@ -1,18 +1,33 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const modal      = document.getElementById('transfer-modal');
-    const showBtn    = document.getElementById('show-transfer');
-    const cancelBtn  = document.getElementById('cancel-transfer');
-    const form       = document.getElementById('transfer-form');
+    const modal = document.getElementById('transfer-modal');
+    const showBtn = document.getElementById('show-transfer');
+    const cancelBtn = document.getElementById('cancel-transfer-btn');
+    const form = document.getElementById('transfer-form');
     const balanceDom = document.getElementById('balance');
 
-    // ===== 開關 modal =====
+    const searchInput = document.getElementById('recipient-search');
+    const suggestionsBox = document.getElementById('search-suggestions');
+    const accountInput = document.querySelector('input[name="to_account_number"]');
+    const amountInput = document.querySelector('input[name="amount"]');
+    const feeAmountSpan = document.querySelector('.fee-amount');
+    const totalAmountSpan = document.querySelector('.total-amount');
+
+    // === 開啟 modal ===
     showBtn?.addEventListener('click', () => {
         form.reset();
-        const suggestionsBox = document.getElementById('search-suggestions');
-        if (suggestionsBox) suggestionsBox.innerHTML = '';
+        suggestionsBox.innerHTML = '';
+        suggestionsBox.style.display = 'none';
         modal.style.display = 'flex';
+        updateTotalAmount();
     });
 
+    ['cancel-transfer-btn', 'cancel-transfer'].forEach(id => {
+        document.getElementById(id)?.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+    });
+
+    // === 關閉 modal ===
     cancelBtn?.addEventListener('click', () => {
         modal.style.display = 'none';
     });
@@ -21,11 +36,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === modal) modal.style.display = 'none';
     });
 
-    // ===== 提交轉帳 =====
+    // === 提交表單 ===
     form?.addEventListener('submit', e => {
         e.preventDefault();
         const data = Object.fromEntries(new FormData(form).entries());
-
         if (!data.to_account_number || !data.amount) return;
 
         SandstormApp.showLoading();
@@ -51,11 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // ===== 模糊搜尋區（含注音輸入支援 + Debug） =====
-    const searchInput = document.getElementById('recipient-search');
-    const suggestionsBox = document.getElementById('search-suggestions');
-    const accountInput = document.querySelector('input[name="to_account_number"]');
-
+    // === 自動補全搜尋 ===
     let isComposing = false;
 
     if (searchInput && suggestionsBox && accountInput) {
@@ -65,30 +75,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         searchInput.addEventListener('compositionend', () => {
             isComposing = false;
-
             handleSearch();
         });
 
         searchInput.addEventListener('input', () => {
-            if (!isComposing) {
-
-                handleSearch();
-            }
+            if (!isComposing) handleSearch();
         });
 
         document.addEventListener('click', (e) => {
             if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
                 suggestionsBox.innerHTML = '';
+                suggestionsBox.style.display = 'none';
             }
         });
     }
 
     async function handleSearch() {
         const query = searchInput.value.trim();
-
         if (query.length < 1) {
             suggestionsBox.innerHTML = '';
-
+            suggestionsBox.style.display = 'none';
             return;
         }
 
@@ -96,36 +102,53 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch(`/api/search-users?q=${encodeURIComponent(query)}`);
             const users = await res.json();
 
-
-
             suggestionsBox.innerHTML = '';
+
             if (users.length === 0) {
                 const noneItem = document.createElement('div');
                 noneItem.className = 'autocomplete-item';
                 noneItem.textContent = '找不到相關使用者';
                 noneItem.style.color = '#888';
                 suggestionsBox.appendChild(noneItem);
+                suggestionsBox.style.display = 'block';
                 return;
             }
 
-            users.forEach((user, i) => {
-
+            users.forEach((user) => {
                 const item = document.createElement('div');
                 item.className = 'autocomplete-item';
                 item.textContent = `${user.fullname}（${user.username}）`;
-
                 item.addEventListener('click', () => {
-
                     accountInput.value = user.account_number;
                     searchInput.value = user.fullname;
                     suggestionsBox.innerHTML = '';
+                    suggestionsBox.style.display = 'none';
                 });
-
                 suggestionsBox.appendChild(item);
             });
-        } catch (err) {
 
+            suggestionsBox.style.display = 'block';
+        } catch (err) {
             suggestionsBox.innerHTML = '';
+            suggestionsBox.style.display = 'none';
         }
     }
+
+    // === 即時更新總計金額（含手續費） ===
+    function updateTotalAmount() {
+        const amount = parseInt(amountInput.value, 10) || 0;
+        const fee = 0;  // 若未來有手續費可改
+        const total = amount + fee;
+
+        if (feeAmountSpan) {
+            feeAmountSpan.textContent = `NT$ ${fee.toLocaleString()}`;
+        }
+
+        if (totalAmountSpan) {
+            totalAmountSpan.textContent = `NT$ ${total.toLocaleString()}`;
+            totalAmountSpan.dataset.amount = total;
+        }
+    }
+
+    amountInput?.addEventListener('input', updateTotalAmount);
 });
