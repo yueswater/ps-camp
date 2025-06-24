@@ -24,7 +24,7 @@
             </span>
         </div>
     </div>
-    
+
     <div class="account-details">
         <div class="account-info">
             <div class="info-row">
@@ -40,7 +40,7 @@
                 <span class="info-value">活期存款</span>
             </div>
         </div>
-        
+
         <div class="balance-section">
             <div class="balance-label">可用餘額</div>
             <div class="account-balance" id="balance">
@@ -91,7 +91,7 @@
                 </tr>
             </thead>
             <tbody>
-            {% for tx in transactions %}
+                {% for tx in transactions %}
                 <tr class="transaction-row">
                     <td class="tx-time">
                         <div class="time-main">{{ tx.created_at.strftime('%m/%d') }}</div>
@@ -99,26 +99,27 @@
                     </td>
                     <td class="tx-type">
                         {% if tx.from_account_id == account.id %}
-                            <span class="type-badge outgoing">
-                                <i class="fas fa-arrow-up"></i>
-                                轉出
-                            </span>
+                        <span class="type-badge outgoing">
+                            <i class="fas fa-arrow-up"></i>
+                            轉出
+                        </span>
                         {% else %}
-                            <span class="type-badge incoming">
-                                <i class="fas fa-arrow-down"></i>
-                                轉入
-                            </span>
+                        <span class="type-badge incoming">
+                            <i class="fas fa-arrow-down"></i>
+                            轉入
+                        </span>
                         {% endif %}
                     </td>
                     <td class="tx-account">
                         {% if tx.from_account_id == account.id %}
-                            {{ tx.to_account_id[:8] }}...
+                        {{ tx.to_account_id[:8] }}...
                         {% else %}
-                            {{ tx.from_account_id[:8] }}...
+                        {{ tx.from_account_id[:8] }}...
                         {% endif %}
                     </td>
                     <td class="tx-amount {{ 'negative' if tx.from_account_id == account.id else 'positive' }}">
-                        <span class="amount-sign">{% if tx.from_account_id == account.id %}-{% else %}+{% endif %}</span>
+                        <span class="amount-sign">{% if tx.from_account_id == account.id %}-{% else %}+{% endif
+                            %}</span>
                         <span class="amount-value">{{ "{:,}".format(tx.amount) }}</span>
                     </td>
                     <td class="tx-note">
@@ -131,16 +132,16 @@
                         </span>
                     </td>
                 </tr>
-            {% endfor %}
+                {% endfor %}
             </tbody>
         </table>
     </div>
     {% else %}
-        <div class="empty-state">
-            <i class="fas fa-receipt"></i>
-            <h3>尚無交易紀錄</h3>
-            <p>您的帳戶目前沒有任何交易記錄</p>
-        </div>
+    <div class="empty-state">
+        <i class="fas fa-receipt"></i>
+        <h3>尚無交易紀錄</h3>
+        <p>您的帳戶目前沒有任何交易記錄</p>
+    </div>
     {% endif %}
 </div>
 
@@ -155,22 +156,29 @@
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        
+
         <div class="modal-body">
             <form id="transfer-form" class="transfer-form">
                 <div class="form-section">
+                    <div class="form-group" style="position: relative;">
+                        <label class="form-label">收款人搜尋</label>
+                        <input type="text" id="recipient-search" class="form-input" placeholder="輸入姓名或帳號關鍵字">
+                        <div id="search-suggestions" class="autocomplete-list"></div>
+                    </div>
+
+
                     <div class="form-group">
                         <label class="form-label">收款方帳號</label>
-                        <input type="text" name="to_account_number" class="form-input" required 
-                               placeholder="請輸入收款方帳號">
+                        <input type="text" name="to_account_number" class="form-input" required placeholder="請輸入收款方帳號">
                     </div>
-                    
+
+
                     <div class="form-group">
                         <label class="form-label">轉帳金額</label>
                         <div class="amount-input-container">
                             <span class="currency-prefix">NT$</span>
-                            <input type="number" name="amount" class="form-input amount-input" 
-                                   min="1" max="{{ account.balance }}" required placeholder="0">
+                            <input type="number" name="amount" class="form-input amount-input" min="1"
+                                max="{{ account.balance }}" required placeholder="0">
                         </div>
                         <div class="balance-hint">
                             可用餘額：NT$ {{ "{:,}".format(account.balance) }}
@@ -179,8 +187,7 @@
 
                     <div class="form-group">
                         <label class="form-label">備註 <span class="optional">(選填)</span></label>
-                        <input type="text" name="note" class="form-input" 
-                               maxlength="50" placeholder="轉帳備註說明">
+                        <input type="text" name="note" class="form-input" maxlength="50" placeholder="轉帳備註說明">
                     </div>
                 </div>
 

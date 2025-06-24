@@ -50,6 +50,7 @@ logger = logging.getLogger(__name__)
 
 
 def map_role_to_owner_type(role: str) -> OwnerType:
+    role = role.lower()
     if role == "admin":
         return OwnerType.admin
     elif role == "party":
@@ -600,6 +601,50 @@ def create_app():
             logging.debug("commit 完成")
 
             return jsonify(success=True, action=action, likes=len(post.likes))
+
+    @app.route("/api/search-users")
+    def search_users():
+        if not session.get("user"):
+            return jsonify([]), 401
+
+        keyword = request.args.get("q", "").strip()
+        if not keyword:
+            return jsonify([])
+
+        with get_db_session() as db:
+            user_repo = UserSQLRepository(db)
+            bank_repo = BankSQLRepository(db)
+
+            matched_users = (
+                db.query(user_repo.model)
+                .filter(user_repo.model.fullname.ilike(f"%{keyword}%"))
+                .limit(5)
+                .all()
+            )
+
+            results = []
+            for user in matched_users:
+                role_str = str(user.role).lower()
+                owner_type = map_role_to_owner_type(role_str)
+                account = bank_repo.get_account_by_owner(user.id, owner_type)
+
+                print(
+                    f"[DEBUG] 使用者：{user.fullname} ({user.role}) → owner_type: {owner_type.value}"
+                )
+                print(
+                    f"[DEBUG] 帳戶查詢結果：{account.account_number if account else '無帳戶'}"
+                )
+
+                if account:
+                    results.append(
+                        {
+                            "fullname": user.fullname,
+                            "username": user.username,
+                            "account_number": account.account_number,
+                        }
+                    )
+
+            return jsonify(results)
 
     @app.route("/vote", methods=["GET", "POST"])
     def vote():

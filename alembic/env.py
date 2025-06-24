@@ -14,15 +14,6 @@ from sqlalchemy import engine_from_config, pool
 from alembic import context
 from ps_camp.db.base import Base
 from ps_camp.sql_models import bank_model  # party_document_model
-from ps_camp.sql_models import (
-    candidate_model,
-    npc_model,
-    post_model,
-    referendum_model,
-    referendum_vote_model,
-    user_model,
-    vote_model,
-)
 
 # this is the alembic config object which provides
 # access to values within the .ini file in use
