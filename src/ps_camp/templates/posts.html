@@ -112,7 +112,7 @@
 {% endif %}
 
 <!-- 浮動新增貼文按鈕 -->
-{% if session.get("user") and session.user.role in ["party", "interest_group", "admin"] %}
+{% if session.get("user") and session.user.role in ["party", "group", "admin"] %}
 <div class="floating-add-btn">
     <a href="{{ url_for('new_post') }}" class="fab-btn" title="發表新貼文">
         <i class="fas fa-plus"></i>
