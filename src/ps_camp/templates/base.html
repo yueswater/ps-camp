@@ -7,9 +7,10 @@
     <link rel="icon" href="{{ url_for('static', filename='assets/favicon.ico') }}" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="canonical" href="{{ request.url }}">
     <meta property="og:title" content="{% block og_title %}沙政風暴 | 臺大政治營{% endblock %}">
     <meta property="og:description" content="{% block og_description %}這是一場屬於你的選戰{% endblock %}">
-    <meta property="og:image" content="{% block og_image %}{{ url_for('static', filename='assets/og-image', _external=True) }}{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{{ url_for('static', filename='assets/og-image.png', _external=True) }}{% endblock %}">
     <meta property="og:url" content="{{ request.url }}">
     <meta property="og:type" content="website">
 </head>
