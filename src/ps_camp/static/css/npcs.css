@@ -1,3 +1,9 @@
+.npcs-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0;
+}
+
 /* 區域標題 */
 .region-title {
   font-size: 1.8rem;
@@ -120,4 +126,37 @@
 .back-link:hover {
   color: #adadad;
   text-decoration: none;
+}
+
+/* 空狀態 */
+.empty-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+}
+
+.empty-state {
+  width: 580px;
+    text-align: center;
+    padding: 4rem 2rem;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: #adb5bd;
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: #6c757d;
+    margin-bottom: 2rem;
 }

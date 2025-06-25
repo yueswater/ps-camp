@@ -1,4 +1,4 @@
-// 移除 mockData，改為從 API 獲取真實數據
+//Remove mockData and get real data from the API instead
 let currentData = null;
 
 function formatNumber(num) {
@@ -18,10 +18,10 @@ function formatNumber(num) {
     };
 }
 
-// 從後端 API 獲取投票結果
+//Get voting results from the backend API
 async function fetchVoteResults() {
     try {
-        const response = await fetch("/api/live_votes"); // 使用正確的 API endpoint
+        const response = await fetch("/api/live_votes"); //Use the correct API endpoint
         if (!response.ok) {
             throw new Error("Failed to fetch vote results");
         }
@@ -29,7 +29,7 @@ async function fetchVoteResults() {
         return data;
     } catch (error) {
         console.error("Error fetching vote results:", error);
-        // 如果 API 失敗，返回空數據結構
+        //If the API fails, return an empty data structure
         return {
             timestamp: new Date().toISOString(),
             votes: {
@@ -42,23 +42,30 @@ async function fetchVoteResults() {
 }
 
 async function updateResults() {
-    // 獲取最新數據
+    //Get the latest data
     currentData = await fetchVoteResults();
     const data = currentData;
 
-    // 更新時間戳
+    //Update the current time
+    const currentTimeElement = document.getElementById("current-time");
+    const now = new Date();
+    if (currentTimeElement) {
+        currentTimeElement.textContent = now.toLocaleString("zh-TW");
+    }
+
+    //Last Update Time
     const timestamp = new Date(data.timestamp);
     const timestampElement = document.getElementById("last-update");
     if (timestampElement) {
         timestampElement.textContent = timestamp.toLocaleString("zh-TW");
     }
 
-    // 處理政黨票
+    //Handle party tickets
     const partyVotes = data.votes.party_votes || {};
     const partyNames = data.votes.party_names || {};
     const totalPartyVotes = Object.values(partyVotes).reduce((a, b) => a + b, 0);
 
-    // 更新統計卡片
+    //Update statistics card
     const totalVotesElement = document.getElementById("total-votes");
     const turnoutElement = document.getElementById("turnout");
     const leadingPartyElement = document.getElementById("leading-party");
@@ -68,7 +75,7 @@ async function updateResults() {
     }
 
     if (turnoutElement) {
-        // 你可以從後端傳送真實的投票率，或者根據總投票數計算
+        //You can send real turnout from the backend, or calculate based on the total number of votes
         const estimatedTurnout = data.votes.turnout || "計算中";
         turnoutElement.textContent =
             typeof estimatedTurnout === "number"
@@ -76,21 +83,37 @@ async function updateResults() {
                 : estimatedTurnout;
     }
 
-    // 找出領先政黨
+    //Find the leading political party
     if (leadingPartyElement && Object.keys(partyVotes).length > 0) {
-        const leadingParty = Object.entries(partyVotes).reduce((a, b) =>
-            a[1] > b[1] ? a : b
-        );
-        leadingPartyElement.textContent = partyNames[leadingParty[0]] || "計算中";
+        const maxVotes = Math.max(...Object.values(partyVotes));
+        const leaders = Object.entries(partyVotes)
+            .filter(([, count]) => count === maxVotes)
+            .slice(0, 3); // 最多顯示 3 個
+
+        const names = leaders.map(([id]) => partyNames[id] || id);
+        const count = names.length;
+
+        // 根據數量調整字體大小 class
+        leadingPartyElement.classList.remove("leading-one", "leading-two", "leading-three");
+        if (count === 1) {
+            leadingPartyElement.classList.add("leading-one");
+        } else if (count === 2) {
+            leadingPartyElement.classList.add("leading-two");
+        } else {
+            leadingPartyElement.classList.add("leading-three");
+        }
+
+        leadingPartyElement.innerHTML = names.join("<br>");
     }
 
-    // 渲染政黨票結果 - 新的卡片式設計
+
+    //Render the results of party tickets -new card design
     const partyContainer = document.getElementById("party-results");
     if (partyContainer) {
         partyContainer.innerHTML = "";
-        partyContainer.className = "party-grid"; // 設定為網格佈局
+        partyContainer.className = "party-grid"; //Set as grid layout
 
-        // 按票數排序
+        //Sort by votes
         const sortedParties = Object.entries(partyVotes).sort(
             ([, a], [, b]) => b - a
         );
@@ -104,7 +127,7 @@ async function updateResults() {
             const formatted = formatNumber(count);
 
             const item = document.createElement("div");
-            item.className = "party-card"; // 改為 party-card
+            item.className = "party-card"; //Change to party-card
             item.innerHTML = `
                 <div class="party-card-header">
                     <div class="party-name">${name}</div>
@@ -139,14 +162,14 @@ async function updateResults() {
         });
     }
 
-    // 公投票卡片顯示
+    //Referendum card display
     const refVotes = data.votes.referendum_votes || {};
     const refTitles = data.votes.referendum_titles || {};
     const refContainer = document.getElementById("referendum-results");
 
     if (refContainer) {
         refContainer.innerHTML = "";
-        refContainer.className = "party-grid"; // 與政黨票一致的卡片網格
+        refContainer.className = "referendum-grid"; //Card grid consistent with party tickets
 
         const sortedRefs = Object.entries(refVotes).sort(([, a], [, b]) => {
             const aTotal = (a.yes || 0) + (a.no || 0);
@@ -161,10 +184,10 @@ async function updateResults() {
             const total = yes + no;
             const yesPercent = total > 0 ? ((yes / total) * 100).toFixed(1) : "0.0";
 
-            const formatted = formatNumber(yes); // 只以同意票為主顯示數字
+            const formatted = formatNumber(yes); //Show numbers only based on consent votes
 
             const item = document.createElement("div");
-            item.className = "party-card"; // 與政黨票卡片一致的樣式
+            item.className = "party-card"; //Style consistent with party ticket cards
             item.innerHTML = `
             <div class="party-card-header">
                 <div class="party-name">${title}</div>
@@ -197,14 +220,14 @@ async function updateResults() {
     }
 }
 
-// 初始化
+//Initialization
 document.addEventListener("DOMContentLoaded", function () {
     updateResults();
-    // 每 5 秒更新一次數據
+    //Update data every 5 seconds
     setInterval(updateResults, 5000);
 });
 
-// 如果需要手動刷新功能
+//If manual refresh function is required
 function refreshResults() {
     updateResults();
 }

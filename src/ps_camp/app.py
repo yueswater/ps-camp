@@ -124,13 +124,18 @@ def create_app():
                     session["user"]["coins"] = 0  # or keep the presets
                     flash("找不到對應的銀行帳戶，請聯繫主辦方", "warning")
 
-        print(f"[DEBUG] 開放時間：{vote_open_time}")
-        print(f"[DEBUG] 結束時間：{vote_close_time}")
+        voted = False
+        if "user" in session:
+            with get_db_session() as db:
+                vote_repo = VoteSQLRepository(db)
+                voted = vote_repo.has_voted(session["user"]["id"])
+
         return render_template(
             "index.html",
             current_time=current_time,
             vote_open_time=vote_open_time,
             vote_close_time=vote_close_time,
+            voted=voted,
         )
 
     @app.route("/ping")
@@ -751,8 +756,16 @@ def create_app():
             flash("請先登入")
             return redirect(url_for("login"))
 
+        user_id = session["user"]["id"]
         with get_db_session() as db:
+            vote_repo = VoteSQLRepository(db)
             user_repo = UserSQLRepository(db)
+
+            # 防止重複投票
+            if vote_repo.has_voted(user_id):
+                flash("您已完成投票")
+                return render_template("vote_success.html")
+
             parties = [u for u in user_repo.get_all() if u.role == "party"]
 
             if request.method == "POST":
@@ -773,30 +786,26 @@ def create_app():
             flash("請先登入")
             return redirect(url_for("login"))
 
+        user_id = session["user"]["id"]
         party_id = session.get("vote_party")
+
         if not party_id:
             flash("請先投政黨票，才能進入公投投票")
             return redirect(url_for("vote_party"))
 
-        user_id = session["user"]["id"]
         with get_db_session() as db:
             vote_repo = VoteSQLRepository(db)
             ref_repo = ReferendumVoteSQLRepository(db)
             ref_source = ReferendumSQLRepository(db)
             referendums = ref_source.get_active_referendums()
 
+            # 防止重複投票
             if vote_repo.has_voted(user_id):
-                flash("你已完成投票")
+                flash("您已完成投票")
                 return render_template("vote_success.html")
 
             if request.method == "POST":
-                # 公投票處理
-                referendum_votes = {
-                    key.replace("referendum_", ""): value
-                    for key, value in request.form.items()
-                    if key.startswith("referendum_")
-                }
-
+                # 驗證是否每一題都投了
                 missing = [
                     ref.id
                     for ref in referendums
@@ -806,10 +815,14 @@ def create_app():
                     flash("請對每一項公投都投票！")
                     return redirect(url_for("vote_referendum"))
 
-                # 儲存政黨票 + 公投票
+                # 儲存政黨票
                 vote_repo.add_vote(user_id, party_id)
-                for ref_id, choice in referendum_votes.items():
-                    ref_repo.add_vote(user_id, ref_id, choice)
+
+                # 儲存所有公投票
+                for ref in referendums:
+                    vote_value = request.form.get(f"referendum_{ref.id}")
+                    if vote_value:
+                        ref_repo.add_vote(user_id, ref.id, vote_value)
 
                 session.pop("vote_party", None)
                 flash("投票成功！")
@@ -1009,25 +1022,27 @@ def create_app():
             user_repo = UserSQLRepository(db)
 
             party_counts = vote_repo.get_party_vote_counts()
-            ref_ids = [r.id for r in ref_source.get_active_referendums()]
-            ref_vote_counts = ref_repo.get_vote_counts_by_referendum_ids(ref_ids)
-
-            referendum_titles = {
-                r.id: r.title for r in ref_source.get_active_referendums()
-            }
-
             party_name_map = {
                 str(p.id): p.fullname for p in user_repo.get_all() if p.role == "party"
             }
+
+            referendums = ref_source.get_active_referendums()
+            ref_ids = [r.id for r in referendums]
+
+            referendum_votes = {
+                str(k): v
+                for k, v in ref_repo.get_vote_counts_by_referendum_ids(ref_ids).items()
+            }
+            referendum_titles = {str(r.id): r.title for r in referendums}
 
             return jsonify(
                 {
                     "timestamp": datetime.now(timezone.utc).isoformat(),
                     "votes": {
                         "party_votes": party_counts,
-                        "referendum_votes": ref_vote_counts,
-                        "referendum_titles": referendum_titles,
                         "party_names": party_name_map,
+                        "referendum_votes": referendum_votes,
+                        "referendum_titles": referendum_titles,
                     },
                 }
             )

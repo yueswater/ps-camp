@@ -322,6 +322,13 @@ body {
   margin-top: 0.75rem;
 }
 
+.time-info {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  color: #333;
+  text-align: center;
+}
+
 .timestamp {
   text-align: center;
   margin-top: 2rem;
@@ -420,6 +427,19 @@ body {
   color: #666;
   white-space: nowrap;
 }
+
+#leading-party.leading-one {
+  font-size: 1.5rem;
+}
+
+#leading-party.leading-two {
+  font-size: 1.2rem;
+}
+
+#leading-party.leading-three {
+  font-size: 1rem;
+}
+
 
 
 /* 響應式設計 */

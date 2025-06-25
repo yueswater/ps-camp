@@ -74,7 +74,16 @@
             {% elif current_time > vote_close_time %}
             <span class="btn btn-outline" style="margin-top: 1rem; opacity: 0.6;">投票已截止</span>
             {% else %}
-            <a href="{{ url_for('vote_party') }}" class="btn btn-outline" style="margin-top: 1rem;">立即投票</a>
+            {% if voted %}
+            <div class="firework-wrapper">
+                <p class="already-voted-firework">已完成投票</p>
+                <div class="firework f1"></div>
+                <div class="firework f2"></div>
+                <div class="firework f3"></div>
+            </div>
+            {% else %}
+            <a href="{{ url_for('vote_party') }}" class="btn btn-outline" style="margin-top: 1rem;">前往投票</a>
+            {% endif %}
             {% endif %}
     </div>
 </div>

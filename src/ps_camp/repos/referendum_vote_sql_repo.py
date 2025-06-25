@@ -47,6 +47,7 @@ class ReferendumVoteSQLRepository:
         if not referendum_ids:
             return {}
 
+        vote_map = {"agree": "yes", "disagree": "no"}
         results = (
             self.db.query(
                 ReferendumVote.referendum_id,
@@ -62,8 +63,8 @@ class ReferendumVoteSQLRepository:
         for ref_id, vote, count in results:
             if ref_id not in counts:
                 counts[ref_id] = {"yes": 0, "no": 0}
-            vote_lower = vote.lower()
-            if vote_lower in ("yes", "no"):
-                counts[ref_id][vote_lower] = count
+            vote_key = vote_map.get(vote.lower())
+            if vote_key:
+                counts[ref_id][vote_key] = count
 
         return counts

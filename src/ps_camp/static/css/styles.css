@@ -339,7 +339,9 @@ body {
 }
 
 .btn-primary:hover {
-    background-color: #0056b3;
+    color: #9a9a9a;
+    border: 2px solid #9a9a9a;
+    background-color: #ffffff;
     transform: translateY(-1px);
 }
 
@@ -552,6 +554,77 @@ body {
     color: #333;
     font-weight: bold;
 }
+
+.firework-wrapper {
+  position: relative;
+  text-align: center;
+  padding: 2rem 1rem;
+  animation: fadeIn 1s ease-in-out;
+}
+
+.already-voted-firework {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #495057;
+  animation: popIn 0.5s ease-in-out;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.firework {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: transparent;
+  box-shadow:
+    0 -20px 0 #ff7675,
+    14px -14px 0 #74b9ff,
+    20px 0 0 #ffeaa7,
+    14px 14px 0 #55efc4,
+    0 20px 0 #fd79a8,
+    -14px 14px 0 #a29bfe,
+    -20px 0 0 #fab1a0,
+    -14px -14px 0 #81ecec;
+  border-radius: 50%;
+  animation: explode 1s ease-out infinite;
+  opacity: 0.7;
+}
+
+.f1 {
+  top: 0;
+  left: 30%;
+  animation-delay: 0s;
+}
+.f2 {
+  top: 20%;
+  left: 60%;
+  animation-delay: 0.3s;
+}
+.f3 {
+  top: 50%;
+  left: 40%;
+  animation-delay: 0.6s;
+}
+
+@keyframes explode {
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 
 /* ================================
    響應式設計 - 手機優化
