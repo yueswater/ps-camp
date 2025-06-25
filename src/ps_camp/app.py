@@ -946,7 +946,7 @@ def create_app():
 
     @app.route("/results")
     def vote_results():
-        return render_template("results.html")
+        return render_template("vote_results.html")
 
     return app
 

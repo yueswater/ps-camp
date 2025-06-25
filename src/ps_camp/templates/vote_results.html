@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>開票結果 - 現代化版本</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/vote_results.css') }}">
+</head>
+<body>
+    <div class="results-container">
+        <div class="header">
+            <h1 class="results-title">
+                <i class="fas fa-chart-pie"></i>
+                即時開票結果
+            </h1>
+            <p class="subtitle">2025 NTU PS CAMP 模擬選舉</p>
+            <div class="live-indicator">
+                <div class="live-dot"></div>
+                <span>即時更新中</span>
+            </div>
+        </div>
+
+        <!-- 統計概覽 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-number" id="total-votes">0</span>
+                <div class="stat-label">總投票數</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="turnout">0%</span>
+                <div class="stat-label">投票率</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="leading-party">--</span>
+                <div class="stat-label">領先政黨</div>
+            </div>
+        </div>
+
+        <!-- 政黨票 -->
+        <div class="section">
+            <h2 class="section-title">
+                <i class="fas fa-users"></i>
+                政黨票結果
+            </h2>
+            <div id="party-results"></div>
+        </div>
+
+        <!-- 公投票 -->
+        <div class="section">
+            <h2 class="section-title">
+                <i class="fas fa-balance-scale"></i>
+                公投結果
+            </h2>
+            <div id="referendum-results"></div>
+        </div>
+
+        <div class="timestamp">
+            <i class="fas fa-clock"></i>
+            最後更新：<span id="last-update">載入中...</span>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/vote_results.js') }}"></script>
+</body>
+</html>
