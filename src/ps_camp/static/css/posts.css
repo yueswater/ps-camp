@@ -818,3 +818,14 @@
 .read-more:hover {
     text-decoration: underline;
 }
+
+.reply-item {
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background: #f8f9fa;
+    border-left: 4px solid #007bff;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    color: #333;
+    word-break: break-word;
+}

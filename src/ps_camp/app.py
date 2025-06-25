@@ -2,7 +2,7 @@ import json
 import logging
 import os
 from datetime import UTC, datetime, timezone
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import markdown
 from dateutil.parser import isoparse
@@ -33,6 +33,7 @@ from ps_camp.repos.user_sql_repo import UserSQLRepository
 from ps_camp.repos.vote_sql_repo import VoteSQLRepository
 from ps_camp.sql_models.bank_model import OwnerType, TransactionType
 from ps_camp.sql_models.candidate_model import Candidate
+from ps_camp.sql_models.party_document_model import PartyDocument
 from ps_camp.sql_models.post_model import Post
 from ps_camp.sql_models.proposal_model import Proposal
 from ps_camp.sql_models.user_model import User
@@ -574,8 +575,6 @@ def create_app():
 
             return render_template("new_post.html")
 
-    from uuid import UUID
-
     @app.route("/api/posts/<string:post_id>/like", methods=["POST"])
     def like_post(post_id: str):
         if not session.get("user"):
@@ -607,6 +606,53 @@ def create_app():
             logging.debug("commit 完成")
 
             return jsonify(success=True, action=action, likes=len(post.likes))
+
+    @app.route("/api/posts/<string:post_id>/replies", methods=["POST"])
+    def add_reply(post_id: str):
+        if not session.get("user"):
+            return jsonify(success=False, message="請先登入"), 401
+
+        try:
+            post_uuid = UUID(post_id)
+        except ValueError:
+            return jsonify(success=False, message="無效貼文 ID"), 400
+
+        data = request.get_json()
+        content = data.get("content", "").strip()
+        if not content:
+            return jsonify(success=False, message="請輸入內容"), 400
+
+        with get_db_session() as db:
+            repo = PostSQLRepository(db)
+            post = repo.get_by_id(post_uuid)
+            if not post:
+                return jsonify(success=False, message="貼文不存在"), 404
+
+            user = session["user"]
+            reply = {
+                "user": user["fullname"],
+                "content": content,
+                "created_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M"),
+            }
+
+            post.replies.append(reply)
+            db.commit()
+            return jsonify(success=True, reply=reply, total=len(post.replies))
+
+    @app.route("/api/posts/<string:post_id>/replies", methods=["GET"])
+    def get_replies(post_id: str):
+        try:
+            post_uuid = UUID(post_id)
+        except ValueError:
+            return jsonify(success=False, message="無效貼文 ID"), 400
+
+        with get_db_session() as db:
+            repo = PostSQLRepository(db)
+            post = repo.get_by_id(post_uuid)
+            if not post:
+                return jsonify(success=False, message="找不到貼文"), 404
+
+            return jsonify(success=True, replies=post.replies)
 
     @app.route("/api/search-users")
     def search_users():
@@ -749,8 +795,6 @@ def create_app():
                     c.user_id for c in existing_candidates if c.user_id
                 }
                 remaining_slots = 6 - len(existing_candidates)
-
-                from src.ps_camp.sql_models.party_document_model import PartyDocument
 
                 party_doc = (
                     db.query(PartyDocument).filter_by(party_id=user["id"]).first()

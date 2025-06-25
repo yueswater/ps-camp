@@ -53,6 +53,15 @@ function initPostInteractions() {
                     }
                 });
         });
+
+        document.querySelectorAll('.post-stats .stats-item').forEach(item => {
+            if (item.textContent.includes('回覆')) {
+                item.addEventListener('click', () => {
+                    const postId = item.closest('.post-card').dataset.postId;
+                    showRepliesModal(postId);
+                });
+            }
+        });
     });
 
 
@@ -222,23 +231,33 @@ function showCommentModal(button) {
     modal.querySelector('.comment-submit').addEventListener('click', () => {
         const comment = modal.querySelector('.comment-input').value.trim();
         if (comment) {
-            const commentBtn = button;
-            const commentSpan = commentBtn.querySelector('span');
-            if (commentSpan) {
-                const currentCount = parseInt(commentSpan.textContent) || 0;
-                commentSpan.textContent = currentCount + 1;
-            }
+            fetch(`/api/posts/${postCard.dataset.postId}/replies`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ content: comment })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        // 更新 UI 顯示數字
+                        const commentBtn = postCard.querySelector('.comment-btn span');
+                        if (commentBtn) {
+                            commentBtn.textContent = data.total;
+                        }
 
-            const statsItems = postCard.querySelectorAll('.stats-item');
-            statsItems.forEach(item => {
-                if (item.textContent.includes('回覆')) {
-                    const currentCount = parseInt(item.textContent.match(/\d+/)[0]) || 0;
-                    item.textContent = `${currentCount + 1} 則回覆`;
-                }
-            });
+                        const statsItems = postCard.querySelectorAll('.stats-item');
+                        statsItems.forEach(item => {
+                            if (item.textContent.includes('回覆')) {
+                                item.textContent = `${data.total} 則回覆`;
+                            }
+                        });
 
-            showNotification('回覆已發送', 'success');
-            closeModal(modal);
+                        showNotification('回覆已發送', 'success');
+                        closeModal(modal);
+                    } else {
+                        showNotification(data.message || '發送失敗', 'error');
+                    }
+                });
         } else {
             showNotification('請輸入回覆內容', 'warning');
         }
@@ -330,27 +349,27 @@ function initInfiniteScroll() {
 }
 
 function loadMorePosts(button) {
-  if (button.classList.contains('loading')) return;
+    if (button.classList.contains('loading')) return;
 
-  button.classList.add('loading');
-  button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 載入中…';
+    button.classList.add('loading');
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 載入中…';
 
-  // 這裡用 fetch 真的去撈下一頁（範例以 setTimeout 假裝）
-  setTimeout(() => {
-    /* ===== 這裡換成你實際插入新貼文的程式 ===== */
-    // 假設從伺服器得知「已經沒有下一頁」
-    const noMore = true; // ← 把這判斷改成你的 API 回傳
+    // 這裡用 fetch 真的去撈下一頁（範例以 setTimeout 假裝）
+    setTimeout(() => {
+        /* ===== 這裡換成你實際插入新貼文的程式 ===== */
+        // 假設從伺服器得知「已經沒有下一頁」
+        const noMore = true; // ← 把這判斷改成你的 API 回傳
 
-    if (noMore) {
-      button.remove();                // 移除按鈕，不再顯示
-    } else {
-      button.classList.remove('loading');
-      button.innerHTML =
-        '<i class="fas fa-chevron-down"></i> 載入更多貼文';
-    }
+        if (noMore) {
+            button.remove();                // 移除按鈕，不再顯示
+        } else {
+            button.classList.remove('loading');
+            button.innerHTML =
+                '<i class="fas fa-chevron-down"></i> 載入更多貼文';
+        }
 
-    showNotification('已載入更多貼文', 'info');
-  }, 1500);
+        showNotification('已載入更多貼文', 'info');
+    }, 1500);
 }
 
 function initPostAnimations() {
@@ -435,4 +454,48 @@ function showNotification(message, type) {
             setTimeout(() => notification.remove(), 300);
         }, 3000);
     }
+}
+
+
+function showRepliesModal(postId) {
+    fetch(`/api/posts/${postId}/replies`)
+        .then(res => res.json())
+        .then(data => {
+            if (!data.success) throw new Error("載入失敗");
+
+            const modal = document.createElement('div');
+            modal.className = 'comment-modal';
+            modal.innerHTML = `
+                <div class="modal-overlay">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>所有回覆</h3>
+                            <button class="modal-close"><i class="fas fa-times"></i></button>
+                        </div>
+                        <div class="modal-body">
+                            ${data.replies.length > 0 ? data.replies.map(r => `
+                                <div class="reply-item">
+                                    <strong>${r.user}</strong>：${r.content}
+                                </div>
+                            `).join('') : `<p style="color:gray;">目前沒有回覆</p>`}
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-outline modal-cancel">關閉</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+            setTimeout(() => modal.classList.add('show'), 10);
+
+            modal.querySelector('.modal-close').addEventListener('click', () => closeModal(modal));
+            modal.querySelector('.modal-cancel').addEventListener('click', () => closeModal(modal));
+            modal.querySelector('.modal-overlay').addEventListener('click', (e) => {
+                if (e.target === modal.querySelector('.modal-overlay')) {
+                    closeModal(modal);
+                }
+            });
+        })
+        .catch(() => showNotification('載入回覆失敗', 'error'));
 }
