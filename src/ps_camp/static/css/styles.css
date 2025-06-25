@@ -121,7 +121,6 @@ body {
     transform: rotate(-45deg) translate(6px, -6px);
 }
 
-/* 手機版遮罩層 */
 .mobile-overlay {
     display: none;
     position: fixed;
