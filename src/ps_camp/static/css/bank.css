@@ -527,7 +527,15 @@
     color: #6c757d;
     font-weight: 600;
     z-index: 1;
-}/* 手機版按鈕修正 - 移除會導致展開的樣式 */
+}
+
+#qr-code {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 手機版按鈕修正 - 移除會導致展開的樣式 */
 @media (max-width: 480px) {
     .account-card {
         padding: 1.5rem 1rem;
@@ -815,5 +823,11 @@
         padding: 0.625rem 0.875rem;
         font-size: 0.9rem;
         min-height: 40px;
+    }
+
+    #qr-code {
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 }

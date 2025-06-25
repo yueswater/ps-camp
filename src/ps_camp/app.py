@@ -36,6 +36,7 @@ from ps_camp.sql_models.party_document_model import PartyDocument
 from ps_camp.sql_models.post_model import Post
 from ps_camp.sql_models.proposal_model import Proposal
 from ps_camp.sql_models.user_model import User
+from ps_camp.utils.get_register_close_time import get_register_close_time
 from ps_camp.utils.humanize_time_diff import humanize_time_diff, taipei_now
 from ps_camp.utils.password_hasher import PasswordHasher
 from ps_camp.utils.pdf_templates import bank_report_template
@@ -105,6 +106,13 @@ def create_app():
     app = Flask(__name__)
     app.secret_key = "2025ntupscamp"
 
+    @app.context_processor
+    def inject_common_time():
+        return {
+            "current_time": taipei_now(),
+            "register_close_time": get_register_close_time(),
+        }
+
     @app.route("/")
     @refresh_user_session
     def home():
@@ -112,6 +120,7 @@ def create_app():
         current_time = taipei_now()
         vote_open_time = get_vote_open_time().astimezone(tz)
         vote_close_time = get_vote_close_time().astimezone(tz)
+        register_close_time = get_register_close_time().astimezone(tz)
         if session.get("user"):
             with get_db_session() as db:
                 bank_repo = BankSQLRepository(db)
@@ -135,6 +144,7 @@ def create_app():
             current_time=current_time,
             vote_open_time=vote_open_time,
             vote_close_time=vote_close_time,
+            register_close_time=register_close_time,
             voted=voted,
         )
 
@@ -265,6 +275,9 @@ def create_app():
 
     @app.route("/register", methods=["GET", "POST"])
     def register():
+        if taipei_now() > get_register_close_time():
+            flash("註冊時間已截止", "danger")
+            return redirect(url_for("home"))
         with get_db_session() as db:
             repo = UserSQLRepository(db)
             hasher = PasswordHasher()
