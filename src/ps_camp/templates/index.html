@@ -4,41 +4,46 @@
 <div class="hero">
     <h1>歡迎來到沙政風暴</h1>
     <p>這是一場專屬於你的模擬選戰！</p>
-    
+    <p style="font-size: 0.85rem; color: #6c757d;">
+        目前時間：{{ current_time.strftime('%Y-%m-%d %H:%M') }} <br>
+        開票時間：{{ vote_open_time.strftime('%Y-%m-%d %H:%M') }} ～ {{ vote_close_time.strftime('%Y-%m-%d %H:%M') }}
+    </p>
+
+
     {% if session.get("user") %}
-        <div class="hero-info">
-            {% if session.user.role == "member" %}
-                <h2><i class="fas fa-user"></i> 個人資訊</h2>
-                <div class="info-item">
-                    <span class="info-label">姓名</span>
-                    <span class="info-value">{{ session.user.fullname }}</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">所屬政黨/利團</span>
-                    <span class="info-value">{{ session.user.affiliation_name or "未知" }}</span>
-                </div>
-            {% else %}
-                <h2><i class="fas fa-user"></i> 政黨/利團資訊</h2>
-                <div class="info-item">
-                    <span class="info-label">政黨/利團名稱</span>
-                    <span class="info-value">{{ session.user.fullname }}</span>
-                </div>
-            {% endif %}
-            <div class="info-item">
-                <span class="info-label">政治幣：</span>
-                <span class="info-value">{{ session["user"]["coins"] }} <i class="fas fa-coins"></i></span>
-            </div>
-            {% if session.get("user") and session.user.role != "member" %}
-            <div style="margin-top: 2rem;">
-                <a href="{{ url_for('new_post') }}" class="btn btn-primary"><i class="fas fa-plus"></i> 新增貼文</a>
-            </div>
-            {% endif %}
+    <div class="hero-info">
+        {% if session.user.role == "member" %}
+        <h2><i class="fas fa-user"></i> 個人資訊</h2>
+        <div class="info-item">
+            <span class="info-label">姓名</span>
+            <span class="info-value">{{ session.user.fullname }}</span>
         </div>
-    {% else %}
+        <div class="info-item">
+            <span class="info-label">所屬政黨/利團</span>
+            <span class="info-value">{{ session.user.affiliation_name or "未知" }}</span>
+        </div>
+        {% else %}
+        <h2><i class="fas fa-user"></i> 政黨/利團資訊</h2>
+        <div class="info-item">
+            <span class="info-label">政黨/利團名稱</span>
+            <span class="info-value">{{ session.user.fullname }}</span>
+        </div>
+        {% endif %}
+        <div class="info-item">
+            <span class="info-label">政治幣：</span>
+            <span class="info-value">{{ session["user"]["coins"] }} <i class="fas fa-coins"></i></span>
+        </div>
+        {% if session.get("user") and session.user.role != "member" %}
         <div style="margin-top: 2rem;">
-            <a href="/register" class="btn btn-primary" style="margin-right: 1rem;">開始遊戲</a>
-            <a href="/login" class="btn btn-outline">登入帳號</a>
+            <a href="{{ url_for('new_post') }}" class="btn btn-primary"><i class="fas fa-plus"></i> 新增貼文</a>
         </div>
+        {% endif %}
+    </div>
+    {% else %}
+    <div style="margin-top: 2rem;">
+        <a href="/register" class="btn btn-primary" style="margin-right: 1rem;">開始遊戲</a>
+        <a href="/login" class="btn btn-outline">登入帳號</a>
+    </div>
     {% endif %}
 </div>
 
@@ -50,7 +55,7 @@
         </p>
         <a href="/posts" class="btn btn-outline" style="margin-top: 1rem;">查看貼文</a>
     </div>
-    
+
     <div class="card">
         <h3 class="card-title"><i class="fas fa-users"></i> NPC 互動</h3>
         <p class="card-content">
@@ -58,19 +63,19 @@
         </p>
         <a href="/npcs" class="btn btn-outline" style="margin-top: 1rem;">查看 NPC</a>
     </div>
-    
+
     <div class="card">
         <h3 class="card-title"><i class="fas fa-chart-bar"></i> 選戰模擬</h3>
         <p class="card-content">
             體驗真實的選舉過程，從政策制定到選民溝通，感受政治的複雜性。
         </p>
-        {% if current_time < vote_open_time %}
-            <span class="btn btn-outline" style="margin-top: 1rem; opacity: 0.6;">尚未開放</span>
-        {% elif current_time > vote_close_time %}
+        {% if current_time < vote_open_time %} <span class="btn btn-outline" style="margin-top: 1rem; opacity: 0.6;">
+            尚未開放</span>
+            {% elif current_time > vote_close_time %}
             <span class="btn btn-outline" style="margin-top: 1rem; opacity: 0.6;">投票已截止</span>
-        {% else %}
-            <a href="{{ url_for('vote') }}" class="btn btn-outline" style="margin-top: 1rem;">立即投票</a>
-        {% endif %}
+            {% else %}
+            <a href="{{ url_for('vote_party') }}" class="btn btn-outline" style="margin-top: 1rem;">立即投票</a>
+            {% endif %}
     </div>
 </div>
 {% endblock %}

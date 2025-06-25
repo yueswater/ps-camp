@@ -1,11 +1,11 @@
 import json
 import logging
 import os
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime, timedelta, timezone
+from functools import wraps
 from uuid import UUID, uuid4
 
 import markdown
-from dateutil.parser import isoparse
 from dotenv import load_dotenv
 from flask import (
     Flask,
@@ -25,7 +25,6 @@ from weasyprint import HTML
 
 from ps_camp.db.session import get_db_session
 from ps_camp.repos.bank_sql_repo import BankSQLRepository
-from ps_camp.repos.candidate_sql_repo import CandidateSQLRepository
 from ps_camp.repos.post_sql_repo import PostSQLRepository
 from ps_camp.repos.referendum_sql_repo import ReferendumSQLRepository
 from ps_camp.repos.referendum_vote_sql_repo import ReferendumVoteSQLRepository
@@ -42,14 +41,28 @@ from ps_camp.utils.password_hasher import PasswordHasher
 from ps_camp.utils.pdf_templates import bank_report_template
 from ps_camp.utils.resolve_owner_name import resolve_owner_name
 from ps_camp.utils.session_helpers import refresh_user_session
+from ps_camp.utils.voting_config import get_vote_close_time, get_vote_open_time
 
 load_dotenv()
 ADMIN_ID = os.getenv("ADMIN_ID")
-VOTE_OPEN_TIME = isoparse(os.getenv("VOTE_OPEN_TIME"))
-VOTE_CLOSE_TIME = isoparse(os.getenv("VOTE_CLOSE_TIME"))
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
+
+def restrict_roles(*allowed_roles):
+    def decorator(f):
+        @wraps(f)
+        def wrapped(*args, **kwargs):
+            user = session.get("user")
+            if not user or user["role"] not in allowed_roles:
+                flash("您沒有權限瀏覽此頁面", "danger")
+                return redirect(url_for("home"))
+            return f(*args, **kwargs)
+
+        return wrapped
+
+    return decorator
 
 
 def map_role_to_owner_type(role: str) -> OwnerType:
@@ -95,7 +108,10 @@ def create_app():
     @app.route("/")
     @refresh_user_session
     def home():
-        current_time = datetime.now(timezone.utc)
+        tz = timezone(timedelta(hours=8))
+        current_time = taipei_now()
+        vote_open_time = get_vote_open_time().astimezone(tz)
+        vote_close_time = get_vote_close_time().astimezone(tz)
         if session.get("user"):
             with get_db_session() as db:
                 bank_repo = BankSQLRepository(db)
@@ -108,11 +124,13 @@ def create_app():
                     session["user"]["coins"] = 0  # or keep the presets
                     flash("找不到對應的銀行帳戶，請聯繫主辦方", "warning")
 
+        print(f"[DEBUG] 開放時間：{vote_open_time}")
+        print(f"[DEBUG] 結束時間：{vote_close_time}")
         return render_template(
             "index.html",
             current_time=current_time,
-            vote_open_time=VOTE_OPEN_TIME,
-            vote_close_time=VOTE_CLOSE_TIME,
+            vote_open_time=vote_open_time,
+            vote_close_time=vote_close_time,
         )
 
     @app.route("/ping")
@@ -726,54 +744,78 @@ def create_app():
                 }
             )
 
-    @app.route("/vote", methods=["GET", "POST"])
-    def vote():
+    @app.route("/vote_party", methods=["GET", "POST"])
+    @restrict_roles("admin", "member")
+    def vote_party():
         if "user" not in session:
             flash("請先登入")
             return redirect(url_for("login"))
+
+        with get_db_session() as db:
+            user_repo = UserSQLRepository(db)
+            parties = [u for u in user_repo.get_all() if u.role == "party"]
+
+            if request.method == "POST":
+                party_id = request.form.get("party")
+                if not party_id:
+                    flash("請選擇一個政黨！")
+                    return redirect(url_for("vote_party"))
+
+                session["vote_party"] = party_id
+                return redirect(url_for("vote_referendum"))
+
+            return render_template("vote_party.html", parties=parties)
+
+    @app.route("/vote_referendum", methods=["GET", "POST"])
+    @restrict_roles("admin", "member")
+    def vote_referendum():
+        if "user" not in session:
+            flash("請先登入")
+            return redirect(url_for("login"))
+
+        party_id = session.get("vote_party")
+        if not party_id:
+            flash("請先投政黨票，才能進入公投投票")
+            return redirect(url_for("vote_party"))
 
         user_id = session["user"]["id"]
         with get_db_session() as db:
             vote_repo = VoteSQLRepository(db)
             ref_repo = ReferendumVoteSQLRepository(db)
-            CandidateSQLRepository(db)
+            ref_source = ReferendumSQLRepository(db)
+            referendums = ref_source.get_active_referendums()
+
+            if vote_repo.has_voted(user_id):
+                flash("你已完成投票")
+                return render_template("vote_success.html")
 
             if request.method == "POST":
-                # Process form submission
-                party_id = request.form.get("party")
-                if not party_id:
-                    flash("請選擇一個政黨才能投票！")
-                    return redirect(url_for("vote"))
+                # 公投票處理
                 referendum_votes = {
                     key.replace("referendum_", ""): value
                     for key, value in request.form.items()
                     if key.startswith("referendum_")
                 }
 
-                if vote_repo.has_voted(user_id):
-                    flash("你已經投過票囉")
-                    return redirect(url_for("vote"))
+                missing = [
+                    ref.id
+                    for ref in referendums
+                    if f"referendum_{ref.id}" not in request.form
+                ]
+                if missing:
+                    flash("請對每一項公投都投票！")
+                    return redirect(url_for("vote_referendum"))
 
+                # 儲存政黨票 + 公投票
                 vote_repo.add_vote(user_id, party_id)
-
                 for ref_id, choice in referendum_votes.items():
                     ref_repo.add_vote(user_id, ref_id, choice)
 
+                session.pop("vote_party", None)
                 flash("投票成功！")
                 return redirect(url_for("home"))
 
-            user_repo = UserSQLRepository(db)
-            parties = [u for u in user_repo.get_all() if u.role == "party"]
-            ref_repo = ReferendumSQLRepository(db)
-            referendums = ref_repo.get_active_referendums()
-
-            if vote_repo.has_voted(user_id):
-                flash("你已完成投票")
-                return render_template("vote_success.html")
-
-            return render_template(
-                "vote.html", parties=parties, referendums=referendums
-            )
+            return render_template("vote_referendum.html", referendums=referendums)
 
     @app.route("/submit", methods=["GET", "POST"])
     @refresh_user_session
@@ -963,15 +1005,19 @@ def create_app():
         with get_db_session() as db:
             vote_repo = VoteSQLRepository(db)
             ref_repo = ReferendumVoteSQLRepository(db)
+            ref_source = ReferendumSQLRepository(db)
             user_repo = UserSQLRepository(db)
 
             party_counts = vote_repo.get_party_vote_counts()
-            ref_counts = ref_repo.get_vote_counts()
+            ref_ids = [r.id for r in ref_source.get_active_referendums()]
+            ref_vote_counts = ref_repo.get_vote_counts_by_referendum_ids(ref_ids)
 
-            # 拿到政黨清單（user.role = "party"）
-            all_parties = user_repo.get_all()
+            referendum_titles = {
+                r.id: r.title for r in ref_source.get_active_referendums()
+            }
+
             party_name_map = {
-                str(p.id): p.fullname for p in all_parties if p.role == "party"
+                str(p.id): p.fullname for p in user_repo.get_all() if p.role == "party"
             }
 
             return jsonify(
@@ -979,10 +1025,8 @@ def create_app():
                     "timestamp": datetime.now(timezone.utc).isoformat(),
                     "votes": {
                         "party_votes": party_counts,
-                        "referendum_votes": {
-                            "yes": ref_counts.get("yes", 0),
-                            "no": ref_counts.get("no", 0),
-                        },
+                        "referendum_votes": ref_vote_counts,
+                        "referendum_titles": referendum_titles,
                         "party_names": party_name_map,
                     },
                 }

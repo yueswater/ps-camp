@@ -40,3 +40,30 @@ class ReferendumVoteSQLRepository:
             .all()
         )
         return {vote.lower(): count for vote, count in results}
+
+    def get_vote_counts_by_referendum_ids(
+        self, referendum_ids: list[str]
+    ) -> dict[str, dict[str, int]]:
+        if not referendum_ids:
+            return {}
+
+        results = (
+            self.db.query(
+                ReferendumVote.referendum_id,
+                ReferendumVote.vote,
+                func.count().label("count"),
+            )
+            .filter(ReferendumVote.referendum_id.in_(referendum_ids))
+            .group_by(ReferendumVote.referendum_id, ReferendumVote.vote)
+            .all()
+        )
+
+        counts: dict[str, dict[str, int]] = {}
+        for ref_id, vote, count in results:
+            if ref_id not in counts:
+                counts[ref_id] = {"yes": 0, "no": 0}
+            vote_lower = vote.lower()
+            if vote_lower in ("yes", "no"):
+                counts[ref_id][vote_lower] = count
+
+        return counts

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/vote.css') }}">
+<script defer src="{{ url_for('static', filename='js/vote.js') }}"></script>
+
+<div class="vote-page">
+    <form method="POST" action="{{ url_for('vote_referendum') }}">
+        <h1>公投案投票</h1>
+        <div class="referendum-grid">
+            {% for ref in referendums %}
+            <div class="referendum-box">
+                <div class="referendum-title">{{ ref.title }}</div>
+                <div class="referendum-options">
+                    <label class="ref-option agree">
+                        <input type="radio" name="referendum_{{ ref.id }}" value="agree" hidden>
+                        同意
+                    </label>
+                    <label class="ref-option disagree">
+                        <input type="radio" name="referendum_{{ ref.id }}" value="disagree" hidden>
+                        不同意
+                    </label>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="submit-button">送出投票</button>
+    </form>
+</div>
+{% endblock %}

@@ -361,6 +361,67 @@ body {
   margin-top: 0.5rem;
 }
 
+.referendum-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.referendum-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-left: 5px solid #667eea;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.vote-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.vote-bar .label {
+  width: 50px;
+  font-weight: 600;
+}
+
+.vote-bar .bar {
+  flex: 1;
+  background: #e0e0e0;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.vote-bar .fill {
+  height: 100%;
+  background: #27ae60;
+  transition: width 0.4s ease;
+}
+
+.vote-bar.no .fill {
+  background: #e74c3c;
+}
+
+.vote-bar .percent {
+  font-size: 0.85rem;
+  color: #666;
+  white-space: nowrap;
+}
+
+
 /* 響應式設計 */
 @media (max-width: 768px) {
   .results-title {

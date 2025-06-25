@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const partyCards = document.querySelectorAll(".party-box");
 
   // 動態處理政黨名稱換行（超過 7 字）
-  document.querySelectorAll(".ballot-name-vertical").forEach(el => {
+  document.querySelectorAll(".ballot-name-vertical").forEach((el) => {
     const name = el.dataset.name || "";
     if (name.length > 7) {
       const midpoint = Math.ceil(name.length / 2);
@@ -15,14 +15,29 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  partyCards.forEach(card => {
+  document.querySelectorAll(".ref-option").forEach((option) => {
+    option.addEventListener("click", () => {
+      const parent = option.closest(".referendum-options");
+      const allOptions = parent.querySelectorAll(".ref-option");
+      const input = option.querySelector("input");
+
+      // 清除選取樣式
+      allOptions.forEach((o) => o.classList.remove("selected"));
+      option.classList.add("selected");
+
+      // 勾選 radio
+      if (input) input.checked = true;
+    });
+  });
+
+  partyCards.forEach((card) => {
     card.addEventListener("click", () => {
       // 勾選 radio
       const input = card.querySelector("input[type=radio]");
       input.checked = true;
 
       // 清除所有卡片的 selected 樣式與動畫
-      partyCards.forEach(c => {
+      partyCards.forEach((c) => {
         c.classList.remove("selected");
         const stamp = c.querySelector(".stamp");
         if (stamp) {

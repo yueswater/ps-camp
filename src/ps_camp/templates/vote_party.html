@@ -4,7 +4,7 @@
 <script defer src="{{ url_for('static', filename='js/vote.js') }}"></script>
 
 <div class="vote-page">
-    <form method="POST" action="{{ url_for('vote') }}">
+    <form method="POST" action="{{ url_for('vote_party') }}">
         <h1>國會議員政黨投票</h1>
         <div class="party-grid">
             {% for party in parties %}
