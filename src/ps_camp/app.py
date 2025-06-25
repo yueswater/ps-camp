@@ -893,7 +893,8 @@ def create_app():
                     # Save candidate photos
                     photo_url = None
                     if photo and photo.filename:
-                        filename = f"{uuid4().hex}_{photo.filename}"
+                        fullname = user.get("fullname", "unknown")
+                        filename = f"{fullname}_{photo.filename}"
                         upload_dir = os.path.join(
                             "src", "ps_camp", "static", "uploads", "candidates"
                         )
@@ -929,7 +930,8 @@ def create_app():
                         )
 
                     if cabinet_pdf and cabinet_pdf.filename:
-                        filename = f"{uuid4().hex}_{cabinet_pdf.filename}"
+                        fullname = user.get("fullname", "unknown")
+                        filename = f"{fullname}_{cabinet_pdf.filename}"
                         path = os.path.join(
                             "src", "ps_camp", "static", "uploads", "cabinet"
                         )
@@ -938,7 +940,8 @@ def create_app():
                         party_doc.cabinet_url = f"/static/uploads/cabinet/{filename}"
 
                     if alliance_pdf and alliance_pdf.filename:
-                        filename = f"{uuid4().hex}_{alliance_pdf.filename}"
+                        fullname = user.get("fullname", "unknown")
+                        filename = f"{fullname}_{alliance_pdf.filename}"
                         path = os.path.join(
                             "src", "ps_camp", "static", "uploads", "alliance"
                         )
