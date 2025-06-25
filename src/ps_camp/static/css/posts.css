@@ -70,13 +70,32 @@
     display: flex;
     gap: 0.5rem;
     overflow-x: auto;
-    padding: 0.25rem 0;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    overflow-y: hidden;
+    padding: 0.25rem 0 0.5rem 0; /* 底部加一點 padding 避免切到陰影 */
+    
+    /* 隱藏滑桿 */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+    
+    /* 平滑滑動 */
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch; /* iOS Safari 平滑滑動 */
+    
+    /* 防止選取文字 */
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    
+    /* 確保內容不被壓縮 */
+    flex-shrink: 0;
 }
 
 .filter-tags::-webkit-scrollbar {
     display: none;
+    width: 0;
+    height: 0;
+    background: transparent;
 }
 
 /* 篩選標籤 */
@@ -92,30 +111,48 @@
     font-weight: 500;
     color: #495057;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     white-space: nowrap;
     user-select: none;
+    
+    /* 防止收縮 */
+    flex-shrink: 0;
+    min-width: auto;
+    
+    /* 微妙的陰影效果 */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .filter-tag:hover {
     background: #e9ecef;
     border-color: #ced4da;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.filter-tag:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .filter-tag.active {
     background: #000;
     color: #fff;
     border-color: #000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .filter-tag.active:hover {
     background: #333;
     border-color: #333;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
 }
 
 .filter-tag i {
     font-size: 0.75rem;
     opacity: 0.7;
+    margin-right: 0;
 }
 
 /* 清除篩選按鈕 */
@@ -130,13 +167,21 @@
     color: #dc3545;
     font-size: 0.8rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     white-space: nowrap;
+    flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(220, 53, 69, 0.1);
 }
 
 .clear-filters:hover {
     background: #dc3545;
     color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(220, 53, 69, 0.2);
+}
+
+.clear-filters:active {
+    transform: translateY(0);
 }
 
 .clear-filters.show {
@@ -176,20 +221,40 @@
 }
 
 .author-avatar {
-    width: 32px;
-    height: 32px;
-    background: #6c757d;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1rem;
+    width: 32px !important;
+    height: 32px !important;
+    background: #6c757d !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: white !important;
+    font-size: 1rem !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+.author-avatar i {
+    font-size: 1rem !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: relative !important;
+    top: 0 !important;
+    left: 0 !important;
+    transform: none !important;
 }
 
 .author-details {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    min-height: 32px;
 }
 
 .author-name {
@@ -377,50 +442,87 @@
 
 /* Threads 風格浮動新增按鈕 */
 .floating-add-btn {
-    position: fixed;
-    bottom: 80px;
-    right: 24px;
-    z-index: 1000;
+    position: fixed !important;
+    bottom: 200px !important;
+    right: 20px !important;
+    z-index: 1000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .fab-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 56px;
-    height: 56px;
-    background: #000;
-    color: white;
-    border-radius: 50%;
-    text-decoration: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    transition: all 0.3s ease;
-    font-size: 1.5rem;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 56px !important;
+    height: 56px !important;
+    background: #000 !important;
+    color: white !important;
+    border-radius: 50% !important;
+    text-decoration: none !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    transition: all 0.3s ease !important;
+    font-size: 1.5rem !important;
+    border: none !important;
+    outline: none !important;
+    /* 防止被其他樣式覆蓋 */
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1 !important;
+    font-family: inherit !important;
 }
 
 .fab-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-    background: #333;
-    color: white;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25) !important;
+    background: #333 !important;
+    color: white !important;
+    text-decoration: none !important;
 }
 
 .fab-btn:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transform: translateY(0) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+    background: #000 !important;
 }
+
+.fab-btn:focus {
+    outline: none !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 0 0 3px rgba(0, 0, 0, 0.1) !important;
+    background: #000 !important;
+}
+
+.fab-btn:visited {
+    color: white !important;
+    background: #000 !important;
+}
+
+.fab-btn:link {
+    color: white !important;
+    background: #000 !important;
+}
+
+.fab-btn i {
+    font-size: 1.5rem !important;
+    color: white !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: inline-block !important;
+}
+
 
 /* 平板和桌面優化 */
 @media (min-width: 768px) {
     .floating-add-btn {
-        bottom: 32px;
-        right: 32px;
+        bottom: 60px !important;
+        right: 32px !important;
     }
     
     .fab-btn {
-        width: 64px;
-        height: 64px;
-        font-size: 1.75rem;
+        width: 64px !important;
+        height: 64px !important;
+        font-size: 1.75rem !important;
     }
 
     .posts-filter {
@@ -436,7 +538,17 @@
 
     .filter-tags {
         flex: 2;
-        justify-content: flex-end;
+        justify-content: flex-start; /* 改為左對齊，讓滑動更自然 */
+        padding: 0.25rem 0 0.5rem 0;
+    }
+
+    .filter-tag {
+        font-size: 0.9rem;
+        padding: 0.6rem 1.2rem;
+    }
+    
+    .filter-tag i {
+        font-size: 0.8rem;
     }
 }
 
@@ -623,10 +735,27 @@
         left: 0.875rem;
         font-size: 0.8rem;
     }
+
+    .filter-tags {
+        /* 手機版讓滑動區域稍微延伸到邊緣 */
+        margin: 0 -0.5rem;
+        padding: 0.25rem 0.5rem 0.5rem 0.5rem;
+    }
     
     .filter-tag {
-        padding: 0.4rem 0.75rem;
+        padding: 0.4rem 0.8rem;
         font-size: 0.8rem;
+        border-radius: 18px;
+    }
+    
+    .filter-tag i {
+        font-size: 0.7rem;
+    }
+
+    .clear-filters {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.75rem;
+        border-radius: 14px;
     }
     
     .post-card {
@@ -660,15 +789,23 @@
     }
     
     .floating-add-btn {
-        bottom: 70px;
-        right: 16px;
+        bottom: 100px !important;
+        right: 16px !important;
     }
     
     .fab-btn {
-        width: 52px;
-        height: 52px;
-        font-size: 1.4rem;
+        width: 52px !important;
+        height: 52px !important;
+        font-size: 1.4rem !important;
     }
+
+    .fab-btn i {
+        font-size: 1.4rem !important;
+    }
+}
+
+.floating-add-btn * {
+    box-sizing: border-box !important;
 }
 
 .read-more {

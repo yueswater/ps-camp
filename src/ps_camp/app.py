@@ -36,6 +36,7 @@ from ps_camp.sql_models.candidate_model import Candidate
 from ps_camp.sql_models.post_model import Post
 from ps_camp.sql_models.proposal_model import Proposal
 from ps_camp.sql_models.user_model import User
+from ps_camp.utils.humanize_time_diff import humanize_time_diff, taipei_now
 from ps_camp.utils.password_hasher import PasswordHasher
 from ps_camp.utils.pdf_templates import bank_report_template
 from ps_camp.utils.resolve_owner_name import resolve_owner_name
@@ -380,6 +381,7 @@ def create_app():
                 posts = repo.get_all()
 
             for post in posts:
+                post.display_time = humanize_time_diff(post.created_at)
                 post.preview = markdown.markdown(
                     post.content[:300], extensions=["nl2br"]
                 )
@@ -561,7 +563,7 @@ def create_app():
                     title=data["title"],
                     category=data["category"],
                     content=data["content"],
-                    created_at=datetime.now(UTC),
+                    created_at=taipei_now(),
                     created_by=user_id,
                     replies=[],
                     likes=[],
