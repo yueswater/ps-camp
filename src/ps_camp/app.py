@@ -46,9 +46,14 @@ from ps_camp.utils.voting_config import get_vote_close_time, get_vote_open_time
 
 load_dotenv()
 ADMIN_ID = os.getenv("ADMIN_ID")
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg"}
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
+
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 def restrict_roles(*allowed_roles):
@@ -105,6 +110,11 @@ def get_account_by_user(user, bank_repo, db):
 def create_app():
     app = Flask(__name__)
     app.secret_key = "2025ntupscamp"
+
+    @app.template_filter("file_exists")
+    def file_exists_filter(path):
+        full_path = os.path.join(current_app.root_path, path)
+        return os.path.exists(full_path)
 
     @app.context_processor
     def inject_common_time():
@@ -381,6 +391,14 @@ def create_app():
 
             user = session.get("user")
             user_obj = user_repo.get_by_id(UUID(user["id"]))
+            user_name = user_obj.fullname
+            avatar_url = None
+            for ext in list(ALLOWED_EXTENSIONS):
+                filename = f"{user_name}_avatar.{ext}"
+                path = os.path.join("static", "uploads", "avatars", filename)
+                if os.path.exists(os.path.join(current_app.root_path, path)):
+                    avatar_url = "/" + path
+                    break
 
             if request.method == "POST":
                 old_password = request.form["old_password"]
@@ -401,7 +419,42 @@ def create_app():
                 session.clear()
                 return redirect(url_for("login"))
 
-            return render_template("profile.html")
+            return render_template("profile.html", avatar_url=avatar_url)
+
+    @app.route("/upload_avatar", methods=["POST"])
+    def upload_avatar():
+        logging.debug("[DEBUG] avatar upload 被觸發了，method:", request.method)
+        # Check if there are any files
+        if "avatar" not in request.files:
+            flash("未選擇檔案", "error")
+            return redirect(url_for("profile"))
+
+        file = request.files["avatar"]
+
+        # The file name is empty
+        if file.filename.strip() == "":
+            flash("檔案名稱為空", "error")
+            return redirect(url_for("profile"))
+
+        # Is it a allowed format
+        if file and allowed_file(file.filename):
+            # The secondary file name retains the original format
+            ext = file.filename.rsplit(".", 1)[1].lower()
+
+            raw_name = session["user"]["fullname"]
+            filename = f"{raw_name}_avatar.{ext}"
+
+            folder = os.path.join(current_app.root_path, "static", "uploads", "avatars")
+            os.makedirs(folder, exist_ok=True)
+
+            filepath = os.path.join(folder, filename)
+            file.save(filepath)
+
+            flash("大頭貼上傳成功", "success")
+            return redirect(url_for("profile"))
+        else:
+            flash("檔案類型不允許，只能上傳 PNG 或 JPG", "error")
+            return redirect(url_for("profile"))
 
     @app.route("/posts")
     @refresh_user_session
@@ -774,7 +827,7 @@ def create_app():
             vote_repo = VoteSQLRepository(db)
             user_repo = UserSQLRepository(db)
 
-            # 防止重複投票
+            # Prevent repeated voting
             if vote_repo.has_voted(user_id):
                 flash("您已完成投票")
                 return render_template("vote_success.html")
@@ -789,6 +842,17 @@ def create_app():
 
                 session["vote_party"] = party_id
                 return redirect(url_for("vote_referendum"))
+
+            for party in parties:
+                party_name = party.fullname
+                extensions = ["png", "jpg", "jpeg"]
+                for ext in extensions:
+                    filename = f"{party_name}_avatar.{ext}"
+                    path = os.path.join("static", "uploads", "avatars", filename)
+                    full_path = os.path.join(current_app.root_path, path)
+                    if os.path.exists(full_path):
+                        party.logo_url = "/" + path
+                        break
 
             return render_template("vote_party.html", parties=parties)
 
@@ -812,13 +876,13 @@ def create_app():
             ref_source = ReferendumSQLRepository(db)
             referendums = ref_source.get_active_referendums()
 
-            # 防止重複投票
+            # Prevent repeated voting
             if vote_repo.has_voted(user_id):
                 flash("您已完成投票")
                 return render_template("vote_success.html")
 
             if request.method == "POST":
-                # 驗證是否每一題都投了
+                # Verify that every question has been submitted
                 missing = [
                     ref.id
                     for ref in referendums
@@ -828,10 +892,10 @@ def create_app():
                     flash("請對每一項公投都投票！")
                     return redirect(url_for("vote_referendum"))
 
-                # 儲存政黨票
+                # Save party tickets
                 vote_repo.add_vote(user_id, party_id)
 
-                # 儲存所有公投票
+                # Store all referendums
                 for ref in referendums:
                     vote_value = request.form.get(f"referendum_{ref.id}")
                     if vote_value:

@@ -19,7 +19,58 @@
     justify-content: center;
     border-radius: 50%;
     margin: 0 auto 1rem;
+    position: relative;
+    cursor: pointer;
+    margin-top: 10px;
 }
+
+.edit-icon {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    font-size: 0.9rem;
+    background: white;
+    color: #555;
+    border-radius: 50%;
+    padding: 6px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, background-color 0.3s, color 0.3s;
+}
+
+.avatar:hover .edit-icon {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 10;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: white;
+    padding: 2rem;
+    margin: 10% auto;
+    border-radius: 12px;
+    width: 300px;
+    position: relative;
+    text-align: center;
+}
+
+.modal-content .close {
+    position: absolute;
+    top: 10px; right: 15px;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
 
 .profile-field {
     margin-bottom: 1rem;
@@ -37,6 +88,44 @@
     font-size: 1rem;
     border: 1px solid #ccc;
     border-radius: 8px;
+}
+
+.file-dropzone {
+    margin-top: 15px;
+    border: 2px dashed #ccc;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    color: #888;
+    font-size: 0.8rem;
+    transition: border-color 0.3s, background-color 0.3s;
+}
+
+.file-dropzone:hover {
+    background-color: #f9f9f9;
+    border-color: #666;
+}
+
+.file-dropzone.dragover {
+    border-color: #007bff;
+    background-color: #eef6ff;
+}
+
+.submit-button {
+    margin-top: 1rem;
+    padding: 0.6rem 1.5rem;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.submit-button:hover {
+    background-color: #555;
 }
 
 .save-button {

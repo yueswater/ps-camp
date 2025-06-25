@@ -6,9 +6,15 @@
 <div class="profile-container">
     <h2 style="text-align: center;">會員管理</h2>
 
-    <div class="avatar">
+    <div class="avatar" id="avatar">
+        {% if avatar_url %}
+        <img src="{{ avatar_url }}" alt="大頭貼" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+        {% else %}
         {{ session.user.fullname[0] }}
+        {% endif %}
+        <i class="fas fa-pen edit-icon"></i>
     </div>
+
 
     <div class="profile-field">
         <label for="fullname">姓名</label>
@@ -33,6 +39,27 @@
 
         <button type="submit" class="save-button">儲存</button>
     </form>
+</div>
+
+<div class="modal" id="avatar-modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3>上傳新大頭貼</h3>
+        <form method="POST" action="{{ url_for('upload_avatar') }}" enctype="multipart/form-data">
+            <div class="file-dropzone" id="avatar-dropzone">
+                <p id="avatar-label">點擊或拖曳上傳 PNG / JPG</p>
+                <input type="file" name="avatar" id="avatar-input" accept="image/png, image/jpeg" hidden>
+            </div>
+
+            <div id="preview-container" style="display: none; text-align: center; margin-top: 1rem;">
+                <img id="preview-img" src="#" alt="預覽"
+                    style="max-width: 80px; border-radius: 50%; box-shadow: 0 0 4px rgba(0,0,0,0.2);" />
+            </div>
+
+            <button type="submit" class="submit-button">確認上傳</button>
+        </form>
+
+    </div>
 </div>
 
 <script src="{{ url_for('static', filename='js/profile.js') }}" defer></script>
