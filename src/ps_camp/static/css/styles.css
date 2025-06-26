@@ -58,6 +58,10 @@ body {
     margin-bottom: 0.2rem;
 }
 
+.logo:focus {
+    outline: none;
+}
+
 .tagline {
     font-size: 0.8rem;
     color: #6c757d;
@@ -620,11 +624,40 @@ body {
   }
 }
 
+.weather-box {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    color: #333;
+}
+
+.weather-box i {
+    font-size: 1.8rem;
+}
+
+.weather-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+    font-size: 1.2rem;
+}
+
+.weather-text .temp {
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.weather-text .pop {
+    color: #555;
+    font-size: 0.85rem;
+}
+
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
 
 /* ================================
    響應式設計 - 手機優化
@@ -665,6 +698,10 @@ body {
     
     .logo h1 {
         font-size: 1.6rem;
+    }
+
+    .logo:focus {
+        outline: none;
     }
     
     /* 顯示漢堡選單按鈕 */

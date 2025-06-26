@@ -37,6 +37,7 @@ from ps_camp.sql_models.party_document_model import PartyDocument
 from ps_camp.sql_models.post_model import Post
 from ps_camp.sql_models.proposal_model import Proposal
 from ps_camp.sql_models.user_model import User
+from ps_camp.utils.get_latest_weather import get_latest_weather_summary
 from ps_camp.utils.get_register_close_time import get_register_close_time
 from ps_camp.utils.humanize_time_diff import humanize_time_diff, taipei_now
 from ps_camp.utils.password_hasher import PasswordHasher
@@ -52,6 +53,16 @@ ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg"}
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
+ICON_MAP = {
+    "晴": "fas fa-sun",
+    "多雲": "fas fa-cloud-sun",
+    "陰": "fas fa-cloud",
+    "雨": "fas fa-cloud-showers-heavy",
+    "雷": "fas fa-bolt",
+    "雷雨": "fas fa-bolt",
+    "雪": "fas fa-snowflake",
+}
 
 
 def allowed_file(filename):
@@ -124,6 +135,26 @@ def create_app():
             "current_time": taipei_now(),
             "register_close_time": get_register_close_time(),
         }
+
+    @app.context_processor
+    def inject_weather():
+        try:
+            w = get_latest_weather_summary("大安區")
+            icon = next(
+                (v for k, v in ICON_MAP.items() if k in w["天氣現象"]), "fas fa-smog"
+            )
+            return {
+                "current_weather_icon": icon,
+                "current_weather_temp": w["溫度"],
+                "current_weather_pop": w["降雨機率"],
+            }
+        except Exception as e:
+            logger.warning(f"[Weather] 無法取得天氣資料：{e}")
+            return {
+                "current_weather_icon": None,
+                "current_weather_temp": None,
+                "current_weather_pop": None,
+            }
 
     @app.route("/")
     @refresh_user_session

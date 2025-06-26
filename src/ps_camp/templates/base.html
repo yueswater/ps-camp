@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,10 +11,12 @@
     <link rel="canonical" href="{{ request.url }}">
     <meta property="og:title" content="{% block og_title %}沙政風暴 | 臺大政治營{% endblock %}">
     <meta property="og:description" content="{% block og_description %}這是一場屬於你的選戰{% endblock %}">
-    <meta property="og:image" content="{% block og_image %}{{ url_for('static', filename='assets/og-image.png', _external=True) }}{% endblock %}">
+    <meta property="og:image"
+        content="{% block og_image %}{{ url_for('static', filename='assets/og-image.png', _external=True) }}{% endblock %}">
     <meta property="og:url" content="{{ request.url }}">
     <meta property="og:type" content="website">
 </head>
+
 <body>
     <div id="loading-screen">
         <div class="loading-mask">
@@ -21,10 +24,10 @@
             <p class="loading-text">沙政風暴啟動中...</p>
         </div>
     </div>
-    
+
     {% if not hide_navbar %}
     <div class="mobile-overlay"></div>
-    
+
     <header class="header">
         <div class="container">
             <div class="header-content">
@@ -32,34 +35,49 @@
                     <h1>沙政風暴</h1>
                     <span class="tagline">2025 NTU PS CAMP</span>
                 </a>
-                
+
                 <!-- 漢堡選單按鈕 (僅手機顯示) -->
                 <button class="mobile-menu-toggle" aria-label="開啟選單">
                     <span class="hamburger-line"></span>
                     <span class="hamburger-line"></span>
                     <span class="hamburger-line"></span>
                 </button>
-                
+
                 <nav class="navbar">
                     <ul class="nav-links">
                         <li><a href="/" class="nav-link">首頁</a></li>
                         <li><a href="/posts" class="nav-link">貼文列表</a></li>
                         <li><a href="/npcs" class="nav-link">NPC 列表</a></li>
                         {% if not session.get("user") %}
-                            {% if current_time < register_close_time %}
-                            <li><a href="/register" class="nav-link">註冊</a></li>
+                        {% if current_time < register_close_time %} <li><a href="/register" class="nav-link">註冊</a></li>
                             {% endif %}
                             <li><a href="/login" class="nav-link">登入</a></li>
-                        {% else %}
+                            {% else %}
                             <li><a href="/bank" class="nav-link">銀行</a></li>
                             {% if session.get("user", {}).get("role") == "admin" %}
-                                <li><a href="{{ url_for('distribute_money') }}" class="nav-link">大撒幣</a></li>
+                            <li><a href="{{ url_for('distribute_money') }}" class="nav-link">大撒幣</a></li>
                             {% endif %}
                             <li class="user-info">
-                                <a href="{{ url_for('profile') }}" class="nav-link username">{{ session.user.fullname }}</a>
+                                <a href="{{ url_for('profile') }}" class="nav-link username">{{ session.user.fullname
+                                    }}</a>
+                            </li>
+                            <li class="nav-link weather-info">
+                                <div class="weather-box">
+                                    {% if current_weather_icon %}
+                                    <i class="{{ current_weather_icon }}"></i>
+                                    <div class="weather-text">
+                                        <div class="temp">{{ current_weather_temp }}°C</div>
+                                        <div class="pop">{{ current_weather_pop }}%</div>
+                                    </div>
+                                    {% else %}
+                                    <span>—</span>
+                                    {% endif %}
+                                </div>
+                            </li>
+                            <li>
                                 <a href="/logout" class="nav-link logout">登出</a>
                             </li>
-                        {% endif %}
+                            {% endif %}
                     </ul>
                 </nav>
             </div>
@@ -85,10 +103,14 @@
                     <div class="contact-info">
                         <p>聯絡我們</p>
                         <div class="social-links">
-                            <a href="mailto:ntupscamp2025@gmail.com" class="social-link"><i class="fas fa-envelope"></i></a>
-                            <a href="https://www.facebook.com/ntupscamp2025" class="social-link"><i class="fab fa-facebook"></i></a>
-                            <a href="https://www.instagram.com/ntupscamp2025/" class="social-link"><i class="fab fa-instagram"></i></a>
-                            <a href="https://www.threads.com/@ntupscamp2025" class="social-link"><i class="fab fa-threads"></i></a>
+                            <a href="mailto:ntupscamp2025@gmail.com" class="social-link"><i
+                                    class="fas fa-envelope"></i></a>
+                            <a href="https://www.facebook.com/ntupscamp2025" class="social-link"><i
+                                    class="fab fa-facebook"></i></a>
+                            <a href="https://www.instagram.com/ntupscamp2025/" class="social-link"><i
+                                    class="fab fa-instagram"></i></a>
+                            <a href="https://www.threads.com/@ntupscamp2025" class="social-link"><i
+                                    class="fab fa-threads"></i></a>
                         </div>
                     </div>
                 </div>
@@ -99,4 +121,5 @@
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
+
 </html>
