@@ -839,3 +839,9 @@
     color: #333;
     word-break: break-word;
 }
+
+.preview-snippet {
+  max-height: 6em;
+  overflow: hidden;
+  position: relative;
+}

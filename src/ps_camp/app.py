@@ -4,7 +4,7 @@ import os
 import re
 from datetime import UTC, datetime, timedelta, timezone
 from functools import wraps
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import markdown
 from dotenv import load_dotenv
@@ -552,9 +552,28 @@ def create_app():
             for post in posts:
                 post.display_time = humanize_time_diff(post.created_at)
                 post.preview = markdown.markdown(
-                    post.content[:300], extensions=["nl2br"]
+                    post.content[:50], extensions=["nl2br"]
                 )
             return render_template("posts.html", posts=posts)
+
+    from uuid import UUID
+
+    @app.route("/api/posts/<post_id>/preview")
+    def get_post_preview(post_id):
+        try:
+            post_uuid = UUID(post_id)
+        except ValueError:
+            return jsonify(success=False, message="無效貼文 ID"), 400
+
+        with get_db_session() as db:
+            repo = PostSQLRepository(db)
+            post = repo.get_by_id(post_uuid)
+            if not post:
+                return jsonify(success=False, message="找不到貼文"), 404
+
+            short_text = post.content[:100] + "..."
+            html = markdown.markdown(short_text, extensions=["nl2br"])
+            return jsonify({"success": True, "preview": html})
 
     @app.route("/api/posts/<string:post_id>", methods=["GET"])
     def get_post_content(post_id: str):

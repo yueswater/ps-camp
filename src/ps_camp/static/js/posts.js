@@ -13,17 +13,41 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener("click", function (e) {
     if (e.target.classList.contains("read-more")) {
         e.preventDefault();
-        const postId = e.target.dataset.postId;
-        fetch(`/api/posts/${postId}`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    const previewEl = document.querySelector(`.preview[data-post-id="${postId}"]`);
-                    previewEl.innerHTML = data.content;
-                }
-            });
+        const btn = e.target;
+        const postId = btn.dataset.postId;
+        const previewEl = document.querySelector(`.preview[data-post-id="${postId}"]`);
+
+        const isExpanded = btn.dataset.expanded === "true";
+
+        if (isExpanded) {
+            // 還原原始預覽
+            fetch(`/api/posts/${postId}/preview`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        previewEl.innerHTML = `
+                    <div class="preview-snippet">${data.preview}</div>
+                    <a href="#" class="read-more" data-post-id="${postId}" data-expanded="false">顯示更多</a>
+                `;
+                    }
+                });
+        }
+        else {
+            // 展開全文
+            fetch(`/api/posts/${postId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        previewEl.innerHTML = `
+                            <div class="full-content">${data.content}</div>
+                            <a href="#" class="read-more" data-post-id="${postId}" data-expanded="true">顯示較少</a>
+                        `;
+                    }
+                });
+        }
     }
 });
+
 
 function initPostInteractions() {
     //Like button function
