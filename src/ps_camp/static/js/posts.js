@@ -53,15 +53,15 @@ function initPostInteractions() {
                     }
                 });
         });
+    });
 
-        document.querySelectorAll('.post-stats .stats-item').forEach(item => {
-            if (item.textContent.includes('回覆')) {
-                item.addEventListener('click', () => {
-                    const postId = item.closest('.post-card').dataset.postId;
-                    showRepliesModal(postId);
-                });
-            }
-        });
+    document.querySelectorAll('.post-stats .stats-item').forEach(item => {
+        if (item.textContent.includes('回覆')) {
+            item.addEventListener('click', () => {
+                const postId = item.closest('.post-card').dataset.postId;
+                showRepliesModal(postId);
+            });
+        }
     });
 
 

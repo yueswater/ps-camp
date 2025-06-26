@@ -680,7 +680,7 @@
     padding: 1rem;
     background: #f8f9fa;
     border-radius: 8px;
-    border-left: 4px solid #007bff;
+    border-left: 4px solid #495057;
 }
 
 .comment-input {
@@ -697,7 +697,7 @@
 
 .comment-input:focus {
     outline: none;
-    border-color: #007bff;
+    border-color: #949595;
 }
 
 .modal-footer {
@@ -833,7 +833,7 @@
     padding: 0.75rem;
     margin-bottom: 0.5rem;
     background: #f8f9fa;
-    border-left: 4px solid #007bff;
+    border-left: 4px solid #495057;
     border-radius: 6px;
     font-size: 0.95rem;
     color: #333;
