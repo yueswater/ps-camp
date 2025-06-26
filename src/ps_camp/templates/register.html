@@ -7,13 +7,18 @@
     <h2 class="form-title">註冊新帳號</h2>
     {% with messages = get_flashed_messages() %}
     {% if messages %}
-        <ul class="flash-messages">
+    <ul class="flash-messages">
         {% for message in messages %}
         <li>{{ message }}</li>
         {% endfor %}
-        </ul>
+    </ul>
     {% endif %}
     {% endwith %}
+    {% if error %}
+    <div id="form-error" class="form-error">{{ error }}</div>
+    {% else %}
+    <div id="form-error" class="form-error" style="display: none;"></div>
+    {% endif %}
     <form method="post" class="auth-form">
         <label for="username">帳號</label>
         <input type="text" id="username" name="username" required>
@@ -23,11 +28,12 @@
 
         <label for="password">密碼</label>
         <input type="password" id="password" name="password" required>
+        <small id="password-strength" class="password-hint">密碼強度：尚未輸入</small>
 
         <label for="role">身分</label>
         <select id="role" name="role" required>
             <option value="" disabled selected>請選擇身份</option>
-            
+
             <option value="party">政黨</option>
             <option value="group">利益團體</option>
             <option value="member">個人</option>
@@ -39,10 +45,10 @@
                 <select name="affiliation_id" id="affiliation_id">
                     <option value="">請選擇</option>
                     {% for p in parties %}
-                        <option value="{{ p.id }}" data-type="party">{{ p.fullname }}</option>
+                    <option value="{{ p.id }}" data-type="party">{{ p.fullname }}</option>
                     {% endfor %}
                     {% for g in interest_groups %}
-                        <option value="{{ g.id }}" data-type="group">{{ g.fullname }}</option>
+                    <option value="{{ g.id }}" data-type="group">{{ g.fullname }}</option>
                     {% endfor %}
                 </select>
             </div>

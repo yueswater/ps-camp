@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import re
 from datetime import UTC, datetime, timedelta, timezone
 from functools import wraps
 from uuid import UUID, uuid4
@@ -39,6 +40,7 @@ from ps_camp.sql_models.user_model import User
 from ps_camp.utils.get_register_close_time import get_register_close_time
 from ps_camp.utils.humanize_time_diff import humanize_time_diff, taipei_now
 from ps_camp.utils.password_hasher import PasswordHasher
+from ps_camp.utils.password_rules import is_strong_password
 from ps_camp.utils.pdf_templates import bank_report_template
 from ps_camp.utils.resolve_owner_name import resolve_owner_name
 from ps_camp.utils.session_helpers import refresh_user_session
@@ -288,38 +290,88 @@ def create_app():
         if taipei_now() > get_register_close_time():
             flash("註冊時間已截止", "danger")
             return redirect(url_for("home"))
+
         with get_db_session() as db:
             repo = UserSQLRepository(db)
             hasher = PasswordHasher()
+
+            # Pre-retrieve lists of all political parties and groups
+            all_users = repo.get_all()
+            parties = [p for p in all_users if p.role == "party"]
+            interest_groups = [g for g in all_users if g.role == "group"]
+
             if request.method == "POST":
                 data = request.form
-                role = data["role"]
 
+                username = data["username"].strip()
+                fullname = data["fullname"].strip()
+                password = data["password"]
+                role = data["role"]
                 affiliation_id = data.get("affiliation_id")
                 affiliation_type = data.get("affiliation_type")
 
-                if role == "member":
-                    if not affiliation_id or not affiliation_type:
-                        flash("請選擇所屬政黨或利益團體")
-                        return redirect(url_for("register"))
+                # Check the account format
+                if not re.match(r"^[a-zA-Z0-9_]{4,20}$", username):
+                    return render_template(
+                        "register.html",
+                        parties=parties,
+                        interest_groups=interest_groups,
+                        error="帳號僅能包含英文、數字與底線，長度 4-20 字",
+                    )
 
+                # Check whether the account is duplicated
+                if repo.get_by_username(username):
+                    return render_template(
+                        "register.html",
+                        parties=parties,
+                        interest_groups=interest_groups,
+                        error="此帳號已被使用，請選擇其他帳號！",
+                    )
+
+                # Register name is prohibited
+                if username.lower() in ["admin", "root"]:
+                    return render_template(
+                        "register.html",
+                        parties=parties,
+                        interest_groups=interest_groups,
+                        error="禁止註冊管理員帳號",
+                    )
+
+                # Password strength check
+                if not is_strong_password(password):
+                    return render_template(
+                        "register.html",
+                        parties=parties,
+                        interest_groups=interest_groups,
+                        error="密碼需至少 8 字，包含大寫、小寫、數字與特殊符號",
+                    )
+
+                # If it is a member, check the column
+                if role == "member" and (not affiliation_id or not affiliation_type):
+                    return render_template(
+                        "register.html",
+                        parties=parties,
+                        interest_groups=interest_groups,
+                        error="請選擇所屬政黨或利益團體",
+                    )
+
+                # Create a user
                 new_user = User(
                     id=str(uuid4()),
-                    username=data["username"],
-                    fullname=data["fullname"],
-                    hashed_password=hasher.hash_password(data["password"]),
-                    role=data["role"],
+                    username=username,
+                    fullname=fullname,
+                    hashed_password=hasher.hash_password(password),
+                    role=role,
                     coins=10000,
                     affiliation_id=affiliation_id if role == "member" else None,
                     affiliation_type=affiliation_type if role == "member" else None,
                 )
-
                 repo.add(new_user)
 
-                bank_repo = BankSQLRepository(db)
-
+                # Create a bank account (member does not need)
                 if role != "member":
-                    owner_type = map_role_to_owner_type(data["role"])
+                    bank_repo = BankSQLRepository(db)
+                    owner_type = map_role_to_owner_type(role)
                     bank_repo.create_account(
                         owner_id=new_user.id,
                         owner_type=owner_type,
@@ -328,11 +380,7 @@ def create_app():
 
                 return redirect(url_for("login"))
 
-            # TODO: list all role == "party" or role == "group"
-            all_users = repo.get_all()
-            parties = [p for p in all_users if p.role == "party"]
-            interest_groups = [g for g in all_users if g.role == "group"]
-
+            # GET Request
             return render_template(
                 "register.html", parties=parties, interest_groups=interest_groups
             )

@@ -68,3 +68,29 @@
     margin-bottom: 0.5rem;
     font-weight: bold;
 }
+
+.password-hint {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.9em;
+    color: #666;
+}
+.password-hint.weak { color: #d9534f; }
+.password-hint.medium { color: #f0ad4e; }
+.password-hint.strong { color: #5cb85c; }
+
+.form-error {
+    background-color: #f8d7da;
+    border: 1px solid #f5c2c7;
+    padding: 10px;
+    border-radius: 6px;
+    color: #842029;
+    margin-bottom: 15px;
+    font-size: 0.95em;
+    transition: opacity 0.3s ease;
+    opacity: 1;
+}
+
+.form-error.hidden {
+    opacity: 0;
+}
