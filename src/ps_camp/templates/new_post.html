@@ -12,11 +12,16 @@
                 <label class="form-label" for="category">分類</label>
                 <select class="form-input" name="category" id="category" required>
                     <option value="">請選擇分類</option>
+                    {% if role == "admin" %}
                     <option value="規則">規則</option>
                     <option value="公告">公告</option>
                     <option value="議題">議題</option>
                     <option value="成立宣言">成立宣言</option>
                     <option value="白皮書">白皮書</option>
+                    {% endif %}
+                    {% if role == "party" or role == "interest_group" %}
+                    <option value="新聞">新聞</option>
+                    {% endif %}
                 </select>
             </div>
             <div class="form-group">

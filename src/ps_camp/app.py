@@ -737,19 +737,38 @@ def create_app():
         if not session.get("user"):
             return redirect(url_for("login"))
 
+        user = session["user"]
+        role = user["role"]
+
+        # Classification permission definition
+        ADMIN_ONLY_CATEGORIES = ["規則", "公告", "議題", "成立宣言", "白皮書"]
+        PARTY_OR_GROUP_ONLY = ["新聞"]
+
         with get_db_session() as db:
             repo = PostSQLRepository(db)
 
             if request.method == "POST":
                 data = request.form
-                user_id = UUID(session["user"]["id"])
-                user_role = session["user"]["role"]
-                owner_type = map_role_to_owner_type(user_role)
+                user_id = UUID(user["id"])
+                owner_type = map_role_to_owner_type(role)
+                category = data["category"]
+
+                # Classification permission check
+                if category in ADMIN_ONLY_CATEGORIES and role != "admin":
+                    flash("您沒有權限發布此分類的貼文")
+                    return redirect(url_for("new_post"))
+
+                if category in PARTY_OR_GROUP_ONLY and role not in [
+                    "party",
+                    "interest_group",
+                ]:
+                    flash("只有政黨與利益團體能發布新聞")
+                    return redirect(url_for("new_post"))
 
                 post = Post(
                     id=uuid4(),
                     title=data["title"],
-                    category=data["category"],
+                    category=category,
                     content=data["content"],
                     created_at=taipei_now(),
                     created_by=user_id,
@@ -760,7 +779,7 @@ def create_app():
                 repo.add(post, owner_id=user_id, owner_type=owner_type)
                 return redirect(url_for("posts"))
 
-            return render_template("new_post.html")
+            return render_template("new_post.html", role=role)
 
     @app.route("/api/posts/<string:post_id>/like", methods=["POST"])
     def like_post(post_id: str):
