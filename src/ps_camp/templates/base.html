@@ -85,6 +85,8 @@
     </header>
     {% endif %}
 
+    {% block hero %}{% endblock %}
+
     <main class="main-content">
         <div class="{% if not hide_container %}container{% endif %}">
             {% block content %}{% endblock %}

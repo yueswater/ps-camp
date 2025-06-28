@@ -23,6 +23,105 @@ body {
     -webkit-tap-highlight-color: transparent;
 }
 
+.big-image {
+    height: 100vh;
+    width: 100vw;
+    position: relative;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url("{{ url_for('static', filename='assets/home-bg.png') }}");
+}
+
+.home-bg {
+    background-image: url("/static/assets/home-bg.png");
+}
+
+.big-image-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+
+.big-image-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+}
+
+
+.overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.overlay h1 {
+    font-size: 65px;
+    letter-spacing: 0px;
+    margin: 0 0 5px;
+}
+
+.overlay p {
+    margin: 0;
+    font-size: 28px;
+}
+
+#vids {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 60px;
+}
+
+#vids a:first-of-type {
+    margin-bottom: 5px;
+}
+
+#vids a {
+    color: #1a0dab;
+    text-decoration: none;
+    font-size: 20px;
+}
+
+#vids a:hover {
+    text-decoration: underline;
+}
+
+.cta-buttons {
+    margin-top: 150px;
+    display: flex;
+    gap: 1.2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.cta-buttons a {
+    padding: 0.8rem 1.4rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    min-width: 130px;
+}
+
+
+@media (max-width: 430px) {
+    .card-grid {
+        padding-left: 10rem;
+        padding-right: 10rem;
+    }
+}
+
+
 /* 容器樣式 */
 .container {
     max-width: 1200px;
@@ -189,7 +288,7 @@ body {
 
 /* 主要內容區域 */
 .main-content {
-    min-height: calc(100vh - 200px);
+    /* min-height: calc(100vh - 200px); */
     padding: 3rem 0;
     /* 避免內容貼邊 */
     padding-bottom: env(safe-area-inset-bottom, 3rem);
@@ -217,6 +316,8 @@ body {
     gap: 2rem;
     margin-top: 2rem;
     width: 100%;
+    padding-left: 100px;
+    padding-right: 100px;
 }
 
 .card-title {
@@ -505,7 +606,9 @@ body {
 }
 
 /* Font Awesome 圖標樣式 */
-.fas, .far, .fab {
+.fas,
+.far,
+.fab {
     margin-right: 0.5rem;
 }
 
@@ -532,7 +635,7 @@ body {
 /* Loading Screen */
 #loading-screen {
     position: fixed;
-    top: 0; 
+    top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
@@ -560,68 +663,78 @@ body {
 }
 
 .firework-wrapper {
-  position: relative;
-  text-align: center;
-  padding: 2rem 1rem;
-  animation: fadeIn 1s ease-in-out;
+    position: relative;
+    text-align: center;
+    padding: 2rem 1rem;
+    animation: fadeIn 1s ease-in-out;
 }
 
 .already-voted-firework {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #495057;
-  animation: popIn 0.5s ease-in-out;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #495057;
+    animation: popIn 0.5s ease-in-out;
 }
 
 @keyframes popIn {
-  0% { transform: scale(0.5); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 .firework {
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  background: transparent;
-  box-shadow:
-    0 -20px 0 #ff7675,
-    14px -14px 0 #74b9ff,
-    20px 0 0 #ffeaa7,
-    14px 14px 0 #55efc4,
-    0 20px 0 #fd79a8,
-    -14px 14px 0 #a29bfe,
-    -20px 0 0 #fab1a0,
-    -14px -14px 0 #81ecec;
-  border-radius: 50%;
-  animation: explode 1s ease-out infinite;
-  opacity: 0.7;
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: transparent;
+    box-shadow:
+        0 -20px 0 #ff7675,
+        14px -14px 0 #74b9ff,
+        20px 0 0 #ffeaa7,
+        14px 14px 0 #55efc4,
+        0 20px 0 #fd79a8,
+        -14px 14px 0 #a29bfe,
+        -20px 0 0 #fab1a0,
+        -14px -14px 0 #81ecec;
+    border-radius: 50%;
+    animation: explode 1s ease-out infinite;
+    opacity: 0.7;
 }
 
 .f1 {
-  top: 0;
-  left: 30%;
-  animation-delay: 0s;
+    top: 0;
+    left: 30%;
+    animation-delay: 0s;
 }
+
 .f2 {
-  top: 20%;
-  left: 60%;
-  animation-delay: 0.3s;
+    top: 20%;
+    left: 60%;
+    animation-delay: 0.3s;
 }
+
 .f3 {
-  top: 50%;
-  left: 40%;
-  animation-delay: 0.6s;
+    top: 50%;
+    left: 40%;
+    animation-delay: 0.6s;
 }
 
 @keyframes explode {
-  0% {
-    transform: scale(0.5);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1.4);
-    opacity: 0;
-  }
+    0% {
+        transform: scale(0.5);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1.4);
+        opacity: 0;
+    }
 }
 
 .weather-box {
@@ -655,8 +768,15 @@ body {
 
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* ================================
@@ -668,11 +788,11 @@ body {
     .container {
         padding: 0 16px;
     }
-    
+
     .hero h1 {
         font-size: 2.5rem;
     }
-    
+
     .card-grid {
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 1.5rem;
@@ -684,18 +804,61 @@ body {
     html {
         font-size: 15px;
     }
-    
+
+    .big-image-wrapper {
+        height: 500px;
+        width: 100%;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .big-image-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center 25%;
+        transform: none;
+    }
+
+    .overlay {
+        position: absolute;
+        inset: 0;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.3);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 0;
+    }
+
+    .cta-buttons {
+        margin-top: 150px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 0 1rem;
+        gap: 1rem;
+    }
+
+    .cta-buttons a {
+        flex: 1;
+        font-size: 1rem;
+        box-sizing: border-box;
+    }
+
     .header {
         padding: 0.75rem 0;
     }
-    
+
     .header-content {
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
         text-align: left;
     }
-    
+
     .logo h1 {
         font-size: 1.6rem;
     }
@@ -703,13 +866,13 @@ body {
     .logo:focus {
         outline: none;
     }
-    
+
     /* 顯示漢堡選單按鈕 */
     .mobile-menu-toggle {
         display: flex;
         order: 3;
     }
-    
+
     /* 手機版導航樣式 */
     .navbar {
         position: fixed;
@@ -724,11 +887,11 @@ body {
         overflow-y: auto;
         padding-top: env(safe-area-inset-top, 0px);
     }
-    
+
     .navbar.active {
         left: 0;
     }
-    
+
     .nav-links {
         flex-direction: column;
         gap: 0;
@@ -736,16 +899,16 @@ body {
         padding: 2rem 0 1rem;
         align-items: stretch;
     }
-    
+
     .nav-links li {
         width: 100%;
         border-bottom: 1px solid #f1f3f4;
     }
-    
+
     .nav-links li:last-child {
         border-bottom: none;
     }
-    
+
     .nav-link {
         width: 100%;
         padding: 1rem 1.5rem;
@@ -755,29 +918,29 @@ body {
         justify-content: flex-start;
         transition: background-color 0.2s ease;
     }
-    
+
     .nav-link:hover {
         background-color: #f8f9fa;
         color: #212529;
     }
-    
+
     .user-info {
         flex-direction: column;
         width: 100%;
         gap: 0;
         align-items: stretch;
     }
-    
+
     .user-info .nav-link {
         border-bottom: 1px solid #f1f3f4;
     }
-    
+
     .username {
         background-color: #f8f9fa;
         font-weight: 600;
         color: #495057 !important;
     }
-    
+
     .logout {
         background-color: #dc3545 !important;
         color: white !important;
@@ -786,63 +949,66 @@ body {
         text-align: center;
         width: calc(100% - 3rem);
     }
-    
+
     .logout:hover {
         background-color: #c82333 !important;
     }
-    
+
     .hero {
         padding: 3rem 1.5rem;
         margin-bottom: 2rem;
     }
-    
+
     .hero h1 {
         font-size: 2.2rem;
         line-height: 1.2;
     }
-    
+
     .hero p {
         font-size: 1.1rem;
     }
-    
+
     .hero-info {
         padding: 1.5rem;
     }
-    
+
     .card {
         padding: 1.5rem;
         margin-bottom: 1.5rem;
     }
-    
+
     .card-grid {
         grid-template-columns: 1fr;
         gap: 1.5rem;
+        padding-left: 80px;
+        padding-right: 80px;
     }
-    
+
     .card-title {
         font-size: 1.3rem;
     }
-    
+
     .main-content {
         padding: 2rem 0;
+        padding-bottom: env(safe-area-inset-bottom, 3rem);
     }
-    
+
     .footer-content {
         flex-direction: column;
         gap: 1.5rem;
         text-align: center;
     }
-    
+
     .social-links {
         justify-content: center;
     }
-    
+
     .info-item {
         flex-direction: column;
         align-items: flex-start;
         gap: 0.25rem;
     }
-    
+
     .info-value {
         text-align: left;
         width: 100%;
@@ -854,99 +1020,100 @@ body {
     html {
         font-size: 14px;
     }
-    
+
     .container {
         padding: 0 12px;
     }
-    
+
     .header {
         padding: 0.5rem 0;
     }
-    
+
     .logo h1 {
         font-size: 1.4rem;
     }
-    
+
     .tagline {
         font-size: 0.7rem;
     }
-    
+
     /* 調整手機版導航寬度 */
     .navbar {
         width: 260px;
     }
-    
+
     .nav-links {
         padding: 1.5rem 0 1rem;
     }
-    
+
     .nav-link {
         padding: 0.875rem 1.25rem;
         font-size: 0.95rem;
     }
-    
+
     .logout {
         margin: 0.75rem 1.25rem;
         width: calc(100% - 2.5rem);
     }
-    
+
     .hero {
         padding: 2rem 1rem;
         border-radius: 8px;
     }
-    
+
     .hero h1 {
         font-size: 1.8rem;
         line-height: 1.1;
         margin-bottom: 0.75rem;
     }
-    
+
     .hero p {
         font-size: 1rem;
         margin-bottom: 1.5rem;
     }
-    
+
     .hero-info {
         padding: 1rem;
         border-radius: 6px;
     }
-    
+
     .hero-info h2 {
         font-size: 1.2rem;
     }
-    
+
     .card {
         padding: 1rem;
         border-radius: 8px;
         margin-bottom: 1rem;
     }
-    
+
     .card-title {
         font-size: 1.1rem;
         margin-bottom: 0.75rem;
     }
-    
+
     .card-content {
         font-size: 0.9rem;
     }
-    
+
     .card-category {
         font-size: 0.75rem;
         padding: 0.2rem 0.5rem;
     }
-    
+
     .form {
         padding: 1rem;
         border-radius: 8px;
     }
-    
+
     .form-input,
     .form-textarea {
         padding: 0.6rem;
-        font-size: 16px; /* 防止iOS縮放 */
+        font-size: 16px;
+        /* 防止iOS縮放 */
         border-radius: 6px;
     }
-    
+
     .btn {
         padding: 0.6rem 1rem;
         font-size: 0.9rem;
@@ -954,33 +1121,33 @@ body {
         width: 100%;
         margin-bottom: 0.5rem;
     }
-    
+
     .list-item {
         padding: 1rem;
         border-radius: 6px;
     }
-    
+
     .list-title {
         font-size: 1.1rem;
     }
-    
+
     .list-description {
         font-size: 0.9rem;
     }
-    
+
     .main-content {
         padding: 1.5rem 0;
     }
-    
+
     .footer {
         padding: 1.5rem 0;
         margin-top: 2rem;
     }
-    
+
     .loading-image {
         width: 80px;
     }
-    
+
     .loading-text {
         font-size: 1rem;
     }
@@ -991,28 +1158,28 @@ body {
     .hero h1 {
         font-size: 1.6rem;
     }
-    
+
     .hero p {
         font-size: 0.95rem;
     }
-    
+
     .card-title {
         font-size: 1rem;
     }
-    
+
     .card-content {
         font-size: 0.85rem;
     }
-    
+
     .nav-link {
         padding: 0.6rem 0.8rem;
         font-size: 0.85rem;
     }
-    
+
     .hero-info h2 {
         font-size: 1.1rem;
     }
-    
+
     .info-label,
     .info-value {
         font-size: 0.9rem;
@@ -1024,44 +1191,44 @@ body {
     html {
         font-size: 13px;
     }
-    
+
     .container {
         padding: 0 8px;
     }
-    
+
     .hero {
         padding: 1.5rem 0.75rem;
     }
-    
+
     .hero h1 {
         font-size: 1.4rem;
     }
-    
+
     .hero p {
         font-size: 0.9rem;
     }
-    
+
     .card {
         padding: 0.75rem;
     }
-    
+
     .card-title {
         font-size: 0.95rem;
     }
-    
+
     .form {
         padding: 0.75rem;
     }
-    
+
     .btn {
         padding: 0.5rem 0.75rem;
         font-size: 0.85rem;
     }
-    
+
     .loading-image {
         width: 60px;
     }
-    
+
     .loading-text {
         font-size: 0.9rem;
     }
@@ -1091,11 +1258,11 @@ body {
     .hero {
         padding: 1.5rem 1rem;
     }
-    
+
     .hero h1 {
         font-size: 1.5rem;
     }
-    
+
     .main-content {
         padding: 1rem 0;
     }
@@ -1114,7 +1281,7 @@ body {
         right: 0;
         background-color: rgba(255, 255, 255, 0.95);
     }
-    
+
     .main-content {
         margin-top: 80px;
     }
@@ -1125,7 +1292,7 @@ body {
     .card-grid {
         gap: 1rem;
     }
-    
+
     .hero {
         margin-bottom: 1.5rem;
     }
@@ -1143,35 +1310,35 @@ body {
         justify-content: center;
         min-height: auto;
     }
-    
+
     .hero h1 {
         font-size: 1.5rem;
         margin-bottom: 0.5rem;
     }
-    
+
     .hero p {
         font-size: 0.9rem;
         margin-bottom: 1rem;
     }
-    
+
     .hero-info {
         padding: 1rem;
         margin-top: 1rem;
     }
-    
+
     .main-content {
         padding: 1rem 0;
     }
-    
+
     .header {
         padding: 0.25rem 0;
     }
-    
+
     .nav-links {
         flex-direction: row;
         gap: 0.5rem;
     }
-    
+
     .nav-link {
         padding: 0.25rem 0.5rem;
         font-size: 0.8rem;

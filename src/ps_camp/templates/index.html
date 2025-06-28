@@ -1,11 +1,25 @@
 {% extends "base.html" %}
 
+{% block hero %}
+{% if not session.get("user") %}
+<div class="big-image-wrapper">
+  <img src="{{ url_for('static', filename='assets/home-bg.png') }}" alt="沙政風暴背景" class="big-image-img">
+  <div class="overlay">
+    <div class="cta-buttons">
+        <a href="/register" class="btn btn-primary">開始遊戲</a>
+        <a href="/login" class="btn btn-outline">登入帳號</a>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+
 {% block content %}
+{% if session.get("user") %}
 <div class="hero">
     <h1>歡迎來到沙政風暴</h1>
     <p>這是一場專屬於你的模擬選戰！</p>
-
-    {% if session.get("user") %}
     <div class="hero-info">
         {% if session.user.role == "member" %}
         <h2><i class="fas fa-user"></i> 個人資訊</h2>
@@ -33,11 +47,6 @@
             <a href="{{ url_for('new_post') }}" class="btn btn-primary"><i class="fas fa-plus"></i> 新增貼文</a>
         </div>
         {% endif %}
-    </div>
-    {% else %}
-    <div style="margin-top: 2rem;">
-        <a href="/register" class="btn btn-primary" style="margin-right: 1rem;">開始遊戲</a>
-        <a href="/login" class="btn btn-outline">登入帳號</a>
     </div>
     {% endif %}
 </div>
