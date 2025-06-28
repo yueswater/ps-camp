@@ -134,6 +134,7 @@ def create_app():
         return {
             "current_time": taipei_now(),
             "register_close_time": get_register_close_time(),
+            "vote_open_time": get_vote_open_time(),
         }
 
     @app.context_processor

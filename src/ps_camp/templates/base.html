@@ -59,12 +59,16 @@
                             {% if session.get("user", {}).get("role") == "admin" %}
                             <li><a href="{{ url_for('distribute_money') }}" class="nav-link">大撒幣</a></li>
                             {% endif %}
+                            {% if current_time > vote_open_time %}
+                            <li><a href="/results" class="nav-link">開票結果</a></li>
+                            {% endif %}
                             <li class="user-info">
                                 <a href="{{ url_for('profile') }}" class="nav-link username">{{ session.user.fullname
                                     }}</a>
                             </li>
                             <li class="nav-link weather-info">
-                                <div class="weather-box">
+                                <a href="https://www.cwa.gov.tw/V8/C/W/Town/Town.html?TID=6300300" target="_blank"
+                                    class="weather-box" style="text-decoration: none; color: inherit;">
                                     {% if current_weather_icon %}
                                     <i class="{{ current_weather_icon }}"></i>
                                     <div class="weather-text">
@@ -74,8 +78,9 @@
                                     {% else %}
                                     <span>—</span>
                                     {% endif %}
-                                </div>
+                                </a>
                             </li>
+
                             <li>
                                 <a href="/logout" class="nav-link logout">登出</a>
                             </li>
