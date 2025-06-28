@@ -1,4 +1,4 @@
-/* 全域樣式重置 */
+/*Global style reset */
 * {
     margin: 0;
     padding: 0;
@@ -7,7 +7,7 @@
 
 html {
     font-size: 16px;
-    /* 防止iOS縮放 */
+    /*Prevent iOS scaling */
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
 }
@@ -17,9 +17,9 @@ body {
     line-height: 1.6;
     color: #333;
     background-color: #f8f9fa;
-    /* 防止水平滾動 */
+    /*Prevent horizontal scrolling */
     overflow-x: hidden;
-    /* 改善觸控體驗 */
+    /*Improve touch experience */
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -122,7 +122,7 @@ body {
 }
 
 
-/* 容器樣式 */
+/*Container style */
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -130,7 +130,7 @@ body {
     width: 100%;
 }
 
-/* 頁首樣式 */
+/*Top style */
 .header {
     background-color: #fff;
     border-bottom: 1px solid #e9ecef;
@@ -138,7 +138,7 @@ body {
     position: sticky;
     top: 0;
     z-index: 1000;
-    /* 避免iOS Safari底部邊界問題 */
+    /*Avoid iOS Safari bottom boundary issues */
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
 }
@@ -168,7 +168,7 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* 導航樣式 */
+/*Navigation style */
 .navbar {
     display: flex;
 }
@@ -181,7 +181,7 @@ body {
     flex-wrap: wrap;
 }
 
-/* 漢堡選單按鈕 */
+/*Hamburger menu button */
 .mobile-menu-toggle {
     display: none;
     flex-direction: column;
@@ -211,7 +211,7 @@ body {
     transform-origin: center;
 }
 
-/* 漢堡選單動畫 - 打開狀態 */
+/*Hamburger menu animation -Open status */
 .mobile-menu-toggle.active .hamburger-line:nth-child(1) {
     transform: rotate(45deg) translate(6px, 6px);
 }
@@ -250,7 +250,7 @@ body {
     padding: 0.5rem 1rem;
     border-radius: 6px;
     transition: all 0.2s ease;
-    /* 增大觸控目標 */
+    /*Enlarge the touch target */
     min-height: 44px;
     display: flex;
     align-items: center;
@@ -277,7 +277,7 @@ body {
 .logout {
     background-color: #dc3545;
     color: white !important;
-    /* 增大觸控目標 */
+    /*Enlarge the touch target */
     min-height: 44px;
     min-width: 44px;
 }
@@ -286,15 +286,15 @@ body {
     background-color: #c82333;
 }
 
-/* 主要內容區域 */
+/*Main content area */
 .main-content {
-    /* min-height: calc(100vh - 200px); */
+    /*min-height: calc(100vh -200px); */
     padding: 3rem 0;
-    /* 避免內容貼邊 */
+    /*Avoid content embed */
     padding-bottom: env(safe-area-inset-bottom, 3rem);
 }
 
-/* 卡片樣式 */
+/*Card style */
 .card {
     background: #fff;
     border-radius: 12px;
@@ -315,7 +315,7 @@ body {
 .card-grid {
     display: flex;
     flex-direction: row;
-    justify-content: center;  /* 或 center / start */
+    justify-content: center;  /*or center /start */
     gap: 3rem;
     margin-top: 2rem;
     width: 100%;
@@ -353,7 +353,7 @@ body {
     margin-top: 1rem;
 }
 
-/* 英雄區塊 */
+/*Hero Block */
 .hero {
     background: #fff;
     border-radius: 12px;
@@ -420,7 +420,7 @@ body {
     word-wrap: break-word;
 }
 
-/* 按鈕樣式 */
+/*Button Style */
 .btn {
     display: inline-block;
     padding: 0.75rem 1.5rem;
@@ -432,7 +432,7 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
     font-size: 1rem;
-    /* 增大觸控目標 */
+    /*Enlarge the touch target */
     min-height: 44px;
     min-width: 44px;
     display: inline-flex;
@@ -464,7 +464,7 @@ body {
     color: white;
 }
 
-/* 表單樣式 */
+/*Form Style */
 .form {
     background: #fff;
     border-radius: 12px;
@@ -494,10 +494,10 @@ body {
     border-radius: 8px;
     font-size: 1rem;
     transition: border-color 0.2s ease;
-    /* 改善iOS表單樣式 */
+    /*Improve iOS form style */
     -webkit-appearance: none;
     appearance: none;
-    /* 增大觸控目標 */
+    /*Enlarge the touch target */
     min-height: 44px;
 }
 
@@ -512,7 +512,7 @@ body {
     min-height: 120px;
 }
 
-/* 列表樣式 */
+/*List style */
 .list {
     list-style: none;
 }
@@ -551,13 +551,13 @@ body {
     word-wrap: break-word;
 }
 
-/* 頁尾樣式 */
+/*End of page style */
 .footer {
     background-color: #343a40;
     color: #adb5bd;
     padding: 2rem 0;
     margin-top: 4rem;
-    /* 支援iPhone底部安全區域 */
+    /*Supports iPhone bottom security area */
     padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
 }
 
@@ -596,7 +596,7 @@ body {
     text-decoration: none;
     border-radius: 6px;
     transition: background-color 0.2s ease;
-    /* 增大觸控目標 */
+    /*Enlarge the touch target */
     min-height: 44px;
     min-width: 44px;
     display: inline-flex;
@@ -608,7 +608,7 @@ body {
     background-color: #495057;
 }
 
-/* Font Awesome 圖標樣式 */
+/*Font Awesome Icon Style */
 .fas,
 .far,
 .fab {
@@ -635,7 +635,7 @@ body {
     margin-right: 0;
 }
 
-/* Loading Screen */
+/*Loading Screen */
 #loading-screen {
     position: fixed;
     top: 0;
@@ -648,7 +648,7 @@ body {
     align-items: center;
     flex-direction: column;
     z-index: 9999;
-    /* 支援iPhone安全區域 */
+    /*Support iPhone security area */
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -782,11 +782,11 @@ body {
     }
 }
 
-/* ================================
-   響應式設計 - 手機優化
-   ================================ */
+/*==============================================
+   Responsive design -mobile phone optimization
+   =========================================*/
 
-/* 大型平板 (iPad Pro, 大型Android平板) */
+/*Large tablet (iPad Pro, large Android tablet) */
 @media (max-width: 1024px) {
     .container {
         padding: 0 16px;
@@ -802,7 +802,7 @@ body {
     }
 }
 
-/* 小型平板 (iPad, 中型Android平板) */
+/*Small tablet (iPad, medium Android tablet) */
 @media (max-width: 768px) {
     html {
         font-size: 15px;
@@ -870,13 +870,13 @@ body {
         outline: none;
     }
 
-    /* 顯示漢堡選單按鈕 */
+    /*Show hamburger menu button */
     .mobile-menu-toggle {
         display: flex;
         order: 3;
     }
 
-    /* 手機版導航樣式 */
+    /*Mobile version navigation style */
     .navbar {
         position: fixed;
         top: 0;
@@ -1020,7 +1020,7 @@ body {
     }
 }
 
-/* iPhone 14 Pro Max, iPhone 14 Plus, Galaxy S23 Ultra */
+/*iPhone 14 Pro Max, iPhone 14 Plus, Galaxy S23 Ultra */
 @media (max-width: 430px) {
     html {
         font-size: 14px;
@@ -1042,7 +1042,7 @@ body {
         font-size: 0.7rem;
     }
 
-    /* 調整手機版導航寬度 */
+    /*Adjust the navigation width of the mobile version */
     .navbar {
         width: 260px;
     }
@@ -1115,7 +1115,7 @@ body {
     .form-textarea {
         padding: 0.6rem;
         font-size: 16px;
-        /* 防止iOS縮放 */
+        /*Prevent iOS scaling */
         border-radius: 6px;
     }
 
@@ -1158,7 +1158,7 @@ body {
     }
 }
 
-/* iPhone SE, iPhone 12 mini, Galaxy S23 */
+/*iPhone SE, iPhone 12 mini, Galaxy S23 */
 @media (max-width: 375px) {
     .hero h1 {
         font-size: 1.6rem;
@@ -1191,7 +1191,7 @@ body {
     }
 }
 
-/* iPhone 12 mini, 舊款小螢幕Android */
+/*iPhone 12 mini, old small screen Android */
 @media (max-width: 320px) {
     html {
         font-size: 13px;
@@ -1239,11 +1239,11 @@ body {
     }
 }
 
-/* ================================
-   特殊iPhone型號優化
-   ================================ */
+/*==============================================
+   Special iPhone model optimization
+   =========================================*/
 
-/* iPhone 14 Pro Max / iPhone 15 Pro Max */
+/*iPhone 14 Pro Max /iPhone 15 Pro Max */
 @media (max-width: 430px) and (min-height: 932px) {
     .main-content {
         min-height: calc(100vh - 180px);
@@ -1251,14 +1251,14 @@ body {
     }
 }
 
-/* iPhone 14 Pro / iPhone 15 Pro */
+/*iPhone 14 Pro /iPhone 15 Pro */
 @media (max-width: 393px) and (min-height: 852px) {
     .hero {
         margin-top: 1rem;
     }
 }
 
-/* iPhone SE (第3代) */
+/*iPhone SE (3rd generation) */
 @media (max-width: 375px) and (max-height: 667px) {
     .hero {
         padding: 1.5rem 1rem;
@@ -1273,11 +1273,11 @@ body {
     }
 }
 
-/* ================================
-   Android特殊優化
-   ================================ */
+/*==============================================
+   Special Android optimization
+   =========================================*/
 
-/* Galaxy S系列大螢幕 */
+/*Galaxy S series big screen */
 @media (max-width: 412px) and (min-height: 915px) {
     .header {
         position: fixed;
@@ -1292,7 +1292,7 @@ body {
     }
 }
 
-/* Pixel 7 Pro / Galaxy Note系列 */
+/*Pixel 7 Pro /Galaxy Note Series */
 @media (max-width: 412px) and (min-height: 824px) {
     .card-grid {
         gap: 1rem;
@@ -1303,9 +1303,9 @@ body {
     }
 }
 
-/* ================================
-   橫屏模式優化
-   ================================ */
+/*==============================================
+   Optimization of horizontal screen mode
+   =========================================*/
 
 @media (max-height: 500px) and (orientation: landscape) {
     .hero {
