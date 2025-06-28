@@ -55,3 +55,6 @@ dist/
 
 # __init__.pyc etc.
 *.cpython-*.pyc
+
+# miscellaeous files
+src/ps_camp/static/data/private/batch_users.json
