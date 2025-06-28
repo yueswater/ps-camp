@@ -50,6 +50,8 @@
                         <li><a href="/npcs" class="nav-link">NPC 列表</a></li>
                         {% if not session.get("user") %}
                         {% if current_time < register_close_time %} <li><a href="/register" class="nav-link">註冊</a></li>
+                            {% else %}
+                            <li><a href="/submit" class="nav-link">上傳</a></li>
                             {% endif %}
                             <li><a href="/login" class="nav-link">登入</a></li>
                             {% else %}
