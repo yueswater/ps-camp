@@ -86,7 +86,11 @@
                 <div class="firework f3"></div>
             </div>
             {% else %}
+            {% if session.get("user") and session["user"]["role"] != "member" %}
+                <a href="/results" class="btn btn-outline" style="margin-top: 1rem;">開票結果</a>
+            {% else %}
             <a href="{{ url_for('vote_party') }}" class="btn btn-outline" style="margin-top: 1rem;">前往投票</a>
+            {% endif %}
             {% endif %}
             {% endif %}
     </div>
