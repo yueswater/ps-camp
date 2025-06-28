@@ -1,0 +1,18 @@
+{% set hide_navbar = True %}
+{% set hide_footer = True %}
+{% set hide_container = True %}
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/500.css') }}">
+<div class="error-page" data-redirect-url="{{ url_for('home') }}">
+    <h1>系統失控了</h1>
+    <p>我們的伺服器被混沌侵蝕，暫時無法回應你的請求。</p>
+    <p class="redirect-message">秩序將在 <span id="countdown">5</span> 秒後重建，並送你返回安全地帶...</p>
+    <a href="{{ url_for('home') }}" class="btn">返回主頁</a>
+    <p style="margin-top: 1rem;">
+        <marquee behavior="alternate" direction="right">伺服器燃燒中...請耐心等候修復</marquee>
+    </p>
+</div>
+<script src="{{ url_for('static', filename='js/500.js') }}" defer></script>
+{% endblock %}

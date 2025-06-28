@@ -196,6 +196,19 @@ def create_app():
     def ping():
         return "pong", 200
 
+    @app.route("/force500")
+    def force_500():
+        raise Exception("這是測試用的 500 internal server error")
+
+    @app.errorhandler(500)
+    def internal_server_error(e):
+        try:
+            logging.exception("Internal Server Error 發生了：")
+            return render_template("500.html"), 500
+        except Exception as inner_e:
+            logging.error(f"連 500.html 都渲染失敗：{inner_e}")
+            return "伺服器發生嚴重錯誤，請聯絡主辦方。", 500
+
     @app.errorhandler(404)
     def page_not_found(e):
         return render_template("404.html"), 404
