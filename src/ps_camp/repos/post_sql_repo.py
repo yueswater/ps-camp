@@ -2,6 +2,7 @@ import logging
 import os
 from uuid import UUID
 
+from datetime import datetime, time, timedelta
 from dotenv import load_dotenv
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
@@ -9,9 +10,31 @@ from sqlalchemy.orm import Session
 from ps_camp.repos.bank_sql_repo import BankSQLRepository
 from ps_camp.sql_models.bank_model import OwnerType, TransactionType
 from ps_camp.sql_models.post_model import Post
+from ps_camp.utils.humanize_time_diff import taipei_now
 
 load_dotenv()
 
+def calculate_post_fee(created_time: datetime) -> int:
+    # Assume that the camp period starts at 00:00 of Day 1
+    CAMP_START_DATE_STR = os.getenv("CAMP_START_DATE", "2025-07-01")  # fallback 可保留
+    CAMP_START_DATE = datetime.strptime(CAMP_START_DATE_STR, "%Y-%m-%d").replace(
+        hour=0, minute=0, second=0
+    ).astimezone(tz=created_time.tzinfo)
+    delta = created_time - CAMP_START_DATE
+    day_number = delta.days + 1  # Day 1 = Day 1
+
+    # Make sure to take effect only on days 1 to 4
+    base_fee_map = {1: 30, 2: 60, 3: 90, 4: 120}
+    bonus_fee_map = {1: 5, 2: 15, 3: 30, 4: 45}
+    base_fee = base_fee_map.get(day_number, 1000)  # After day 4, return to fixed fee
+    bonus_fee = bonus_fee_map.get(day_number, 0)
+
+    # Primetime check
+    golden_start = time(18, 0)
+    golden_end = time(21, 0)
+    if golden_start <= created_time.time() <= golden_end:
+        return base_fee + bonus_fee
+    return base_fee
 
 class PostSQLRepository:
     def __init__(self, db: Session):
@@ -40,11 +63,15 @@ class PostSQLRepository:
             )
             raise ValueError("找不到帳戶（政黨或中央）")
 
+        # Calculate the fee based on the time of issuance
+        created_time = post.created_at or taipei_now()
+        fee = calculate_post_fee(created_time)
+
         self.bank_repo.create_transaction(
             from_account=user_account,
             to_account=admin_account,
-            amount=1000,
-            note="發文自動扣款",
+            amount=fee,
+            note=f"發文自動扣款（{fee}）",
             transaction_type=TransactionType.post_cost,
         )
 
