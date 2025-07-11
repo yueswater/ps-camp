@@ -58,42 +58,47 @@
                             <li><a href="{{ url_for('distribute_money') }}" class="nav-link">大撒幣</a></li>
                             {% endif %}
                             {% if current_time > vote_close_time %}
-                                <li><a href="/results" class="nav-link">開票結果</a></li>
+                            <li><a href="/results" class="nav-link">開票結果</a></li>
 
                             {% elif current_time > vote_open_time %}
-                                {% if session.get("user", {}).get("role") == "member" %}
-                                    <li><a href="/vote" class="nav-link">立即投票</a></li>
+                            {% if session.get("user", {}).get("role") == "member" %}
+                            <li><a href="/vote" class="nav-link">立即投票</a></li>
+                            {% endif %}
+
+                            {% elif current_time > register_close_time and current_time < upload_close_time %} {% set
+                                role=session.get("user", {}).get("role") %} {% if role in ["party", "group" ] %} <li><a
+                                    href="/submit" class="nav-link">上傳</a></li>
                                 {% endif %}
 
-                            {% elif current_time > register_close_time %}
-                                {% set role = session.get("user", {}).get("role") %}
-                                {% if role in ["party", "group"] %}
-                                    <li><a href="/submit" class="nav-link">上傳</a></li>
-                                {% endif %}
-                            {% endif %}
-                            <li class="user-info">
-                                <a href="{{ url_for('profile') }}" class="nav-link username">{{ session.user.fullname
-                                    }}</a>
-                            </li>
-                            <li class="nav-link weather-info">
-                                <a href="https://www.cwa.gov.tw/V8/C/W/Town/Town.html?TID=6300300" target="_blank"
-                                    class="weather-box" style="text-decoration: none; color: inherit;">
-                                    {% if current_weather_icon %}
-                                    <i class="{{ current_weather_icon }}"></i>
-                                    <div class="weather-text">
-                                        <div class="temp">{{ current_weather_temp }}°C</div>
-                                        <div class="pop">{{ current_weather_pop }}%</div>
-                                    </div>
-                                    {% else %}
-                                    <span>—</span>
+                                {% elif current_time > upload_close_time and current_time < vote_open_time %} <li>
+                                    <small>上傳已截止，尚未開放投票</small></li>
+
                                     {% endif %}
-                                </a>
-                            </li>
+                                    <li class="user-info">
+                                        <a href="{{ url_for('profile') }}" class="nav-link username">{{
+                                            session.get("user", {}).get("fullname")
+                                            }}</a>
+                                    </li>
+                                    <li class="nav-link weather-info">
+                                        <a href="https://www.cwa.gov.tw/V8/C/W/Town/Town.html?TID=6300300"
+                                            target="_blank" class="weather-box"
+                                            style="text-decoration: none; color: inherit;">
+                                            {% if current_weather_icon %}
+                                            <i class="{{ current_weather_icon }}"></i>
+                                            <div class="weather-text">
+                                                <div class="temp">{{ current_weather_temp }}°C</div>
+                                                <div class="pop">{{ current_weather_pop }}%</div>
+                                            </div>
+                                            {% else %}
+                                            <span>—</span>
+                                            {% endif %}
+                                        </a>
+                                    </li>
 
-                            <li>
-                                <a href="/logout" class="nav-link logout">登出</a>
-                            </li>
-                            {% endif %}
+                                    <li>
+                                        <a href="/logout" class="nav-link logout">登出</a>
+                                    </li>
+                                    {% endif %}
                     </ul>
                 </nav>
             </div>

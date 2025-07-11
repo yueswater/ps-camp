@@ -15,5 +15,9 @@ def get_vote_open_time():
 def get_vote_close_time():
     return isoparse(os.getenv("VOTE_CLOSE_TIME"))
 
+
 def get_register_close_time():
     return isoparse(os.getenv("REGISTER_CLOSE_TIME"))
+
+def get_upload_close_time():
+    return isoparse(os.getenv("UPLOAD_CLOSE_TIME"))

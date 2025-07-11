@@ -45,7 +45,7 @@ from ps_camp.utils.password_rules import is_strong_password
 from ps_camp.utils.pdf_templates import bank_report_template
 from ps_camp.utils.resolve_owner_name import resolve_owner_name
 from ps_camp.utils.session_helpers import refresh_user_session
-from ps_camp.utils.voting_config import get_vote_close_time, get_vote_open_time, get_register_close_time
+from ps_camp.utils.voting_config import get_vote_close_time, get_vote_open_time, get_register_close_time, get_upload_close_time
 
 load_dotenv()
 ADMIN_ID = os.getenv("ADMIN_ID")
@@ -165,6 +165,7 @@ def create_app():
         vote_open_time = get_vote_open_time().astimezone(tz)
         vote_close_time = get_vote_close_time().astimezone(tz)
         register_close_time = get_register_close_time().astimezone(tz)
+        upload_close_time = get_upload_close_time().astimezone(tz)
         if session.get("user"):
             with get_db_session() as db:
                 bank_repo = BankSQLRepository(db)
@@ -189,6 +190,7 @@ def create_app():
             vote_open_time=vote_open_time,
             vote_close_time=vote_close_time,
             register_close_time=register_close_time,
+            upload_close_time=upload_close_time,
             voted=voted,
         )
 
@@ -1162,7 +1164,8 @@ def create_app():
                     current_time=taipei_now(),
                     vote_open_time=get_vote_open_time().astimezone(tz),
                     vote_close_time=get_vote_close_time().astimezone(tz),
-                    register_close_time=get_register_close_time().astimezone(tz)
+                    register_close_time=get_register_close_time().astimezone(tz),
+                    upload_close_time=get_upload_close_time().astimezone(tz)
                 )
 
             elif user["role"] == "group":
@@ -1231,7 +1234,8 @@ def create_app():
                     current_time=taipei_now(),
                     vote_open_time=get_vote_open_time().astimezone(tz),
                     vote_close_time=get_vote_close_time().astimezone(tz),
-                    register_close_time=get_register_close_time().astimezone(tz)
+                    register_close_time=get_register_close_time().astimezone(tz),
+                    upload_close_time=get_upload_close_time().astimezone(tz)
                 )
 
     @app.route("/api/live_votes")
