@@ -58,3 +58,4 @@ dist/
 
 # miscellaeous files
 src/ps_camp/static/data/private/batch_users.json
+src/ps_camp/static/data/private/batch_workers.json
