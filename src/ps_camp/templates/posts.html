@@ -3,7 +3,7 @@
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/posts.css') }}">
 
-<!-- 搜尋與篩選區，登入狀態下永遠顯示 -->
+<!--Search and filter area, always displayed under login status -->
 {% if session.get("user") %}
 <div class="posts-header">
     <div class="posts-filter">
@@ -28,7 +28,7 @@
 </div>
 {% endif %}
 
-<!-- 貼文主容器 -->
+<!--Post main container -->
 <div class="posts-container">
     {% if not session.get("user") %}
         <div class="empty-wrapper">
@@ -56,7 +56,7 @@
                     </div>
 
                     <div class="post-content">
-                        <h3 class="post-title" style="font-weight: bold;">{{ post.title }}</h3>
+                        <h2 class="post-title" style="font-weight: bold;">{{ post.title }}</h2>
                         <div class="post-text">
                             <div class="preview" data-post-id="{{ post.id|string }}">
                                 {{ post.preview|safe }}
@@ -101,7 +101,7 @@
     {% endif %}
 </div>
 
-<!-- 載入更多按鈕 -->
+<!--Load more buttons -->
 {% if session.get("user") and posts %}
 <div class="load-more-container">
     <button class="btn btn-outline load-more-btn hidden">
@@ -111,7 +111,7 @@
 </div>
 {% endif %}
 
-<!-- 浮動新增貼文按鈕 -->
+<!--Floating new post button -->
 {% if session.get("user") and session.user.role in ["party", "group", "admin"] %}
 <div class="floating-add-btn">
     <a href="{{ url_for('new_post') }}" class="fab-btn" title="發表新貼文">

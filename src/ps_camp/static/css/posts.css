@@ -1,25 +1,25 @@
-/* 貼文頁面專用樣式 - Threads 風格 */
+/*Special style for post pages -Threads style */
 
-/* 貼文容器 */
+/*Post container */
 .posts-container {
     max-width: 580px;
     margin: 0 auto;
     padding: 0;
 }
 
-/* Threads 風格頁面頭部 */
+/*Threads style page header */
 .posts-header {
     position: sticky;
     top: 0;
-    /* background: rgba(255, 255, 255, 0.95); */
-    /* backdrop-filter: blur(20px); */
-    /* -webkit-backdrop-filter: blur(20px); */
+    /*background: rgba(255, 255, 255, 0.95); */
+    /*backdrop-filter: blur(20px); */
+    /*-webkit-backdrop-filter: blur(20px); */
     z-index: 100;
     padding: 1rem 1.25rem;
     margin-bottom: 0;
 }
 
-/* 搜尋篩選容器 */
+/*Search filter container */
 .posts-filter {
     display: flex;
     flex-direction: column;
@@ -28,7 +28,7 @@
     margin: 0 auto;
 }
 
-/* 搜尋框 */
+/*Search box */
 .search-container {
     position: relative;
     width: 100%;
@@ -65,29 +65,29 @@
     pointer-events: none;
 }
 
-/* 篩選標籤容器 */
+/*Filter tag container */
 .filter-tags {
     display: flex;
     gap: 0.5rem;
     overflow-x: auto;
     overflow-y: hidden;
-    padding: 0.25rem 0 0.5rem 0; /* 底部加一點 padding 避免切到陰影 */
+    padding: 0.25rem 0 0.5rem 0; /*Add a little padding at the bottom to avoid cutting to shadows */
     
-    /* 隱藏滑桿 */
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE/Edge */
+    /*Hidden slider */
+    scrollbar-width: none; /*Firefox */
+    -ms-overflow-style: none; /*IE/Edge */
     
-    /* 平滑滑動 */
+    /*Smooth sliding */
     scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch; /* iOS Safari 平滑滑動 */
+    -webkit-overflow-scrolling: touch; /*iOS Safari Smooth Slide */
     
-    /* 防止選取文字 */
+    /*Prevent text selection */
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     
-    /* 確保內容不被壓縮 */
+    /*Make sure the content is not compressed */
     flex-shrink: 0;
 }
 
@@ -98,7 +98,7 @@
     background: transparent;
 }
 
-/* 篩選標籤 */
+/*Filter tags */
 .filter-tag {
     display: inline-flex;
     align-items: center;
@@ -115,11 +115,11 @@
     white-space: nowrap;
     user-select: none;
     
-    /* 防止收縮 */
+    /*Prevent shrinkage */
     flex-shrink: 0;
     min-width: auto;
     
-    /* 微妙的陰影效果 */
+    /*Subtle shadow effect */
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
@@ -155,7 +155,7 @@
     margin-right: 0;
 }
 
-/* 清除篩選按鈕 */
+/*Clear filter button */
 .clear-filters {
     display: none;
     align-items: center;
@@ -188,7 +188,7 @@
     display: inline-flex;
 }
 
-/* 貼文卡片 */
+/*Post card */
 .post-card {
     background: #fff;
     border-radius: 0;
@@ -206,7 +206,7 @@
     background-color: #fafafa;
 }
 
-/* 貼文頭部 */
+/*Post header */
 .post-header {
     display: flex;
     justify-content: space-between;
@@ -282,7 +282,7 @@
     font-weight: 500;
 }
 
-/* 貼文內容 */
+/*Post content */
 .post-content {
     margin-bottom: 1rem;
 }
@@ -317,9 +317,9 @@
 
 .full-content ul,
 .full-content ol {
-  padding-left: 1rem;   /* 給點內縮空間 */
-  margin: 0.5rem 0;        /* 保持段落間距 */
-  list-style-position: inside;  /* 可選：點點內縮進來 */
+  padding-left: 1rem;   /*Give point shrink space */
+  margin: 0.5rem 0;        /*Keep paragraph spacing */
+  list-style-position: inside;  /*Optional: Indented inside the dot */
 }
 
 .full-content li {
@@ -338,7 +338,7 @@
 }
 
 
-/* 貼文操作按鈕 */
+/*Post operation button */
 .post-actions {
     justify-content: flex-start !important;
     margin-left: -0.7rem !important;
@@ -422,7 +422,7 @@
     color: #666;
 }
 
-/* 貼文統計 */
+/*Post statistics */
 .post-stats {
     display: flex;
     gap: 1rem;
@@ -440,7 +440,7 @@
     color: #666;
 }
 
-/* 空狀態 */
+/*empty state */
 .empty-wrapper {
   display: flex;
   justify-content: center;
@@ -456,7 +456,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
   width: 100%;
-  max-width: 640px;  /* 或 720px、768px 視你整體版型 */
+  max-width: 640px;  /*or 720px, 768px depends on your overall version */
 }
 
 .empty-state i {
@@ -475,7 +475,7 @@
     margin-bottom: 2rem;
 }
 
-/* 載入更多 */
+/*Load more */
 .load-more-container {
     text-align: center;
     margin: 2rem 0;
@@ -485,7 +485,7 @@
     min-width: 200px;
 }
 
-/* Threads 風格浮動新增按鈕 */
+/*Threads style float new button */
 .floating-add-btn {
     position: fixed !important;
     bottom: 200px !important;
@@ -510,7 +510,7 @@
     font-size: 1.5rem !important;
     border: none !important;
     outline: none !important;
-    /* 防止被其他樣式覆蓋 */
+    /*Prevent it from being overwritten by other styles */
     margin: 0 !important;
     padding: 0 !important;
     line-height: 1 !important;
@@ -557,7 +557,7 @@
 }
 
 
-/* 平板和桌面優化 */
+/*Tablet and desktop optimization */
 @media (min-width: 768px) {
     .floating-add-btn {
         bottom: 60px !important;
@@ -583,7 +583,7 @@
 
     .filter-tags {
         flex: 2;
-        justify-content: flex-start; /* 改為左對齊，讓滑動更自然 */
+        justify-content: flex-start; /*Change to left alignment to make sliding more natural */
         padding: 0.25rem 0 0.5rem 0;
     }
 
@@ -597,7 +597,7 @@
     }
 }
 
-/* 動畫效果 */
+/*Animation effect */
 @keyframes likeAnimation {
     0% { transform: scale(1); }
     50% { transform: scale(1.2); }
@@ -608,7 +608,7 @@
     animation: likeAnimation 0.3s ease;
 }
 
-/* 特殊分類樣式 */
+/*Special classification style */
 .category-tag.politics {
     background: #e8f4f8;
     color: #0077be;
@@ -629,7 +629,7 @@
     color: #9c27b0;
 }
 
-/* 模態框樣式 */
+/*Modal box style */
 .comment-modal {
     position: fixed;
     top: 0;
@@ -745,7 +745,7 @@
 
 .hidden { display: none !important; }
 
-/* 隱藏的貼文動畫 */
+/*Hidden post animation */
 .post-card.hidden {
     opacity: 0;
     transform: translateY(-10px);
@@ -755,7 +755,7 @@
     transition: all 0.3s ease;
 }
 
-/* 響應式設計 */
+/*Responsive design */
 @media (max-width: 768px) {
     .posts-container {
         padding: 0;
@@ -782,7 +782,7 @@
     }
 
     .filter-tags {
-        /* 手機版讓滑動區域稍微延伸到邊緣 */
+        /*Mobile version allows the sliding area to extend slightly to the edge */
         margin: 0 -0.5rem;
         padding: 0.25rem 0.5rem 0.5rem 0.5rem;
     }
@@ -864,15 +864,16 @@
     text-decoration: underline;
 }
 
-.reply-item {
-    padding: 0.75rem;
-    margin-bottom: 0.5rem;
-    background: #f8f9fa;
-    border-left: 4px solid #495057;
-    border-radius: 6px;
-    font-size: 0.95rem;
-    color: #333;
-    word-break: break-word;
+.reply-item a {
+  color: #212529;
+  text-decoration: underline;
+  font-weight: 500;
+  word-break: break-all;
+}
+
+.reply-item a:hover {
+  color: #6c757d;
+  text-decoration: none;
 }
 
 .preview-snippet {

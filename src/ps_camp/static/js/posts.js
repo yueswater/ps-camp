@@ -20,7 +20,7 @@ document.addEventListener("click", function (e) {
         const isExpanded = btn.dataset.expanded === "true";
 
         if (isExpanded) {
-            // 還原原始預覽
+            //Restore the original preview
             fetch(`/api/posts/${postId}/preview`)
                 .then(res => res.json())
                 .then(data => {
@@ -33,7 +33,7 @@ document.addEventListener("click", function (e) {
                 });
         }
         else {
-            // 展開全文
+            //Expand the full text
             fetch(`/api/posts/${postId}`)
                 .then(res => res.json())
                 .then(data => {
@@ -264,7 +264,7 @@ function showCommentModal(button) {
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        // 更新 UI 顯示數字
+                        //Update UI to display numbers
                         const commentBtn = postCard.querySelector('.comment-btn span');
                         if (commentBtn) {
                             commentBtn.textContent = data.total;
@@ -350,11 +350,11 @@ function initInfiniteScroll() {
 
     const hasNextPage = document.body.dataset.hasNextPage === 'true';
     if (!hasNextPage) {
-        loadMoreBtn.remove();              // 沒下一頁→整顆按鈕不顯示
+        loadMoreBtn.remove();              //There is no next page → the entire button will not be displayed
         return;
     }
 
-    // 讓按鈕先顯示（出現在畫面下方）
+    //Let the button be displayed first (appearing at the bottom of the screen)
     loadMoreBtn.classList.remove('hidden');
 
     loadMoreBtn.addEventListener('click', () => loadMorePosts(loadMoreBtn));
@@ -362,7 +362,7 @@ function initInfiniteScroll() {
     window.addEventListener(
         'scroll',
         debounce(() => {
-            // 捲到離底 800px 內就自動觸發一次
+            //It will automatically trigger once when the roll is within 800px.
             if (
                 window.innerHeight + window.scrollY >=
                 document.body.offsetHeight - 800
@@ -379,14 +379,14 @@ function loadMorePosts(button) {
     button.classList.add('loading');
     button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 載入中…';
 
-    // 這裡用 fetch 真的去撈下一頁（範例以 setTimeout 假裝）
+    //Use fetch here to really pick up the next page (example pretend to be setTimeout)
     setTimeout(() => {
-        /* ===== 這裡換成你實際插入新貼文的程式 ===== */
-        // 假設從伺服器得知「已經沒有下一頁」
-        const noMore = true; // ← 把這判斷改成你的 API 回傳
+        /*===== Here is a program where you actually insert a new post ===== */
+        //Suppose you know from the server that "there is no next page"
+        const noMore = true; //← Change this judgment to your API return
 
         if (noMore) {
-            button.remove();                // 移除按鈕，不再顯示
+            button.remove();                //Remove button, no longer display
         } else {
             button.classList.remove('loading');
             button.innerHTML =
@@ -481,6 +481,10 @@ function showNotification(message, type) {
     }
 }
 
+function autoLink(text) {
+    const urlPattern = /https?:\/\/[^\s]+/g;
+    return text.replace(urlPattern, url => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
+}
 
 function showRepliesModal(postId) {
     fetch(`/api/posts/${postId}/replies`)
@@ -500,7 +504,8 @@ function showRepliesModal(postId) {
                         <div class="modal-body">
                             ${data.replies.length > 0 ? data.replies.map(r => `
                                 <div class="reply-item">
-                                    <strong>${r.user}</strong>：${r.content}
+                                    <div><strong>${r.user}</strong></div>
+                                    <div>${autoLink(r.content)}</div>
                                 </div>
                             `).join('') : `<p style="color:gray;">目前沒有回覆</p>`}
                         </div>
