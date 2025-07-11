@@ -59,11 +59,15 @@
                             {% endif %}
                             {% if current_time > vote_close_time %}
                             <li><a href="/results" class="nav-link">開票結果</a></li>
+
                             {% elif current_time > vote_open_time and session.get("user", {}).get("role") == "member" %}
                             <li><a href="/vote" class="nav-link">立即投票</a></li>
-                            {% elif current_time > register_close_time %}
+
+                            {% elif current_time > register_close_time and session.get("user", {}).get("role") in
+                            ["party", "interest_group"] %}
                             <li><a href="/submit" class="nav-link">上傳</a></li>
                             {% endif %}
+
                             <li class="user-info">
                                 <a href="{{ url_for('profile') }}" class="nav-link username">{{ session.user.fullname
                                     }}</a>
