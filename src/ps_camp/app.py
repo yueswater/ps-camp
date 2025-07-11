@@ -45,7 +45,7 @@ from ps_camp.utils.password_rules import is_strong_password
 from ps_camp.utils.pdf_templates import bank_report_template
 from ps_camp.utils.resolve_owner_name import resolve_owner_name
 from ps_camp.utils.session_helpers import refresh_user_session
-from ps_camp.utils.voting_config import get_vote_close_time, get_vote_open_time
+from ps_camp.utils.voting_config import get_vote_close_time, get_vote_open_time, get_register_close_time
 
 load_dotenv()
 ADMIN_ID = os.getenv("ADMIN_ID")
@@ -1041,6 +1041,7 @@ def create_app():
     @app.route("/submit", methods=["GET", "POST"])
     @refresh_user_session
     def submit():
+        tz = timezone(timedelta(hours=8))
         user = session.get("user")
         if not user or user["role"] not in ["party", "group"]:
             abort(403)
@@ -1158,6 +1159,10 @@ def create_app():
                     existing_candidates=existing_candidates,
                     remaining_slots=remaining_slots,
                     party_doc=party_doc,
+                    current_time=taipei_now(),
+                    vote_open_time=get_vote_open_time().astimezone(tz),
+                    vote_close_time=get_vote_close_time().astimezone(tz),
+                    register_close_time=get_register_close_time().astimezone(tz)
                 )
 
             elif user["role"] == "group":
@@ -1222,6 +1227,11 @@ def create_app():
                     role="group",
                     user=user_dict,
                     proposal=proposal_dict,
+                    session=session,
+                    current_time=taipei_now(),
+                    vote_open_time=get_vote_open_time().astimezone(tz),
+                    vote_close_time=get_vote_close_time().astimezone(tz),
+                    register_close_time=get_register_close_time().astimezone(tz)
                 )
 
     @app.route("/api/live_votes")
