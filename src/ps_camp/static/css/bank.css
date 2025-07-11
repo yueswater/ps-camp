@@ -1,4 +1,4 @@
-/* 帳戶資訊卡片 */
+/*Account Information Card */
 .account-card {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-radius: 20px;
@@ -62,7 +62,7 @@
     border: 1px solid rgba(46, 204, 113, 0.3);
 }
 
-/* 修正帳戶詳細資訊佈局 */
+/*Correct the detailed account information layout */
 .account-details {
     display: grid;
     grid-template-columns: 1fr auto;
@@ -74,14 +74,14 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    justify-self: start; /* 強制左對齊 */
+    justify-self: start; /*Force left alignment */
 }
 
 .info-row {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
-    align-items: flex-start; /* 確保內容靠左 */
+    align-items: flex-start; /*Make sure the content is left */
 }
 
 .info-label {
@@ -134,7 +134,7 @@
     gap: 1rem;
     position: relative;
     z-index: 2;
-    margin-top: 1.5rem; /* 增加與上方內容的距離 */
+    margin-top: 1.5rem; /*Increase the distance from the above content */
 }
 
 .transfer-btn {
@@ -175,16 +175,16 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    text-decoration: none; /* 直接移除底線 */
+    text-decoration: none; /*Remove the bottom line directly */
 }
 
 .btn-secondary:hover {
     background: rgba(255, 255, 255, 0.1);
     border-color: rgba(255, 255, 255, 0.5);
-    text-decoration: none; /* hover 時也確保沒有底線 */
+    text-decoration: none; /*Make sure there is no bottom line when hover */
 }
 
-/* 移除按鈕內連結的底線 */
+/*Remove the bottom line of the link in the button */
 .transfer-btn a,
 .btn-secondary a {
     text-decoration: none;
@@ -196,7 +196,7 @@
     text-decoration: none;
 }
 
-/* 交易紀錄區塊 */
+/*Transaction record block */
 .transactions-section {
     background: white;
     border-radius: 16px;
@@ -246,7 +246,7 @@
     overflow-x: auto;
 }
 
-/* 交易紀錄表格 */
+/*Transaction record form */
 .transaction-table {
     width: 100%;
     border-collapse: collapse;
@@ -365,7 +365,7 @@
     font-size: 0.75rem;
 }
 
-/* 空狀態 */
+/*empty state */
 .empty-state {
     text-align: center;
     padding: 4rem 2rem;
@@ -389,7 +389,7 @@
     font-size: 0.95rem;
 }
 
-/* 轉帳 Modal */
+/*Transfer Modal */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -535,7 +535,7 @@
   align-items: center;
 }
 
-/* 手機版按鈕修正 - 移除會導致展開的樣式 */
+/*Mobile version button correction -Remove the style that will cause expansion */
 @media (max-width: 480px) {
     .account-card {
         padding: 1.5rem 1rem;
@@ -585,7 +585,7 @@
         font-size: 1.8rem;
     }
     
-    /* 修正手機版按鈕佈局 - 保持固定大小，不會展開 */
+    /*Fixed the button layout of the mobile version -keep it fixed size and will not expand */
     .account-actions {
         margin-top: 1rem;
         display: grid !important;
@@ -594,34 +594,34 @@
         gap: 0.75rem !important;
     }
     
-    /* 移除所有會導致按鈕展開的樣式 */
+    /*Remove all styles that cause the button to expand */
     .transfer-btn,
     .btn-secondary {
-        /* 固定尺寸，不會因內容變化 */
+        /*Fixed size, will not change due to content */
         width: 100% !important;
         height: 64px !important;
         padding: 0 !important;
         font-size: 1rem !important;
         border-radius: 12px !important;
         
-        /* 內容居中 */
+        /*Content centered */
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
         
-        /* 防止內容溢出 */
+        /*Prevent content overflow */
         overflow: hidden !important;
         white-space: nowrap !important;
         
-        /* 移除所有文字縮進和隱藏效果 */
+        /*Remove all text indentation and hidden effects */
         text-indent: 0 !important;
         line-height: 1.2 !important;
         
-        /* 固定背景，防止狀態變化 */
+        /*Fix the background to prevent state changes */
         transition: background-color 0.2s ease, transform 0.2s ease !important;
     }
     
-    /* 確保按鈕內的圖標和文字正常顯示 */
+    /*Make sure the icons and text in the button are displayed normally */
     .transfer-btn i,
     .btn-secondary i {
         margin-right: 0.5rem !important;
@@ -631,7 +631,7 @@
         text-indent: 0 !important;
     }
     
-    /* 按鈕文字正常顯示 */
+    /*The button text is displayed normally */
     .transfer-btn span,
     .btn-secondary span {
         font-size: 0.9rem !important;
@@ -640,12 +640,12 @@
         overflow: visible !important;
     }
     
-    /* 移除會導致佈局變化的樣式 */
+    /*Remove styles that cause layout changes */
     .account-actions > div {
         display: contents !important;
     }
     
-    /* hover 效果保持簡單 */
+    /*hover effect keeps simple */
     .transfer-btn:hover,
     .btn-secondary:hover {
         transform: none !important;

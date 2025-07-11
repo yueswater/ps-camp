@@ -43,6 +43,7 @@ from ps_camp.utils.humanize_time_diff import humanize_time_diff, taipei_now
 from ps_camp.utils.password_hasher import PasswordHasher
 from ps_camp.utils.password_rules import is_strong_password
 from ps_camp.utils.pdf_templates import bank_report_template
+from ps_camp.utils.convert_md import downgrade_headings
 from ps_camp.utils.resolve_owner_name import resolve_owner_name
 from ps_camp.utils.session_helpers import refresh_user_session
 from ps_camp.utils.voting_config import get_vote_close_time, get_vote_open_time, get_register_close_time, get_upload_close_time
@@ -568,7 +569,7 @@ def create_app():
             for post in posts:
                 post.display_time = humanize_time_diff(post.created_at)
                 post.preview = markdown.markdown(
-                    post.content[:50], extensions=["nl2br"]
+                    downgrade_headings(post.content[:50]), extensions=["nl2br", "fenced_code", "codehilite"]
                 )
             return render_template("posts.html", posts=posts)
 
@@ -588,7 +589,7 @@ def create_app():
                 return jsonify(success=False, message="找不到貼文"), 404
 
             short_text = post.content[:100] + "..."
-            html = markdown.markdown(short_text, extensions=["nl2br"])
+            html = markdown.markdown(downgrade_headings(short_text), extensions=["nl2br", "fenced_code", "codehilite"])
             return jsonify({"success": True, "preview": html})
 
     @app.route("/api/posts/<string:post_id>", methods=["GET"])
@@ -604,7 +605,7 @@ def create_app():
             if not post:
                 return jsonify(success=False, message="貼文不存在"), 404
 
-            html_content = markdown.markdown(post.content, extensions=["nl2br"])
+            html_content = markdown.markdown(downgrade_headings(post.content), extensions=["nl2br", "fenced_code", "codehilite"])
             return jsonify(success=True, content=html_content)
 
     @app.route("/npcs")
@@ -719,6 +720,8 @@ def create_app():
             if not post:
                 abort(404)
 
+            post.rendered_content = markdown.markdown(downgrade_headings(post.content), extensions=["nl2br", "fenced_code", "codehilite"])
+
             # Parse replies JSON
             if isinstance(post.replies, str):
                 try:
@@ -776,7 +779,7 @@ def create_app():
 
                 if category in PARTY_OR_GROUP_ONLY and role not in [
                     "party",
-                    "interest_group",
+                    "group",
                 ]:
                     flash("只有政黨與利益團體能發布新聞")
                     return redirect(url_for("new_post"))
@@ -1275,6 +1278,16 @@ def create_app():
     @app.route("/results")
     def vote_results():
         return render_template("vote_results.html")
+    
+    @app.context_processor
+    def inject_common_time():
+        return {
+            "current_time": taipei_now(),
+            "vote_open_time": get_vote_open_time(),
+            "vote_close_time": get_vote_close_time(),
+            "register_close_time": get_register_close_time(),
+            "upload_close_time": get_upload_close_time(),
+        }
 
     return app
 

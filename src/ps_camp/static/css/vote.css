@@ -29,7 +29,7 @@
   box-shadow: 0 0 0 3px red;
 }
 
-/* 四區塊配置：蓋章、編號、logo、黨名 */
+/*Four block configurations: stamp, number, logo, party name */
 .party-layout {
   display: grid;
   grid-template-rows: 25% 20% 25% 30%;
@@ -40,7 +40,7 @@
   border-collapse: collapse;
 }
 
-/* stamp 區 */
+/*stamp area */
 .stamp-area {
   width: 100%;
   height: 100%;
@@ -63,7 +63,7 @@
   animation-delay: 0.5s;
 }
 
-/* 編號區 */
+/*Numbering area */
 .party-section {
   width: 100%;
   height: 100%;
@@ -80,7 +80,7 @@
   color: black;
 }
 
-/* logo 區 */
+/*logo area */
 .ballot-logo {
   width: 100%;
   height: 100%;
@@ -104,7 +104,7 @@
   font-size: 20px;
 }
 
-/* 政黨名稱：直書 */
+/*Party name: Direct Book */
 .ballot-name-vertical {
   writing-mode: vertical-rl;
   text-orientation: upright;
@@ -121,7 +121,7 @@
   height: 100%;
 }
 
-/* 動畫 */
+/*Animation */
 @keyframes stampIn {
   0% {
     opacity: 0;
@@ -137,7 +137,7 @@
   }
 }
 
-/* 投票按鈕 */
+/*Voting Button */
 .submit-button {
   display: block;
   margin: 2rem auto;

@@ -4,7 +4,7 @@
     padding: 0;
 }
 
-/* 區域標題 */
+/*Region Title */
 .region-title {
   font-size: 1.8rem;
   font-weight: bold;
@@ -13,7 +13,7 @@
   padding-bottom: 0.5rem;
 }
 
-/* 橫向 NPC 畫廊 */
+/*Horizontal NPC Gallery */
 .npc-gallery {
   display: flex;
   overflow-x: auto;
@@ -31,7 +31,7 @@
   border-radius: 4px;
 }
 
-/* NPC 卡片 */
+/*NPC Card */
 .npc-card {
   flex: 0 0 auto;
   width: 200px;
@@ -68,7 +68,7 @@
   margin-bottom: 0.5rem;
 }
 
-/* NPC 詳細頁：橫向排版 */
+/*NPC details page: horizontal layout */
 .npc-detail-container {
   display: flex;
   gap: 2rem;
@@ -128,7 +128,7 @@
   text-decoration: none;
 }
 
-/* 空狀態 */
+/*empty state */
 .empty-wrapper {
   display: flex;
   justify-content: center;

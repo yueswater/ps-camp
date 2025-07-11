@@ -21,7 +21,7 @@
   margin-bottom: 1.5rem;
 }
 
-/* 小隊員卡片樣式（如未來要回復卡片選擇時） */
+/*Small team member card style (such as when you want to reply to card selection in the future) */
 .member-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -61,7 +61,7 @@
   color: #666;
 }
 
-/* 表單欄位統一樣式 */
+/*Form column uniform style */
 .submit-form input[type="file"],
 .submit-form input[type="text"],
 .submit-form input[type="email"],
@@ -95,7 +95,7 @@
 }
 
 
-/* 提交按鈕 */
+/*Submit button */
 .submit-button {
   display: block;
   width: 100%;
@@ -127,7 +127,7 @@
   cursor: not-allowed;
 }
 
-/* 顯示已提名名單 */
+/*Show nominated list */
 .existing-section {
   margin-top: 2rem;
   border-top: 1px solid #eee;
@@ -143,7 +143,7 @@
   margin: 0.25rem 0;
 }
 
-/* 小隊員表格樣式（政黨提名使用） */
+/*Small team member form style (for party nomination) */
 .member-table {
   width: 100%;
   border-collapse: collapse;
@@ -166,7 +166,7 @@
   transform: scale(1.2);
 }
 
-/* 下載連結樣式 */
+/*Download link style */
 a[target="_blank"] {
   display: inline-block;
   margin-top: 0.5rem;

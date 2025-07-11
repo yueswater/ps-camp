@@ -57,7 +57,8 @@
                             {% if session.get("user", {}).get("role") == "admin" %}
                             <li><a href="{{ url_for('distribute_money') }}" class="nav-link">大撒幣</a></li>
                             {% endif %}
-                            {% if current_time > vote_close_time %}
+                            {% if current_time is defined and vote_close_time is defined and current_time >
+                            vote_close_time %}
                             <li><a href="/results" class="nav-link">開票結果</a></li>
 
                             {% elif current_time > vote_open_time %}
@@ -143,6 +144,22 @@
     {% endif %}
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+            }
+        };
+    </script>
+
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+        </script>
 </body>
 
 </html>

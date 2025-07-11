@@ -303,6 +303,41 @@
     font-weight: 400;
 }
 
+.post-text a {
+  color: #212529;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.post-text a:hover {
+  color: #6c757d;
+}
+
+.full-content ul,
+.full-content ol {
+  padding-left: 1rem;   /* 給點內縮空間 */
+  margin: 0.5rem 0;        /* 保持段落間距 */
+  list-style-position: inside;  /* 可選：點點內縮進來 */
+}
+
+.full-content li {
+  line-height: 1.6;
+}
+
+.preview ul,
+.preview ol {
+  padding-left: 1rem;
+  margin: 0.5rem 0;
+  list-style-position: inside;
+}
+
+.preview li {
+  line-height: 1.6;
+}
+
+
 /* 貼文操作按鈕 */
 .post-actions {
     justify-content: flex-start !important;

@@ -11,7 +11,13 @@
             <div class="form-group">
                 <label class="form-label" for="category">分類</label>
                 <select class="form-input" name="category" id="category" required>
-                    {% set options = ["規則", "公告", "議題", "成立宣言", "白皮書"] if role != "member" else ["新聞"] %}
+                    {% if role == "admin" %}
+                    {% set options = ["規則", "公告", "議題", "成立宣言", "白皮書", "新聞"] %}
+                    {% elif role in ["party", "group"] %}
+                    {% set options = ["新聞"] %}
+                    {% else %}
+                    {% set options = [] %}
+                    {% endif %}
                     {% for opt in options %}
                     <option value="{{ opt }}">{{ opt }}</option>
                     {% endfor %}

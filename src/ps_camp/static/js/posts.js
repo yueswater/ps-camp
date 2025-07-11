@@ -42,6 +42,7 @@ document.addEventListener("click", function (e) {
                             <div class="full-content">${data.content}</div>
                             <a href="#" class="read-more" data-post-id="${postId}" data-expanded="true">顯示較少</a>
                         `;
+                        MathJax.typeset();
                     }
                 });
         }

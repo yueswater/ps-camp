@@ -90,7 +90,7 @@ body {
   color: #667eea;
 }
 
-/* 新的政黨網格佈局 */
+/*New Party Grid Layout */
 .party-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -99,7 +99,7 @@ body {
   justify-items: center;
 }
 
-/* 政黨卡片樣式 */
+/*Party card style */
 .party-card {
   background: linear-gradient(135deg, #f8f9ff 0%, #e8f0ff 100%);
   border-radius: 16px;
@@ -247,7 +247,7 @@ body {
   }
 }
 
-/* 公投票保持原樣式 */
+/*Referendum remains the same */
 .vote-item {
   background: linear-gradient(135deg, #f8f9ff 0%, #e8f0ff 100%);
   border-radius: 16px;
@@ -442,7 +442,7 @@ body {
 
 
 
-/* 響應式設計 */
+/*Responsive design */
 @media (max-width: 768px) {
   .results-title {
     font-size: 2.2rem;

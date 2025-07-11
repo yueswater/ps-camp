@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let scanStream;
 
-    // === 開啟 modal ===
+    //=== Turn on modal ===
     showBtn?.addEventListener('click', () => {
         form.reset();
         suggestionsBox.innerHTML = '';
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     });
 
-    // === 產生 QR Code（只放 account_number） ===
+    //=== Generate QR Code (only put account_number) ===
     openQrBtn?.addEventListener('click', () => {
         const qrTarget = document.getElementById('qr-code');
         qrTarget.innerHTML = '';
@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
         qrModal.style.display = 'none';
     });
 
-    // === 掃描 QR Code（讀帳號＋自動補人名）===
+    //=== Scan QR Code (read account number + automatic name replacement) ===
     scanBtn?.addEventListener('click', async () => {
         scanModal.style.display = 'flex';
         scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const scannedAccount = result.data;
                     console.log("📦 掃描帳號：", scannedAccount);
 
-                    document.getElementById('show-transfer')?.click();  // 開 modal
+                    document.getElementById('show-transfer')?.click();  //Open modal
 
                     setTimeout(() => {
                         const accountInput = document.querySelector('input[name="to_account_number"]');
@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (scanStream) scanStream.getTracks().forEach(track => track.stop());
     });
 
-    // === 自動補全搜尋 ===
+    //=== Automatic completion search ===
     let isComposing = false;
     if (searchInput && suggestionsBox && accountInput) {
         searchInput.addEventListener('compositionstart', () => { isComposing = true; });
@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // === 金額變動時更新總計 ===
+    //=== Update the total when the amount changes ===
     function updateTotalAmount() {
         const amount = parseInt(amountInput.value, 10) || 0;
         const fee = 0;

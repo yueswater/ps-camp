@@ -1,4 +1,4 @@
-/* === 基本設定與置中 === */
+/*=== Basic settings and setting === */
 html, body {
     height: 100%;
     margin: 0;
@@ -16,7 +16,7 @@ body {
     animation: flicker 3s infinite;
 }
 
-/* === 主內容區塊 === */
+/*=== Main content block === */
 .error-page {
     text-align: center;
     padding: 1rem 2rem;
@@ -26,7 +26,7 @@ body {
     transform: translateY(5%);
 }
 
-/* 標題效果 */
+/*Title effect */
 .error-page h1 {
     font-size: 3rem;
     margin-bottom: 1.2rem;
@@ -35,7 +35,7 @@ body {
     animation: glitch 1s infinite alternate;
 }
 
-/* 逃出生天按鈕 */
+/*Escape Day Button */
 .error-page .btn {
     display: inline-block;
     margin-top: 2rem;
@@ -53,7 +53,7 @@ body {
     background-color: #ff3b2e;
 }
 
-/* === 動畫區段 === */
+/*=== Animation section === */
 @keyframes flicker {
     0%, 100% { opacity: 1; filter: none; }
     50% { opacity: 0.9; filter: blur(1px); }
