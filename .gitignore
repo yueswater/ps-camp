@@ -46,6 +46,11 @@ uploads/
 # Logs
 *.log
 
+# JSON file
+/*.json
+
+/*.txt
+
 # Temporary files
 *.tmp
 *.bak
