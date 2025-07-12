@@ -1247,22 +1247,24 @@ def create_app():
         with get_db_session() as db:
             vote_repo = VoteSQLRepository(db)
             ref_repo = ReferendumVoteSQLRepository(db)
-            ref_source = ReferendumSQLRepository(db)
+            proposal_repo = ProposalSQLRepository(db)
             user_repo = UserSQLRepository(db)
-
+            
+            # 政黨票
             party_counts = vote_repo.get_party_vote_counts()
             party_name_map = {
                 str(p.id): p.fullname for p in user_repo.get_all() if p.role == "party"
             }
 
-            referendums = ref_source.get_active_referendums()
-            ref_ids = [r.id for r in referendums]
+            # 公投案
+            proposals = proposal_repo.get_all()
+            proposal_ids = [p.id for p in proposals]
 
             referendum_votes = {
                 str(k): v
-                for k, v in ref_repo.get_vote_counts_by_referendum_ids(ref_ids).items()
+                for k, v in ref_repo.get_vote_counts_by_referendum_ids(proposal_ids).items()
             }
-            referendum_titles = {str(r.id): r.title for r in referendums}
+            referendum_titles = {str(p.id): p.title for p in proposals}
 
             return jsonify(
                 {
