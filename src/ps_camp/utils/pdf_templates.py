@@ -31,6 +31,7 @@ bank_report_template = """
       background-color: #f0f0f0;
     }
   </style>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC&display=swap" rel="stylesheet">
 </head>
 <body>
   <h1>銀行交易明細</h1>
