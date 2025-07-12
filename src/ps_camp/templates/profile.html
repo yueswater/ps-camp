@@ -3,50 +3,58 @@
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
 
-<div class="profile-container">
-    <h2 style="text-align: center;">會員管理</h2>
+<form method="POST" action="{{ url_for('profile') }}" id="profile-form">
+    <div class="profile-container">
+        <h2 style="text-align: center;">會員管理</h2>
 
-    <div class="avatar" id="avatar">
-        {% if avatar_url %}
-        <img src="{{ avatar_url }}" alt="大頭貼" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
-        {% else %}
-        {{ session.user.fullname[0] }}
-        {% endif %}
-        <i class="fas fa-pen edit-icon"></i>
-    </div>
+        <div class="avatar" id="avatar">
+            {% if avatar_url %}
+            <img src="{{ avatar_url }}" alt="大頭貼"
+                style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+            {% else %}
+            {{ session.user.fullname[0] }}
+            {% endif %}
+            <i class="fas fa-pen edit-icon"></i>
+        </div>
 
-    <!--Name modification block -->
-    <form method="POST" action="{{ url_for('profile') }}">
+        <!-- 帳號名稱 -->
+        <div class="profile-field">
+            <label for="username">帳號名稱</label>
+            <span class="field-display" id="username-display">{{ session.user.username }}</span>
+            <input type="text" id="username" name="username" value="{{ session.user.username }}" class="field-input"
+                hidden>
+            <i class="fas fa-pen field-edit" data-target="username"></i>
+        </div>
+
+        <!-- 姓名 -->
         <div class="profile-field">
             <label for="fullname">姓名</label>
-            <input type="text" id="fullname" name="fullname" value="{{ session.user.fullname }}" {% if session.user.role
-                !='member' %}disabled{% endif %}>
+            <span class="field-display" id="fullname-display">{{ session.user.fullname }}</span>
+            <input type="text" id="fullname" name="fullname" value="{{ session.user.fullname }}" class="field-input"
+                hidden {% if session.user.role !='member' %}disabled{% endif %}>
+            {% if session.user.role == 'member' %}
+            <i class="fas fa-pen field-edit" data-target="fullname"></i>
+            {% endif %}
         </div>
-        <button type="submit" class="save-button" name="action" value="update_name" {% if session.user.role !='member'
-            %}disabled{% endif %}>更新姓名</button>
-    </form>
 
-    <!--Password modification block -->
-    <form id="profile-form" method="POST" action="{{ url_for('profile') }}">
+        <!-- 密碼（以修改欄位方式處理） -->
         <div class="profile-field">
-            <label for="old_password">舊密碼</label>
-            <input type="password" name="old_password" id="old_password" required>
+            <label for="old_password">密碼</label>
+            <span class="field-display" id="password-display">********</span>
+            <div id="password-inputs" class="password-group" style="display: none;">
+                <input type="password" name="old_password" id="old_password" placeholder="舊密碼" class="field-input" autocomplete="new-password">
+                <input type="password" name="new_password" id="new_password" placeholder="新密碼" class="field-input">
+                <input type="password" name="confirm_password" id="confirm_password" placeholder="確認新密碼" class="field-input">
+            </div>
+            <i class="fas fa-pen field-edit" data-target="password"></i>
         </div>
 
-        <div class="profile-field">
-            <label for="new_password">新密碼</label>
-            <input type="password" name="new_password" id="new_password" required>
-        </div>
+        <!-- 最後的儲存按鈕 -->
+        <button type="submit" class="save-button">儲存</button>
+    </div>
+    <input type="hidden" name="action" value="update_all">
+</form>
 
-        <div class="profile-field">
-            <label for="confirm_password">確認新密碼</label>
-            <input type="password" name="confirm_password" id="confirm_password" required>
-        </div>
-
-        <button type="submit" class="save-button" name="action" value="update_password">修改密碼</button>
-    </form>
-
-</div>
 
 <div class="modal" id="avatar-modal">
     <div class="modal-content">

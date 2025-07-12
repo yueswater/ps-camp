@@ -84,7 +84,7 @@
 
 .profile-field input {
     width: 100%;
-    padding: 0.5rem;
+    padding: 0.75rem;
     font-size: 1rem;
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -144,4 +144,32 @@
 
 .save-button:hover {
     background-color: #555;
+}
+
+#password-inputs {
+  display: none;
+}
+
+.password-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.password-group input {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.field-input {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 1rem;
 }

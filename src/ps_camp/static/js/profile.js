@@ -75,4 +75,30 @@ document.addEventListener("DOMContentLoaded", function () {
             reader.readAsDataURL(file);
         }
     }
+
+    document.querySelectorAll(".field-edit").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const target = btn.dataset.target;
+
+            if (target === "password") {
+                const pwdDisplay = document.getElementById("password-display");
+                const pwdInputs = document.getElementById("password-inputs");
+                if (pwdDisplay && pwdInputs) {
+                    pwdDisplay.style.display = "none";
+                    pwdInputs.style.display = "block";
+                    pwdInputs.hidden = false;
+                    btn.style.display = "none"; // 🔸 讓筆 icon 消失
+                }
+            } else {
+                const displayEl = document.getElementById(`${target}-display`);
+                const inputEl = document.getElementById(target);
+                if (displayEl && inputEl) {
+                    displayEl.style.display = "none";
+                    inputEl.hidden = false;
+                    inputEl.focus();
+                    btn.style.display = "none"; // 🔸 筆 icon 消失
+                }
+            }
+        });
+    });
 });

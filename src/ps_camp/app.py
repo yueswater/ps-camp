@@ -466,6 +466,7 @@ def create_app():
 
                     session["user"] = {
                         "id": str(user.id),
+                        "username": user.username,
                         "fullname": user.fullname,
                         "coins": user.coins,
                         "role": user.role,
@@ -498,6 +499,7 @@ def create_app():
             user = session.get("user")
             user_obj = user_repo.get_by_id(UUID(user["id"]))
             user_name = user_obj.fullname
+
             avatar_url = None
             for ext in list(ALLOWED_EXTENSIONS):
                 filename = f"{user_name}_avatar.{ext}"
@@ -509,6 +511,19 @@ def create_app():
             if request.method == "POST":
                 action = request.form.get("action")
 
+                if action == "update_username":
+                    new_username = request.form.get("username", "").strip()
+                    if new_username and new_username != user_obj.username:
+                        existing_user = user_repo.get_by_username(new_username)
+                        if existing_user:
+                            flash("此帳號名稱已被使用")
+                            return redirect(url_for("profile"))
+                        user_obj.username = new_username
+                        session["user"]["username"] = new_username
+                        db.commit()
+                        flash("帳號名稱已更新")
+                    return redirect(url_for("profile"))
+
                 if action == "update_name":
                     if user_obj.role == "member":
                         new_name = request.form.get("fullname", "").strip()
@@ -519,7 +534,7 @@ def create_app():
                             flash("姓名已更新")
                     return redirect(url_for("profile"))
 
-                elif action == "update_password":
+                if action == "update_password":
                     old_password = request.form["old_password"]
                     new_password = request.form["new_password"]
                     confirm_password = request.form["confirm_password"]
@@ -534,11 +549,55 @@ def create_app():
 
                     user_obj.hashed_password = hasher.hash_password(new_password)
                     db.commit()
-
                     session.clear()
+                    flash("密碼已更新，請重新登入")
                     return redirect(url_for("login"))
 
+                if action == "update_all":
+                    updated = False
+
+                    # 帳號名稱
+                    new_username = request.form.get("username", "").strip()
+                    if new_username and new_username != user_obj.username:
+                        if user_repo.get_by_username(new_username):
+                            flash("此帳號名稱已被使用")
+                            return redirect(url_for("profile"))
+                        user_obj.username = new_username
+                        session["user"]["username"] = new_username
+                        updated = True
+
+                    # 姓名
+                    if user_obj.role == "member":
+                        new_name = request.form.get("fullname", "").strip()
+                        if new_name and new_name != user_obj.fullname:
+                            user_obj.fullname = new_name
+                            session["user"]["fullname"] = new_name
+                            updated = True
+
+                    # 密碼
+                    old_pw = request.form.get("old_password", "")
+                    new_pw = request.form.get("new_password", "")
+                    confirm_pw = request.form.get("confirm_password", "")
+                    if old_pw or new_pw or confirm_pw:
+                        if not hasher.verify_password(old_pw, user_obj.hashed_password):
+                            flash("舊密碼錯誤")
+                            return redirect(url_for("profile"))
+                        if new_pw != confirm_pw:
+                            flash("新密碼與確認不一致")
+                            return redirect(url_for("profile"))
+                        user_obj.hashed_password = hasher.hash_password(new_pw)
+                        db.commit()
+                        session.clear()
+                        flash("密碼已更新，請重新登入")
+                        return redirect(url_for("login"))
+
+                    if updated:
+                        db.commit()
+                        flash("個人資料已更新")
+                    return redirect(url_for("profile"))
+
             return render_template("profile.html", avatar_url=avatar_url)
+
 
     @app.route("/upload_avatar", methods=["POST"])
     def upload_avatar():
