@@ -43,7 +43,7 @@ from ps_camp.utils.humanize_time_diff import humanize_time_diff, taipei_now
 from ps_camp.utils.password_hasher import PasswordHasher
 from ps_camp.utils.password_rules import is_strong_password
 from ps_camp.utils.pdf_templates import bank_report_template
-from ps_camp.utils.convert_md import downgrade_headings
+from ps_camp.utils.convert_md import downgrade_headings, generate_preview
 from ps_camp.utils.resolve_owner_name import resolve_owner_name
 from ps_camp.utils.session_helpers import refresh_user_session
 from ps_camp.utils.voting_config import (
@@ -578,10 +578,14 @@ def create_app():
 
             for post in posts:
                 post.display_time = humanize_time_diff(post.created_at)
-                post.preview = markdown.markdown(
-                    downgrade_headings(post.content[:50]),
-                    extensions=["nl2br", "fenced_code", "codehilite"],
-                )
+                # post.preview = generate_preview(post.content, limit=100)
+                preview_data = generate_preview(post.content, limit=100)
+                post.preview_html = preview_data["html"]
+                post.show_read_more = preview_data["is_truncated"]
+                # post.preview = markdown.markdown(
+                #     downgrade_headings(post.content[:50]),
+                #     extensions=["nl2br", "fenced_code", "codehilite"],
+                # )
             return render_template("posts.html", posts=posts)
 
     from uuid import UUID

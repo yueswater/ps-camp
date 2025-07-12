@@ -31,63 +31,69 @@
 <!--Post main container -->
 <div class="posts-container">
     {% if posts %}
-        {% for post in posts %}
-            <article class="post-card" data-post-id="{{ post.id|string }}">
-                <div class="post-header">
-                    <div class="author-info">
-                        <div class="author-avatar"><i class="fas fa-user"></i></div>
-                        <div class="author-details">
-                            <h4 class="author-name">{{ post.user.fullname }}</h4>
-                            <span class="post-time">{{ post.display_time }}</span>
-                        </div>
-                    </div>
-                    <div class="post-category">
-                        <span class="category-tag">{{ post.category }}</span>
-                    </div>
+    {% for post in posts %}
+    <article class="post-card" data-post-id="{{ post.id|string }}">
+        <div class="post-header">
+            <div class="author-info">
+                <div class="author-avatar"><i class="fas fa-user"></i></div>
+                <div class="author-details">
+                    <h4 class="author-name">{{ post.user.fullname }}</h4>
+                    <span class="post-time">{{ post.display_time }}</span>
                 </div>
-
-                <div class="post-content">
-                    <h2 class="post-title" style="font-weight: bold;">{{ post.title }}</h2>
-                    <div class="post-text">
-                        <div class="preview" data-post-id="{{ post.id|string }}">
-                            {{ post.preview|safe }}
-                            <a href="#" class="read-more" data-post-id="{{ post.id|string }}">顯示更多</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="post-actions">
-                    <button class="action-btn like-btn">
-                        <i class="far fa-heart"></i>
-                        <span>{{ post.likes|length }}</span>
-                    </button>
-                    <button class="action-btn comment-btn">
-                        <i class="far fa-comment"></i>
-                        <span>{{ post.replies|length }}</span>
-                    </button>
-                    <button class="action-btn bookmark-btn">
-                        <i class="far fa-bookmark"></i>
-                    </button>
-                </div>
-
-                <div class="post-stats">
-                    <span class="stats-item">{{ post.likes|length }} 個讚</span>
-                    <span class="stats-item">{{ post.replies|length }} 則回覆</span>
-                </div>
-            </article>
-        {% endfor %}
-    {% else %}
-        <div class="empty-wrapper">
-            <div class="empty-state">
-                <i class="fas fa-comments"></i>
-                <h3>還沒有任何貼文</h3>
-                {% if session.user.role in ["party", "interest_group", "admin"] %}
-                <p>點擊右下角的 + 按鈕開始發表貼文吧！</p>
-                {% else %}
-                <p>快跟夥伴一起討論吧！</p>
-                {% endif %}
+            </div>
+            <div class="post-category">
+                <span class="category-tag">{{ post.category }}</span>
             </div>
         </div>
+
+        <div class="post-content">
+            <h2 class="post-title" style="font-weight: bold;">{{ post.title }}</h2>
+            <div class="post-text">
+                <div class="preview" data-post-id="{{ post.id|string }}">
+                    <div class="preview-snippet">
+                        {{ post.preview_html|safe }}
+                    </div>
+                    {% if post.show_read_more %}
+                    <div class="read-more-wrapper">
+                        <a href="#" class="read-more" data-post-id="{{ post.id|string }}">顯示更多</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="post-actions">
+            <button class="action-btn like-btn">
+                <i class="far fa-heart"></i>
+                <span>{{ post.likes|length }}</span>
+            </button>
+            <button class="action-btn comment-btn">
+                <i class="far fa-comment"></i>
+                <span>{{ post.replies|length }}</span>
+            </button>
+            <button class="action-btn bookmark-btn">
+                <i class="far fa-bookmark"></i>
+            </button>
+        </div>
+
+        <div class="post-stats">
+            <span class="stats-item">{{ post.likes|length }} 個讚</span>
+            <span class="stats-item">{{ post.replies|length }} 則回覆</span>
+        </div>
+    </article>
+    {% endfor %}
+    {% else %}
+    <div class="empty-wrapper">
+        <div class="empty-state">
+            <i class="fas fa-comments"></i>
+            <h3>還沒有任何貼文</h3>
+            {% if session.user.role in ["party", "interest_group", "admin"] %}
+            <p>點擊右下角的 + 按鈕開始發表貼文吧！</p>
+            {% else %}
+            <p>快跟夥伴一起討論吧！</p>
+            {% endif %}
+        </div>
+    </div>
     {% endif %}
 </div>
 
