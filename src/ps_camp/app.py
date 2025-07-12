@@ -507,23 +507,36 @@ def create_app():
                     break
 
             if request.method == "POST":
-                old_password = request.form["old_password"]
-                new_password = request.form["new_password"]
-                confirm_password = request.form["confirm_password"]
+                action = request.form.get("action")
 
-                if not hasher.verify_password(old_password, user_obj.hashed_password):
-                    flash("舊密碼錯誤")
+                if action == "update_name":
+                    if user_obj.role == "member":
+                        new_name = request.form.get("fullname", "").strip()
+                        if new_name and new_name != user_obj.fullname:
+                            user_obj.fullname = new_name
+                            session["user"]["fullname"] = new_name
+                            db.commit()
+                            flash("姓名已更新")
                     return redirect(url_for("profile"))
 
-                if new_password != confirm_password:
-                    flash("新密碼與確認不一致")
-                    return redirect(url_for("profile"))
+                elif action == "update_password":
+                    old_password = request.form["old_password"]
+                    new_password = request.form["new_password"]
+                    confirm_password = request.form["confirm_password"]
 
-                user_obj.hashed_password = hasher.hash_password(new_password)
-                db.commit()
+                    if not hasher.verify_password(old_password, user_obj.hashed_password):
+                        flash("舊密碼錯誤")
+                        return redirect(url_for("profile"))
 
-                session.clear()
-                return redirect(url_for("login"))
+                    if new_password != confirm_password:
+                        flash("新密碼與確認不一致")
+                        return redirect(url_for("profile"))
+
+                    user_obj.hashed_password = hasher.hash_password(new_password)
+                    db.commit()
+
+                    session.clear()
+                    return redirect(url_for("login"))
 
             return render_template("profile.html", avatar_url=avatar_url)
 
