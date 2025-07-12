@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlalchemy.orm import Session
 
 from ps_camp.sql_models.proposal_model import Proposal
@@ -21,3 +22,7 @@ class ProposalSQLRepository:
 
     def delete(self, proposal: Proposal) -> None:
         self.db.delete(proposal)
+
+    def get_active_proposals(self) -> list[Proposal]:
+        now = datetime.now()
+        return self.db.query(Proposal).filter(Proposal.deadline >= now).all()

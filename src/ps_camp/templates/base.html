@@ -63,7 +63,7 @@
 
                             {% elif current_time > vote_open_time %}
                             {% if session.get("user", {}).get("role") == "member" %}
-                            <li><a href="/vote" class="nav-link">立即投票</a></li>
+                            <li><a href="/vote_party" class="nav-link">立即投票</a></li>
                             {% endif %}
 
                             {% elif current_time > register_close_time and current_time < upload_close_time %} {% set

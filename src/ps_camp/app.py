@@ -47,6 +47,7 @@ from ps_camp.utils.convert_md import downgrade_headings
 from ps_camp.utils.resolve_owner_name import resolve_owner_name
 from ps_camp.utils.session_helpers import refresh_user_session
 from ps_camp.utils.voting_config import get_vote_close_time, get_vote_open_time, get_register_close_time, get_upload_close_time
+from ps_camp.repos.proposal_sql_repo import ProposalSQLRepository
 
 load_dotenv()
 ADMIN_ID = os.getenv("ADMIN_ID")
@@ -1009,8 +1010,8 @@ def create_app():
         with get_db_session() as db:
             vote_repo = VoteSQLRepository(db)
             ref_repo = ReferendumVoteSQLRepository(db)
-            ref_source = ReferendumSQLRepository(db)
-            referendums = ref_source.get_active_referendums()
+            proposal_repo = ProposalSQLRepository(db)
+            referendums = proposal_repo.get_all()
 
             # Prevent repeated voting
             if vote_repo.has_voted(user_id):
