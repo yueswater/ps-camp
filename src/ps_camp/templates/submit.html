@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/submit.css') }}">
-<script src="{{ url_for('static', filename='js/submit.js') }}"></script>
+<!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/submit.css') }}">
+<script src="{{ url_for('static', filename='js/submit.js') }}"></script> -->
 
+<div class="container">
 <div class="submit-container">
   {% if role == "party" %}
   <div class="submit-header">
@@ -131,5 +132,6 @@
     <button type="submit" class="submit-button">提交公投案</button>
   </form>
   {% endif %}
+</div>
 </div>
 {% endblock %}

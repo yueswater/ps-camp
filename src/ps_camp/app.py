@@ -1095,11 +1095,6 @@ def create_app():
         can_upload_candidate = now <= candidate_deadline
         can_upload_alliance = now <= alliance_deadline
 
-        print("[debug] upload_close_time =", get_upload_close_time())
-        print("[debug] candidate_deadline =", get_candidate_deadline())
-        print("[debug] camp_deadline =", get_camp_deadlines())
-        print("[debug] now =", taipei_now())
-
         tz = timezone(timedelta(hours=8))
         user = session.get("user")
         if not user or user["role"] not in ["party", "group"]:
@@ -1206,6 +1201,7 @@ def create_app():
 
                 return render_template(
                     "submit.html",
+                    page="submit",
                     role="party",
                     user=user,
                     members=all_members,
@@ -1282,6 +1278,7 @@ def create_app():
 
                 return render_template(
                     "submit.html",
+                    page="submit",
                     role="group",
                     user=user_dict,
                     proposal=proposal_dict,
