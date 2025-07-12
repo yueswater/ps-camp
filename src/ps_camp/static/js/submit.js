@@ -1,24 +1,18 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // 先抓 element，再決定是否 parse
+  // 名額限制處理
   const remainingEl = document.getElementById("remaining");
   let maxSlots = 0;
 
   if (remainingEl) {
     maxSlots = parseInt(remainingEl.textContent);
-    const checkboxes = document.querySelectorAll(
-      'input[name="selected_members"]'
-    );
+    const checkboxes = document.querySelectorAll('input[name="selected_members"]');
 
     checkboxes.forEach((checkbox) => {
       checkbox.addEventListener("change", () => {
-        const checkedCount = document.querySelectorAll(
-          'input[name="selected_members"]:checked'
-        ).length;
+        const checkedCount = document.querySelectorAll('input[name="selected_members"]:checked').length;
         const remaining = maxSlots - checkedCount;
-
         remainingEl.textContent = remaining;
 
-        // 若已達上限，disable 其他未勾選的 checkbox
         checkboxes.forEach((cb) => {
           if (!cb.checked) {
             cb.disabled = remaining <= 0;
@@ -39,18 +33,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!fileInput || !textEl) return;
 
-    // 點擊 dropzone → 開啟檔案選擇
     dropzone.addEventListener("click", () => {
-      console.log(`🖱️ Dropzone 點擊觸發！ inputId=${inputId}`);
       fileInput.value = "";
       fileInput.click();
     });
 
-    // 選擇完檔案後更新文字
     fileInput.addEventListener("change", () => {
       const file = fileInput.files[0];
-      console.log("📂 檔案選擇觸發 change：", file);
-
       if (file) {
         textEl.textContent = `已選擇：${file.name}`;
         dropzone.classList.remove("error");
@@ -59,7 +48,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // 拖曳上傳樣式處理
     dropzone.addEventListener("dragover", (e) => {
       e.preventDefault();
       dropzone.classList.add("dragover");
@@ -80,15 +68,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ✅ 表單驗證：只有 group 角色會用到
+  // group 專用公投表單驗證
   const form = document.querySelector(".submit-form");
   const proposalInput = document.getElementById("proposal_pdf");
   const proposalDropzone = proposalInput?.closest(".file-dropzone");
   const proposalLabel = document.getElementById("proposal_label");
-
-  console.log("🔍 找到 proposalInput:", proposalInput);
-  console.log("🔍 找到 proposalLabel:", proposalLabel);
-  console.log("🔍 找到 proposalDropzone:", proposalDropzone);
 
   if (form && proposalInput && proposalDropzone && proposalLabel) {
     form.addEventListener("submit", (e) => {
@@ -96,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!file) {
         e.preventDefault();
         proposalDropzone.classList.add("error");
-        proposalLabel.textContent = "⚠ 請先選擇一個 PDF 檔案再提交";
+        proposalLabel.textContent = "請先選擇一個 PDF 檔案再提交";
         return;
       }
 
@@ -104,19 +88,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  const disabledForm = document.querySelector(".disabled-form");
-  if (disabledForm) {
-    disabledForm.querySelectorAll("input, textarea, select, button").forEach((el) => {
+  // 禁用 .disabled-form 區塊內所有互動元件
+  document.querySelectorAll(".disabled-form").forEach((formEl) => {
+    formEl.querySelectorAll("input, textarea, select, button").forEach((el) => {
       el.setAttribute("disabled", "disabled");
       el.style.pointerEvents = "none";
       el.style.backgroundColor = "#f8f9fa";
       el.style.opacity = "0.6";
     });
 
-    // 禁用 dropzone 行為
-    document.querySelectorAll(".file-dropzone").forEach((zone) => {
+    formEl.querySelectorAll(".file-dropzone").forEach((zone) => {
       zone.style.pointerEvents = "none";
       zone.style.opacity = "0.6";
     });
-  }
+  });
 });

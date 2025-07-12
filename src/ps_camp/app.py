@@ -3,6 +3,7 @@ import logging
 import os
 import re
 from datetime import UTC, datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 from functools import wraps
 from uuid import uuid4
 
@@ -50,6 +51,8 @@ from ps_camp.utils.voting_config import (
     get_vote_open_time,
     get_register_close_time,
     get_upload_close_time,
+    get_candidate_deadline,
+    get_alliance_deadline,
     get_camp_deadlines,
 )
 from ps_camp.repos.proposal_sql_repo import ProposalSQLRepository
@@ -1063,9 +1066,39 @@ def create_app():
     @app.route("/submit", methods=["GET", "POST"])
     @refresh_user_session
     def submit():
-        now = datetime.now(timezone.utc)
-        deadline = get_camp_deadlines()
-        expired = now > deadline
+        tz = ZoneInfo("Asia/Taipei")
+
+        start_date = datetime.strptime(os.getenv("CAMP_START_DATE"), "%Y-%m-%d").date()
+
+        # Get the current time: with Taipei time zone
+        now = datetime.now(timezone.utc).astimezone(tz)
+
+        # Fix the following deadlines to let them also have time zones tz
+        party_deadline = datetime.combine(
+            start_date + timedelta(days=2),
+            datetime.min.time(),
+            tz
+        ) + timedelta(hours=23, minutes=59)
+
+        group_deadline = datetime.combine(
+            start_date + timedelta(days=2),
+            datetime.min.time(),
+            tz
+        ) + timedelta(hours=23, minutes=59)
+
+        # These functions should also be converted to tz-aware
+        candidate_deadline = get_candidate_deadline().astimezone(tz)
+        alliance_deadline = get_alliance_deadline().astimezone(tz)
+
+        expired_party = now > party_deadline
+        expired_group = now > group_deadline
+        can_upload_candidate = now <= candidate_deadline
+        can_upload_alliance = now <= alliance_deadline
+
+        print("[debug] upload_close_time =", get_upload_close_time())
+        print("[debug] candidate_deadline =", get_candidate_deadline())
+        print("[debug] camp_deadline =", get_camp_deadlines())
+        print("[debug] now =", taipei_now())
 
         tz = timezone(timedelta(hours=8))
         user = session.get("user")
@@ -1118,11 +1151,10 @@ def create_app():
                         fullname = user.get("fullname", "unknown")
                         filename = f"{fullname}_候選人照片"
                         photo_url = upload_file_to_drive(photo_zip, filename)
-                            
 
                     for selected_user_id in selected_user_ids:
                         if selected_user_id in candidate_user_ids:
-                            continue  # 或 flash 警告該名已被提名
+                            continue  # or flash warns that the name has been nominated
 
                         selected_user = (
                             db.query(User).filter(User.id == selected_user_id).first()
@@ -1185,7 +1217,10 @@ def create_app():
                     vote_close_time=get_vote_close_time().astimezone(tz),
                     register_close_time=get_register_close_time().astimezone(tz),
                     upload_close_time=get_upload_close_time().astimezone(tz),
-                    expired=expired
+                    expired_party=expired_party,
+                    expired_group=expired_group,
+                    can_upload_candidate=can_upload_candidate,
+                    can_upload_alliance=can_upload_alliance,
                 )
 
             elif user["role"] == "group":
@@ -1220,7 +1255,7 @@ def create_app():
 
                     if proposal_pdf and proposal_pdf.filename:
                         fullname = user.get("fullname", "unknown")
-                        filename = f"{fullname}_{proposal_pdf.filename}"
+                        filename = f"{fullname}_公投案"
                         path = os.path.join(
                             "src", "ps_camp", "static", "uploads", "proposals"
                         )
@@ -1256,7 +1291,8 @@ def create_app():
                     vote_close_time=get_vote_close_time().astimezone(tz),
                     register_close_time=get_register_close_time().astimezone(tz),
                     upload_close_time=get_upload_close_time().astimezone(tz),
-                    expired=expired
+                    expired_party=expired_party,
+                    expired_group=expired_group,
                 )
 
     @app.route("/api/live_votes")
@@ -1267,13 +1303,13 @@ def create_app():
             proposal_repo = ProposalSQLRepository(db)
             user_repo = UserSQLRepository(db)
 
-            # 政黨票
+            #Party votes
             party_counts = vote_repo.get_party_vote_counts()
             party_name_map = {
                 str(p.id): p.fullname for p in user_repo.get_all() if p.role == "party"
             }
 
-            # 公投案
+            # Referendum
             proposals = proposal_repo.get_all()
             proposal_ids = [p.id for p in proposals]
 
@@ -1314,7 +1350,6 @@ def create_app():
     return app
 
 
-# TODO: change to guicorn
 app = create_app()
 
 if __name__ == "__main__":

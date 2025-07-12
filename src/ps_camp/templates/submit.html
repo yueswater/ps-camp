@@ -14,7 +14,7 @@
   <p class="limit-warning">您已提名 6 位候選人，無法再新增。</p>
   {% endif %}
 
-  <form method="POST" enctype="multipart/form-data" class="submit-form {% if expired %}disabled-form{% endif %}">
+  <form method="POST" class="submit-form" enctype="multipart/form-data">
     <table class="member-table">
       <thead>
         <tr>
@@ -27,7 +27,7 @@
         {% for member in members %}
         {% if member.id not in existing_candidates | map(attribute='user_id') | list %}
         <tr>
-          <td><input type="checkbox" name="selected_members" value="{{ member.id }}"></td>
+          <td><input type="checkbox" name="selected_members" value="{{ member.id }}" {% if not can_upload_candidate %}disabled{% endif %}></td>
           <td>{{ member.fullname }}</td>
           <td>{{ member.username }}</td>
         </tr>
@@ -35,7 +35,8 @@
         {% endfor %}
       </tbody>
     </table>
-
+    
+    {% if can_upload_candidate %}
     <label for="description">政見（選填）</label>
     <textarea name="description" rows="4" placeholder="請輸入該候選人的政見..."></textarea>
 
@@ -50,13 +51,22 @@
       <p id="cabinet_label" style="color: #ced4da;">點擊或拖曳上傳 PDF 檔案</p>
       <input type="file" id="cabinet_input" name="cabinet_pdf" accept="application/pdf" hidden>
     </div>
+
     {% if party_doc and party_doc.cabinet_url %}
     <p>
-      <i class="fas fa-paperclip" style="margin-right: 4px;"></i>
+      <i class="fas fa-paperclip"></i>
       <a href="{{ party_doc.cabinet_url }}" target="_blank">已上傳：點我下載</a>
     </p>
     {% endif %}
+    
+    <button type="submit" class="submit-button">上傳候選人 & 建設性內閣名單</button>
+    {% else %}
+    <div class="disabled-form">
+      <p style="color: gray;">⚠ 候選人提名與建設性內閣名單已截止</p>
+    </div>
+    {% endif %}
 
+    {% if can_upload_alliance %}
     <label>上傳政黨聯盟協定書（PDF）</label>
     <div class="file-dropzone" data-input-id="alliance_input" data-label-id="alliance_label">
       <p id="alliance_label" style="color: #ced4da;">點擊或拖曳上傳 PDF 檔案</p>
@@ -67,11 +77,14 @@
       <i class="fas fa-paperclip" style="margin-right: 4px;"></i>
       <a href="{{ party_doc.alliance_url }}" target="_blank">已上傳：點我下載</a>
     </p>
-    {% endif %}
 
-    <button type="submit" class="submit-button" {% if remaining_slots==0 %}disabled{% endif %}>
-      提名候選人與上傳檔案
-    </button>
+    <button type="submit" class="submit-button">上傳政黨聯盟協定書</button>
+    {% endif %}
+    {% else %}
+    <div class="disabled-form">
+      <p style="color: gray;">⚠ 政黨聯盟協定書已截止</p>
+    </div>
+    {% endif %}
   </form>
 
   {% if existing_candidates %}
@@ -90,7 +103,10 @@
     <h2>提交公投案</h2>
   </div>
 
-  <form method="POST" enctype="multipart/form-data" class="submit-form {% if expired %}disabled-form{% endif %}">
+  <li><small>{{ expired_group }}</small></li>
+  <form method="POST"
+    class="submit-form {% if (role == 'party' and expired_party) or (role == 'group' and expired_group) %}disabled-form{% endif %}"
+    enctype="multipart/form-data">
     <label for="title">公投案標題</label>
     <input type="text" id="title" name="title" required placeholder="請輸入清楚明確的標題，例如：反對貪污特赦法案">
 
