@@ -1,8 +1,37 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // 處理所有 file-dropzone 區塊
+  // 先抓 element，再決定是否 parse
+  const remainingEl = document.getElementById("remaining");
+  let maxSlots = 0;
+
+  if (remainingEl) {
+    maxSlots = parseInt(remainingEl.textContent);
+    const checkboxes = document.querySelectorAll(
+      'input[name="selected_members"]'
+    );
+
+    checkboxes.forEach((checkbox) => {
+      checkbox.addEventListener("change", () => {
+        const checkedCount = document.querySelectorAll(
+          'input[name="selected_members"]:checked'
+        ).length;
+        const remaining = maxSlots - checkedCount;
+
+        remainingEl.textContent = remaining;
+
+        // 若已達上限，disable 其他未勾選的 checkbox
+        checkboxes.forEach((cb) => {
+          if (!cb.checked) {
+            cb.disabled = remaining <= 0;
+          }
+        });
+      });
+    });
+  }
+
+  // Dropzone 行為處理
   const dropzones = document.querySelectorAll(".file-dropzone");
 
-  dropzones.forEach(dropzone => {
+  dropzones.forEach((dropzone) => {
     const inputId = dropzone.dataset.inputId;
     const labelId = dropzone.dataset.labelId;
     const fileInput = document.getElementById(inputId);
@@ -12,12 +41,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 點擊 dropzone → 開啟檔案選擇
     dropzone.addEventListener("click", () => {
+      console.log(`🖱️ Dropzone 點擊觸發！ inputId=${inputId}`);
+      fileInput.value = "";
       fileInput.click();
     });
 
     // 選擇完檔案後更新文字
     fileInput.addEventListener("change", () => {
       const file = fileInput.files[0];
+      console.log("📂 檔案選擇觸發 change：", file);
+
       if (file) {
         textEl.textContent = `已選擇：${file.name}`;
         dropzone.classList.remove("error");
@@ -26,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // 拖曳上傳樣式處理（可選）
+    // 拖曳上傳樣式處理
     dropzone.addEventListener("dragover", (e) => {
       e.preventDefault();
       dropzone.classList.add("dragover");
@@ -47,11 +80,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // 表單驗證（僅檢查公投案 PDF 是否有上傳）
+  // ✅ 表單驗證：只有 group 角色會用到
   const form = document.querySelector(".submit-form");
   const proposalInput = document.getElementById("proposal_pdf");
   const proposalDropzone = proposalInput?.closest(".file-dropzone");
   const proposalLabel = document.getElementById("proposal_label");
+
+  console.log("🔍 找到 proposalInput:", proposalInput);
+  console.log("🔍 找到 proposalLabel:", proposalLabel);
+  console.log("🔍 找到 proposalDropzone:", proposalDropzone);
 
   if (form && proposalInput && proposalDropzone && proposalLabel) {
     form.addEventListener("submit", (e) => {

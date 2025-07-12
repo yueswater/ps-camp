@@ -1,0 +1,42 @@
+[
+  {
+    "id": "f13aef44-70e9-44ad-81df-74d41ded0424",
+    "username": "academic_team",
+    "fullname": "學術部",
+    "role": "worker",
+    "coins": 400000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "44ec2784-1456-4cef-a96a-0f3727b3dc48",
+    "username": "leader_team",
+    "fullname": "隊輔部",
+    "role": "worker",
+    "coins": 400000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "b6c9d0d6-e964-45af-98dc-814d98183bd7",
+    "username": "public_team",
+    "fullname": "公生部",
+    "role": "worker",
+    "coins": 400000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "f7cda12c-6d33-4dc1-99ad-8c57b32a85b7",
+    "username": "event_team",
+    "fullname": "活動部",
+    "role": "worker",
+    "coins": 400000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "2489b5a6-6b26-4eb4-abba-5d239c716042",
+    "username": "promo_team",
+    "fullname": "文宣部",
+    "role": "worker",
+    "coins": 400000,
+    "password": "ntupscamp2025"
+  }
+]

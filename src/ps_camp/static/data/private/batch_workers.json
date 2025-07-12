@@ -1,0 +1,258 @@
+[
+  {
+    "id": "18667a1c-7b7e-4245-9d85-e1c305f6c649",
+    "username": "puff",
+    "fullname": "噗小妹",
+    "role": "npc",
+    "coins": 1000000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "a4725b94-f931-4a9b-8175-16b20ce22661",
+    "username": "rocky",
+    "fullname": "石掰的",
+    "role": "npc",
+    "coins": 1000000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "47ca82eb-87f3-4b7d-a339-4563e94b6637",
+    "username": "rosie",
+    "fullname": "羅絲釘",
+    "role": "npc",
+    "coins": 2000000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "d46b9304-3c8c-4d16-abcb-871809780ea7",
+    "username": "pudding",
+    "fullname": "噗汀",
+    "role": "npc",
+    "coins": 2000000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "d78bfad2-fa6a-4dcb-9717-37c58debb809",
+    "username": "minera",
+    "fullname": "礦世奇派",
+    "role": "npc",
+    "coins": 4000000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "38ed3ea9-a59e-491b-846c-3b2d19ddf223",
+    "username": "katya",
+    "fullname": "卡催娜",
+    "role": "npc",
+    "coins": 4000000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "32fe593b-9744-4720-800b-a36079d12051",
+    "username": "hop",
+    "fullname": "啤酒花",
+    "role": "npc",
+    "coins": 2000000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "45508626-5f2f-46ab-bd04-ba6df7d4ff29",
+    "username": "anball",
+    "fullname": "安魚丸",
+    "role": "npc",
+    "coins": 2000000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "5e708d2c-b563-4105-88e4-43253d7e9655",
+    "username": "donald",
+    "fullname": "唐納德",
+    "role": "npc",
+    "coins": 2000000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "89ece537-29dc-433b-a806-3463e8ac676f",
+    "username": "libai",
+    "fullname": "李白",
+    "role": "npc",
+    "coins": 1000000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "e64ef12e-b9cd-4640-bc95-f8a463f21112",
+    "username": "zucker",
+    "fullname": "祖克剝",
+    "role": "npc",
+    "coins": 4000000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "762daa2a-063e-44d6-aa08-adf376d89813",
+    "username": "kencha",
+    "fullname": "肯恰拿",
+    "role": "npc",
+    "coins": 4000000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "ca1e3189-f9c9-4857-96c4-0badb14c9fc6",
+    "username": "yinxuan",
+    "fullname": "殷梓軒",
+    "role": "npc",
+    "coins": 1000000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "5c8bd651-105f-42ea-aec5-564b63024c8e",
+    "username": "jenni",
+    "fullname": "金潔妮",
+    "role": "npc",
+    "coins": 2000000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "8f5f24c5-3d4d-46e8-b06d-a62af0711e6f",
+    "username": "merkel",
+    "fullname": "梅課兒",
+    "role": "npc",
+    "coins": 2000000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "a97f5aba-242b-4615-b050-2267819bc8ce",
+    "username": "sang",
+    "fullname": "桑言",
+    "role": "npc",
+    "coins": 2000000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "a66e720a-1f8b-41b3-ac55-a8e557b981cc",
+    "username": "liberal",
+    "fullname": "自由主義政黨",
+    "role": "party",
+    "coins": 5000000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "7fc27332-b195-437b-9312-fc49ab080a52",
+    "username": "conserv",
+    "fullname": "保守主義政黨",
+    "role": "party",
+    "coins": 5000000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "a797c2e9-8870-4a23-8a4a-7c561701fa62",
+    "username": "socdem",
+    "fullname": "社會民主黨",
+    "role": "party",
+    "coins": 5000000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "d59d532b-5e41-4c65-b8c4-3fb79823b348",
+    "username": "labor",
+    "fullname": "勞工黨",
+    "role": "party",
+    "coins": 4000000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "1c4ef3e2-d9cc-42b7-aa1f-4ff531466dd8",
+    "username": "feminist",
+    "fullname": "女性權益黨",
+    "role": "party",
+    "coins": 4000000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "ae6a9c71-adf6-447a-95cd-70d19357d942",
+    "username": "green",
+    "fullname": "綠黨",
+    "role": "party",
+    "coins": 4000000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "2dd79a69-789c-4b98-b97f-d93cc349bb48",
+    "username": "protrade",
+    "fullname": "自由貿易推進利益團體",
+    "role": "group",
+    "coins": 6000000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "1b4f5844-5b02-437c-95d4-1267b45b68a8",
+    "username": "protect",
+    "fullname": "貿易保護支持利益團體",
+    "role": "group",
+    "coins": 6000000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "fee09b8f-2d35-4817-ba75-61c2067b0298",
+    "username": "proeu",
+    "fullname": "親歐洲整合利益團體",
+    "role": "group",
+    "coins": 6000000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "b0e57c5e-00fa-4e51-a41f-3324def4cd6c",
+    "username": "prorussia",
+    "fullname": "親俄羅斯發展利益團體",
+    "role": "group",
+    "coins": 6500000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "ee2ee776-4795-408d-bc1f-d4780a14015e",
+    "username": "immigrant",
+    "fullname": "移民友善利益團體",
+    "role": "group",
+    "coins": 6000000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "4f4ea0f0-7374-4785-9ef6-78974bb8269d",
+    "username": "antiimmi",
+    "fullname": "反移民立場利益團體",
+    "role": "group",
+    "coins": 6000000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "e878482d-8ea4-48d4-a650-15c0c168cdf3",
+    "username": "leader",
+    "fullname": "總召",
+    "role": "worker",
+    "coins": 500000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "f5a6baa2-c4fd-48dd-9fae-4ee21591a0d7",
+    "username": "vleader",
+    "fullname": "副召",
+    "role": "worker",
+    "coins": 400000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "af468ca3-b4d4-4b4a-8f46-aa5b61805e3a",
+    "username": "minister",
+    "fullname": "部長",
+    "role": "worker",
+    "coins": 400000,
+    "password": "ntupscamp2025"
+  },
+  {
+    "id": "eb2f5e2a-cf61-442b-83da-232a29239591",
+    "username": "worker",
+    "fullname": "中立工人",
+    "role": "worker",
+    "coins": 300000,
+    "password": "ntupscamp2025"
+  }
+]

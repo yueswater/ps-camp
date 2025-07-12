@@ -37,6 +37,9 @@ coverage.xml
 *.cover
 *.py,cover
 
+# test uploads
+uploads/
+
 # pytest cache
 .pytest_cache/
 
@@ -58,4 +61,5 @@ dist/
 
 # miscellaeous files
 src/ps_camp/static/data/private/batch_users.json
-src/ps_camp/static/data/private/batch_workers.json
+src/ps_camp/static/data/private/batch_workers.jsonntu-political-camp-*.json
+token_drive.pkl

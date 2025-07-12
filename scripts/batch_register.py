@@ -18,7 +18,7 @@ def main():
         logging.debug(f"目前已註冊資料表：{list(Base.metadata.tables.keys())}")
 
         with open(
-            "./src/ps_camp/static/data/private/batch_users.json", encoding="utf-8"
+            "./src/ps_camp/static/data/private/batch_team.json", encoding="utf-8"
         ) as f:
             users = json.load(f)
 

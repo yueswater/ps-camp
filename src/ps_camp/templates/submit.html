@@ -27,7 +27,7 @@
         {% for member in members %}
         {% if member.id not in existing_candidates | map(attribute='user_id') | list %}
         <tr>
-          <td><input type="radio" name="selected_member" value="{{ member.id }}" required></td>
+          <td><input type="checkbox" name="selected_members" value="{{ member.id }}"></td>
           <td>{{ member.fullname }}</td>
           <td>{{ member.username }}</td>
         </tr>
@@ -42,7 +42,7 @@
     <label>上傳候選人照片（選填）</label>
     <div class="file-dropzone" data-input-id="photo_input" data-label-id="photo_label">
       <p id="photo_label" style="color: #ced4da;">點擊或拖曳上傳圖片</p>
-      <input type="file" id="photo_input" name="photo" accept="image/*" hidden>
+      <input type="file" id="photo_input" name="photo_zip" accept=".zip" hidden>
     </div>
 
     <label>上傳建設性內閣名單（PDF）</label>
@@ -107,8 +107,10 @@
     <p>
       <i class="fas fa-paperclip" style="margin-right: 4px;"></i>
       <a href="{{ proposal.file_url }}" target="_blank">已上傳：點我下載</a>
+      <span style="margin-left: 8px; font-size: 0.9em; color: #6c757d;">（可重新選擇以覆蓋）</span>
     </p>
     {% endif %}
+
 
     <button type="submit" class="submit-button">提交公投案</button>
   </form>

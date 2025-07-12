@@ -46,8 +46,14 @@ from ps_camp.utils.pdf_templates import bank_report_template
 from ps_camp.utils.convert_md import downgrade_headings
 from ps_camp.utils.resolve_owner_name import resolve_owner_name
 from ps_camp.utils.session_helpers import refresh_user_session
-from ps_camp.utils.voting_config import get_vote_close_time, get_vote_open_time, get_register_close_time, get_upload_close_time
+from ps_camp.utils.voting_config import (
+    get_vote_close_time,
+    get_vote_open_time,
+    get_register_close_time,
+    get_upload_close_time,
+)
 from ps_camp.repos.proposal_sql_repo import ProposalSQLRepository
+from ps_camp.utils.google_drive import upload_file_to_drive
 
 load_dotenv()
 ADMIN_ID = os.getenv("ADMIN_ID")
@@ -570,7 +576,8 @@ def create_app():
             for post in posts:
                 post.display_time = humanize_time_diff(post.created_at)
                 post.preview = markdown.markdown(
-                    downgrade_headings(post.content[:50]), extensions=["nl2br", "fenced_code", "codehilite"]
+                    downgrade_headings(post.content[:50]),
+                    extensions=["nl2br", "fenced_code", "codehilite"],
                 )
             return render_template("posts.html", posts=posts)
 
@@ -590,7 +597,10 @@ def create_app():
                 return jsonify(success=False, message="找不到貼文"), 404
 
             short_text = post.content[:100] + "..."
-            html = markdown.markdown(downgrade_headings(short_text), extensions=["nl2br", "fenced_code", "codehilite"])
+            html = markdown.markdown(
+                downgrade_headings(short_text),
+                extensions=["nl2br", "fenced_code", "codehilite"],
+            )
             return jsonify({"success": True, "preview": html})
 
     @app.route("/api/posts/<string:post_id>", methods=["GET"])
@@ -606,7 +616,10 @@ def create_app():
             if not post:
                 return jsonify(success=False, message="貼文不存在"), 404
 
-            html_content = markdown.markdown(downgrade_headings(post.content), extensions=["nl2br", "fenced_code", "codehilite"])
+            html_content = markdown.markdown(
+                downgrade_headings(post.content),
+                extensions=["nl2br", "fenced_code", "codehilite"],
+            )
             return jsonify(success=True, content=html_content)
 
     @app.route("/npcs")
@@ -721,7 +734,10 @@ def create_app():
             if not post:
                 abort(404)
 
-            post.rendered_content = markdown.markdown(downgrade_headings(post.content), extensions=["nl2br", "fenced_code", "codehilite"])
+            post.rendered_content = markdown.markdown(
+                downgrade_headings(post.content),
+                extensions=["nl2br", "fenced_code", "codehilite"],
+            )
 
             # Parse replies JSON
             if isinstance(post.replies, str):
@@ -1072,56 +1088,57 @@ def create_app():
 
                 if request.method == "POST":
                     form = request.form
-                    photo = request.files.get("photo")
+                    photo_zip = request.files.get("photo_zip")
                     cabinet_pdf = request.files.get("cabinet_pdf")
                     alliance_pdf = request.files.get("alliance_pdf")
 
                     # Handle candidate nominations
-                    selected_user_id = form.get("selected_member")
+                    selected_user_ids = form.getlist("selected_members")
                     description = form.get("description", "")
 
                     if remaining_slots <= 0:
                         flash("您已提名 6 位候選人，無法再新增", "danger")
                         return redirect(url_for("submit"))
 
-                    if not selected_user_id:
-                        flash("請選擇一位小隊員作為候選人", "warning")
+                    if not selected_user_ids:
+                        flash("請至少選擇一位小隊員作為候選人", "warning")
                         return redirect(url_for("submit"))
 
-                    if selected_user_id in candidate_user_ids:
-                        flash("此小隊員已被提名", "warning")
+                    if len(selected_user_ids) > remaining_slots:
+                        flash(f"最多只能提名 {remaining_slots} 位候選人", "danger")
                         return redirect(url_for("submit"))
 
                     # Save candidate photos
                     photo_url = None
-                    if photo and photo.filename:
+                    if photo_zip and photo_zip.filename.endswith(".zip"):
                         fullname = user.get("fullname", "unknown")
-                        filename = f"{fullname}_{photo.filename}"
-                        upload_dir = os.path.join(
-                            "src", "ps_camp", "static", "uploads", "candidates"
+                        filename = f"{fullname}_候選人照片"
+                        photo_url = upload_file_to_drive(photo_zip, filename)
+                            
+
+                    for selected_user_id in selected_user_ids:
+                        if selected_user_id in candidate_user_ids:
+                            continue  # 或 flash 警告該名已被提名
+
+                        selected_user = (
+                            db.query(User).filter(User.id == selected_user_id).first()
                         )
-                        os.makedirs(upload_dir, exist_ok=True)
-                        photo_path = os.path.join(upload_dir, filename)
-                        photo.save(photo_path)
-                        photo_url = f"/static/uploads/candidates/{filename}"
+                        if (
+                            not selected_user
+                            or selected_user.affiliation_id != user["id"]
+                        ):
+                            continue
 
-                    selected_user = (
-                        db.query(User).filter(User.id == selected_user_id).first()
-                    )
-                    if not selected_user or selected_user.affiliation_id != user["id"]:
-                        flash("無效的小隊員", "danger")
-                        return redirect(url_for("submit"))
-
-                    candidate = Candidate(
-                        id=str(uuid4()),
-                        user_id=selected_user.id,
-                        party_id=user["id"],
-                        name=selected_user.fullname,
-                        description=description,
-                        created_at=datetime.now(UTC),
-                        photo_url=photo_url,
-                    )
-                    db.add(candidate)
+                        candidate = Candidate(
+                            id=str(uuid4()),
+                            user_id=selected_user.id,
+                            party_id=user["id"],
+                            name=selected_user.fullname,
+                            description=description,
+                            created_at=datetime.now(UTC),
+                            photo_url=photo_url,
+                        )
+                        db.add(candidate)
 
                     # Handle party archives
                     if not party_doc:
@@ -1131,25 +1148,19 @@ def create_app():
                             created_at=datetime.now(UTC),
                         )
 
-                    if cabinet_pdf and cabinet_pdf.filename:
+                    cabinet_url = None
+                    if cabinet_pdf and cabinet_pdf.filename.endswith(".pdf"):
                         fullname = user.get("fullname", "unknown")
-                        filename = f"{fullname}_{cabinet_pdf.filename}"
-                        path = os.path.join(
-                            "src", "ps_camp", "static", "uploads", "cabinet"
-                        )
-                        os.makedirs(path, exist_ok=True)
-                        cabinet_pdf.save(os.path.join(path, filename))
-                        party_doc.cabinet_url = f"/static/uploads/cabinet/{filename}"
+                        filename = f"{fullname}_建設性內閣名單"
+                        cabinet_url = upload_file_to_drive(cabinet_pdf, filename)
+                        party_doc.cabinet_url = cabinet_url
 
-                    if alliance_pdf and alliance_pdf.filename:
+                    alliance_url = None
+                    if alliance_pdf and alliance_pdf.filename.endswith(".pdf"):
                         fullname = user.get("fullname", "unknown")
-                        filename = f"{fullname}_{alliance_pdf.filename}"
-                        path = os.path.join(
-                            "src", "ps_camp", "static", "uploads", "alliance"
-                        )
-                        os.makedirs(path, exist_ok=True)
-                        alliance_pdf.save(os.path.join(path, filename))
-                        party_doc.alliance_url = f"/static/uploads/alliance/{filename}"
+                        filename = f"{fullname}_政黨聯盟協定書"
+                        alliance_url = upload_file_to_drive(alliance_pdf, filename)
+                        party_doc.alliance_url = alliance_url
 
                     db.merge(party_doc)
                     db.commit()
@@ -1169,7 +1180,7 @@ def create_app():
                     vote_open_time=get_vote_open_time().astimezone(tz),
                     vote_close_time=get_vote_close_time().astimezone(tz),
                     register_close_time=get_register_close_time().astimezone(tz),
-                    upload_close_time=get_upload_close_time().astimezone(tz)
+                    upload_close_time=get_upload_close_time().astimezone(tz),
                 )
 
             elif user["role"] == "group":
@@ -1209,8 +1220,8 @@ def create_app():
                             "src", "ps_camp", "static", "uploads", "proposals"
                         )
                         os.makedirs(path, exist_ok=True)
-                        proposal_pdf.save(os.path.join(path, filename))
-                        proposal_obj.file_url = f"/static/uploads/proposals/{filename}"
+                        drive_url = upload_file_to_drive(proposal_pdf, filename)
+                        proposal_obj.file_url = drive_url
 
                     db.merge(proposal_obj)
                     db.commit()
@@ -1239,7 +1250,7 @@ def create_app():
                     vote_open_time=get_vote_open_time().astimezone(tz),
                     vote_close_time=get_vote_close_time().astimezone(tz),
                     register_close_time=get_register_close_time().astimezone(tz),
-                    upload_close_time=get_upload_close_time().astimezone(tz)
+                    upload_close_time=get_upload_close_time().astimezone(tz),
                 )
 
     @app.route("/api/live_votes")
@@ -1249,7 +1260,7 @@ def create_app():
             ref_repo = ReferendumVoteSQLRepository(db)
             proposal_repo = ProposalSQLRepository(db)
             user_repo = UserSQLRepository(db)
-            
+
             # 政黨票
             party_counts = vote_repo.get_party_vote_counts()
             party_name_map = {
@@ -1262,7 +1273,9 @@ def create_app():
 
             referendum_votes = {
                 str(k): v
-                for k, v in ref_repo.get_vote_counts_by_referendum_ids(proposal_ids).items()
+                for k, v in ref_repo.get_vote_counts_by_referendum_ids(
+                    proposal_ids
+                ).items()
             }
             referendum_titles = {str(p.id): p.title for p in proposals}
 
@@ -1281,7 +1294,7 @@ def create_app():
     @app.route("/results")
     def vote_results():
         return render_template("vote_results.html")
-    
+
     @app.context_processor
     def inject_common_time():
         return {

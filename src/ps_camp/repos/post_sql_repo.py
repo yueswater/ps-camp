@@ -14,20 +14,23 @@ from ps_camp.utils.humanize_time_diff import taipei_now
 
 load_dotenv()
 
+
 def calculate_post_fee(created_time: datetime) -> int:
     # Assume that the camp period starts at 00:00 of Day 1
-    CAMP_START_DATE_STR = os.getenv("CAMP_START_DATE", "2025-07-01")  # fallback 可保留
-    CAMP_START_DATE = datetime.strptime(CAMP_START_DATE_STR, "%Y-%m-%d").replace(
-        hour=0, minute=0, second=0
-    ).astimezone(tz=created_time.tzinfo)
+    CAMP_START_DATE_STR = os.getenv("CAMP_START_DATE", "2025-07-14")  # fallback 可保留
+    CAMP_START_DATE = (
+        datetime.strptime(CAMP_START_DATE_STR, "%Y-%m-%d")
+        .replace(hour=0, minute=0, second=0)
+        .astimezone(tz=created_time.tzinfo)
+    )
     delta = created_time - CAMP_START_DATE
     day_number = delta.days + 1  # Day 1 = Day 1
 
     # Make sure to take effect only on days 1 to 4
     base_fee_map = {1: 30, 2: 60, 3: 90, 4: 120}
     bonus_fee_map = {1: 5, 2: 15, 3: 30, 4: 45}
-    base_fee = base_fee_map.get(day_number, 1000)  # After day 4, return to fixed fee
-    bonus_fee = bonus_fee_map.get(day_number, 0)
+    base_fee = base_fee_map.get(day_number, 30) * 10000
+    bonus_fee = bonus_fee_map.get(day_number, 0) * 10000
 
     # Primetime check
     golden_start = time(18, 0)
@@ -35,6 +38,7 @@ def calculate_post_fee(created_time: datetime) -> int:
     if golden_start <= created_time.time() <= golden_end:
         return base_fee + bonus_fee
     return base_fee
+
 
 class PostSQLRepository:
     def __init__(self, db: Session):
