@@ -103,4 +103,20 @@ document.addEventListener("DOMContentLoaded", () => {
       proposalDropzone.classList.add("loading");
     });
   }
+
+  const disabledForm = document.querySelector(".disabled-form");
+  if (disabledForm) {
+    disabledForm.querySelectorAll("input, textarea, select, button").forEach((el) => {
+      el.setAttribute("disabled", "disabled");
+      el.style.pointerEvents = "none";
+      el.style.backgroundColor = "#f8f9fa";
+      el.style.opacity = "0.6";
+    });
+
+    // 禁用 dropzone 行為
+    document.querySelectorAll(".file-dropzone").forEach((zone) => {
+      zone.style.pointerEvents = "none";
+      zone.style.opacity = "0.6";
+    });
+  }
 });

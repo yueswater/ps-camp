@@ -27,7 +27,6 @@ from weasyprint import HTML
 from ps_camp.db.session import get_db_session
 from ps_camp.repos.bank_sql_repo import BankSQLRepository
 from ps_camp.repos.post_sql_repo import PostSQLRepository
-from ps_camp.repos.referendum_sql_repo import ReferendumSQLRepository
 from ps_camp.repos.referendum_vote_sql_repo import ReferendumVoteSQLRepository
 from ps_camp.repos.user_sql_repo import UserSQLRepository
 from ps_camp.repos.vote_sql_repo import VoteSQLRepository
@@ -51,6 +50,7 @@ from ps_camp.utils.voting_config import (
     get_vote_open_time,
     get_register_close_time,
     get_upload_close_time,
+    get_camp_deadlines,
 )
 from ps_camp.repos.proposal_sql_repo import ProposalSQLRepository
 from ps_camp.utils.google_drive import upload_file_to_drive
@@ -1063,6 +1063,10 @@ def create_app():
     @app.route("/submit", methods=["GET", "POST"])
     @refresh_user_session
     def submit():
+        now = datetime.now(timezone.utc)
+        deadline = get_camp_deadlines()
+        expired = now > deadline
+
         tz = timezone(timedelta(hours=8))
         user = session.get("user")
         if not user or user["role"] not in ["party", "group"]:
@@ -1181,6 +1185,7 @@ def create_app():
                     vote_close_time=get_vote_close_time().astimezone(tz),
                     register_close_time=get_register_close_time().astimezone(tz),
                     upload_close_time=get_upload_close_time().astimezone(tz),
+                    expired=expired
                 )
 
             elif user["role"] == "group":
@@ -1251,6 +1256,7 @@ def create_app():
                     vote_close_time=get_vote_close_time().astimezone(tz),
                     register_close_time=get_register_close_time().astimezone(tz),
                     upload_close_time=get_upload_close_time().astimezone(tz),
+                    expired=expired
                 )
 
     @app.route("/api/live_votes")
