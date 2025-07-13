@@ -55,6 +55,7 @@ from ps_camp.utils.voting_config import (
     get_alliance_deadline,
     get_camp_deadlines,
 )
+from ps_camp.utils.seats_allocator import compute_seats
 from ps_camp.repos.proposal_sql_repo import ProposalSQLRepository
 from ps_camp.utils.google_drive import upload_file_to_drive
 
@@ -74,6 +75,8 @@ ICON_MAP = {
     "雷雨": "fas fa-bolt",
     "雪": "fas fa-snowflake",
 }
+
+TOTAL_VOTES = 521
 
 
 def allowed_file(filename):
@@ -1385,6 +1388,8 @@ def create_app():
 
             #Party votes
             party_counts = vote_repo.get_party_vote_counts()
+            turnout = round(sum(party_counts.values()) / TOTAL_VOTES, 4) * 100
+            seats = compute_seats(party_counts)
             party_name_map = {
                 str(p.id): p.fullname for p in user_repo.get_all() if p.role == "party"
             }
@@ -1405,10 +1410,12 @@ def create_app():
                 {
                     "timestamp": datetime.now(timezone.utc).isoformat(),
                     "votes": {
+                        "turnout": turnout,
                         "party_votes": party_counts,
                         "party_names": party_name_map,
                         "referendum_votes": referendum_votes,
                         "referendum_titles": referendum_titles,
+                        "seats": seats
                     },
                 }
             )

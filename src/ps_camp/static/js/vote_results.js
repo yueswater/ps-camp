@@ -76,11 +76,11 @@ async function updateResults() {
 
     if (turnoutElement) {
         //You can send real turnout from the backend, or calculate based on the total number of votes
-        const estimatedTurnout = data.votes.turnout || "計算中";
+        const estimatedTurnout = data.votes.turnout;
         turnoutElement.textContent =
-            typeof estimatedTurnout === "number"
+            typeof estimatedTurnout === "number" && !isNaN(estimatedTurnout)
                 ? `${estimatedTurnout.toFixed(1)}%`
-                : estimatedTurnout;
+                : "計算中";
     }
 
     //Find the leading political party
