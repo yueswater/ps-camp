@@ -103,8 +103,6 @@
   <div class="submit-header">
     <h2>提交公投案</h2>
   </div>
-
-  <li><small>{{ expired_group }}</small></li>
   <form method="POST"
     class="submit-form {% if (role == 'party' and expired_party) or (role == 'group' and expired_group) %}disabled-form{% endif %}"
     enctype="multipart/form-data">

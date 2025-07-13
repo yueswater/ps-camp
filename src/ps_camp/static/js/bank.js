@@ -128,6 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (accountInput) {
                             accountInput.value = scannedAccount;
                             console.log("✅ 已寫入收款帳號欄位");
+                            accountInput.dispatchEvent(new Event('input', { bubbles: true }));
                         } else {
                             console.warn("❌ 找不到收款帳號 input");
                         }
@@ -175,6 +176,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         searchInput.addEventListener('input', () => {
             if (!isComposing) handleSearch();
+
+            const val = searchInput.value.trim().toLowerCase();
+            const amountLabel = document.getElementById('amount-label');
+            const hint = document.getElementById('withdrawal-hint');
+
+            if (val === "admin") {
+                amountLabel.textContent = "提款金額";
+                if (hint) hint.style.display = "block";
+            } else {
+                amountLabel.textContent = "轉帳金額";
+                if (hint) hint.style.display = "none";
+            }
         });
 
         document.addEventListener('click', (e) => {
@@ -218,6 +231,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     searchInput.value = user.fullname;
                     suggestionsBox.innerHTML = '';
                     suggestionsBox.style.display = 'none';
+
+                    accountInput.dispatchEvent(new Event('input', { bubbles: true }));
                 });
                 suggestionsBox.appendChild(item);
             });
@@ -245,4 +260,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     amountInput?.addEventListener('input', updateTotalAmount);
+
+    accountInput?.addEventListener('input', () => {
+        const val = accountInput.value.trim();
+        const amountLabel = document.getElementById('amount-label');
+        const hint = document.getElementById('withdrawal-hint');
+
+        if (val === "54660567") {
+            console.log("🟢 收款帳號是 admin，啟用提款模式");
+            amountLabel.textContent = "提款金額";
+            if (hint) hint.style.display = "block";
+        } else {
+            console.log("🔵 收款帳號非 admin，為一般轉帳");
+            amountLabel.textContent = "轉帳金額";
+            if (hint) hint.style.display = "none";
+        }
+    });
 });

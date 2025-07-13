@@ -304,6 +304,12 @@
     white-space: nowrap;
 }
 
+.type-badge.withdraw {
+    background: #fff5f5;
+    color: #dc3545;
+    border: 1px solid #fecaca;
+}
+
 .type-badge.outgoing {
     background: #fff5f5;
     color: #dc3545;
@@ -364,6 +370,31 @@
     border-radius: 12px;
     font-size: 0.75rem;
 }
+
+.autocomplete-list {
+  position: absolute;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+  margin-top: 0.25rem;
+  width: 100%;
+}
+
+.autocomplete-item {
+  padding: 0.625rem 0.875rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.autocomplete-item:hover {
+  background-color: #f1f5f9;
+}
+
 
 /*empty state */
 .empty-state {
@@ -522,11 +553,18 @@
 }
 
 .currency-prefix {
-    position: absolute;
-    left: 1rem;
-    color: #6c757d;
-    font-weight: 600;
-    z-index: 1;
+  position: absolute;
+  top: 50%;
+  left: 1rem;
+  transform: translateY(-50%);
+  color: #6c757d;
+  font-weight: 600;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.amount-input {
+    padding-left: 3.2rem;
 }
 
 #qr-code {
@@ -534,6 +572,43 @@
   justify-content: center;
   align-items: center;
 }
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn-cancel,
+.btn-confirm {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn-cancel {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.btn-cancel:hover {
+  background-color: #d6d6d6;
+}
+
+.btn-confirm {
+  background-color: #667eea;
+  color: white;
+}
+
+.btn-confirm:hover {
+  background-color: #556cd6;
+}
+
 
 /*Mobile version button correction -Remove the style that will cause expansion */
 @media (max-width: 480px) {

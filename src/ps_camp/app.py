@@ -237,7 +237,13 @@ def create_app():
 
         with get_db_session() as db:
             bank_repo = BankSQLRepository(db)
+            user_repo = UserSQLRepository(db)
+
             user = session["user"]
+            user_map = {
+                str(user.id): user
+                for user in user_repo.get_all()
+            }
 
             account, affiliation_name = get_account_by_user(user, bank_repo, db)
             if not account:
@@ -249,6 +255,7 @@ def create_app():
                 account=account,
                 transactions=transactions,
                 affiliation_name=affiliation_name,
+                user_map=user_map,
             )
 
     @app.route("/bank/export")
@@ -326,7 +333,7 @@ def create_app():
 
             from_account = bank_repo.get_account_by_owner(from_user_id, from_owner_type)
             to_account = bank_repo.get_account_by_number(to_account_number)
-
+            
             if not from_account or not to_account:
                 return jsonify(success=False, message="找不到帳戶"), 404
 

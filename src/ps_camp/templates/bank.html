@@ -66,9 +66,7 @@
             <button id="scan-qr" class="btn-secondary">
                 <i class="fas fa-camera"></i> 掃碼轉帳
             </button>
-            <button id="generate-qr" 
-                class="btn-secondary" 
-                data-account="{{ account.account_number }}"
+            <button id="generate-qr" class="btn-secondary" data-account="{{ account.account_number }}"
                 data-fullname="{{ session.user.fullname }}">
                 <i class="fas fa-qrcode"></i> 收款 QR Code
             </button>
@@ -101,6 +99,7 @@
                     <th>交易類型</th>
                     <th>對象帳號</th>
                     <th>金額</th>
+                    <th>說明</th>
                     <th>備註</th>
                     <th>狀態</th>
                 </tr>
@@ -114,10 +113,17 @@
                     </td>
                     <td class="tx-type">
                         {% if tx.from_account_id == account.id %}
+                        {% if tx.to_account.owner_type.name == "admin" %}
+                        <span class="type-badge withdraw">
+                            <i class="fas fa-arrow-up"></i>
+                            提款
+                        </span>
+                        {% else %}
                         <span class="type-badge outgoing">
                             <i class="fas fa-arrow-up"></i>
                             轉出
                         </span>
+                        {% endif %}
                         {% else %}
                         <span class="type-badge incoming">
                             <i class="fas fa-arrow-down"></i>
@@ -132,10 +138,31 @@
                         {{ tx.from_account_id[:8] }}...
                         {% endif %}
                     </td>
-                    <td class="tx-amount {{ 'negative' if tx.from_account_id == account.id else 'positive' }}">
-                        <span class="amount-sign">{% if tx.from_account_id == account.id %}-{% else %}+{% endif
-                            %}</span>
+                    {% set is_outgoing = tx.from_account_id == account.id %}
+                    {% set is_admin = user_map[tx.to_account.owner_id].role == 'admin' if is_outgoing else
+                    user_map[tx.from_account.owner_id].role == 'admin' %}
+                    {% set is_withdraw = is_outgoing and is_admin %}
+
+                    <td class="tx-amount {{ 'negative' if is_withdraw or is_outgoing else 'positive' }}">
+                        <span class="amount-sign">{{ '-' if is_withdraw or is_outgoing else '+' }}</span>
                         <span class="amount-value">{{ "{:,}".format(tx.amount) }}</span>
+                    </td>
+                    <td class="tx-description">
+                        {% set from_owner = user_map[tx.from_account.owner_id] %}
+                        {% set to_owner = user_map[tx.to_account.owner_id] %}
+                        {% if tx.from_account_id == account.id %}
+                        {% if to_owner.role == 'admin' %}
+                        提款至 {{ from_owner.fullname }}
+                        {% else %}
+                        轉帳給 {{ to_owner.fullname }}
+                        {% endif %}
+                        {% else %}
+                        {% if from_owner.role == 'admin' %}
+                        自 {{ from_owner.fullname }} 提款
+                        {% else %}
+                        來自 {{ from_owner.fullname }} 的轉帳
+                        {% endif %}
+                        {% endif %}
                     </td>
                     <td class="tx-note">
                         <span class="transaction-note">{{ tx.note or '-' }}</span>
@@ -189,7 +216,7 @@
 
 
                     <div class="form-group">
-                        <label class="form-label">轉帳金額</label>
+                        <label class="form-label" id="amount-label">轉帳金額</label>
                         <div class="amount-input-container">
                             <span class="currency-prefix">NT$</span>
                             <input type="number" name="amount" class="form-input amount-input" min="1"

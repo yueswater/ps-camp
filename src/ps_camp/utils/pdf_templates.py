@@ -55,9 +55,21 @@ bank_report_template = """
       {% for tx in transactions %}
       <tr>
         <td>{{ tx.created_at.strftime('%Y-%m-%d') }}</td>
-        <td>{{ "支出" if tx.from_account_id == account.id else "收入" }}</td>
         <td>
-          {% if tx.from_account_id == account.id %}
+          {% if tx.from_account_id == account.id and account_to_fullname.get(tx.to_account_id) == "中央銀行" %}
+            提款
+          {% elif tx.to_account_id == account.id and account_to_fullname.get(tx.from_account_id) == "中央銀行" %}
+            存款
+          {% elif tx.from_account_id == account.id %}
+            轉出
+          {% else %}
+            轉入
+          {% endif %}
+        </td>
+        <td>
+          {% if tx.from_account_id == account.id and account_to_fullname.get(tx.to_account_id) == "中央銀行" %}
+            -
+          {% elif tx.from_account_id == account.id %}
             {{ account_to_fullname.get(tx.to_account_id, "未知") }}
           {% else %}
             {{ account_to_fullname.get(tx.from_account_id, "未知") }}
