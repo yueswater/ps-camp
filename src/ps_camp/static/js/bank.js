@@ -265,15 +265,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const val = accountInput.value.trim();
         const amountLabel = document.getElementById('amount-label');
         const hint = document.getElementById('withdrawal-hint');
+        const confirmBtn = document.querySelector('.modal-actions .btn-confirm');
 
         if (val === "54660567") {
-            console.log("🟢 收款帳號是 admin，啟用提款模式");
+            console.log("收款帳號是 admin，啟用提款模式");
             amountLabel.textContent = "提款金額";
             if (hint) hint.style.display = "block";
+            if (confirmBtn) {
+                confirmBtn.innerHTML = `<i class="fas fa-hand-holding-usd"></i> 確認提款`;
+            }
         } else {
-            console.log("🔵 收款帳號非 admin，為一般轉帳");
+            console.log("收款帳號非 admin，為一般轉帳");
             amountLabel.textContent = "轉帳金額";
             if (hint) hint.style.display = "none";
+            if (confirmBtn) {
+                confirmBtn.innerHTML = `<i class="fas fa-paper-plane"></i> 確認轉帳`;
+            }
         }
     });
 });
