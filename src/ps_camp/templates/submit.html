@@ -16,7 +16,7 @@
   {% endif %}
 
   <form method="POST" class="submit-form" enctype="multipart/form-data">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() | e }}">
+    
     <table class="member-table">
       <thead>
         <tr>
@@ -107,7 +107,7 @@
   <form method="POST"
     class="submit-form {% if (role == 'party' and expired_party) or (role == 'group' and expired_group) %}disabled-form{% endif %}"
     enctype="multipart/form-data">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() | e }}">
+    
     <label for="title">公投案標題</label>
     <input type="text" id="title" name="title" required placeholder="請輸入清楚明確的標題，例如：反對貪污特赦法案">
 
