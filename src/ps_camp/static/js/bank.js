@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
     const modal = document.getElementById('transfer-modal');
     const showBtn = document.getElementById('show-transfer');
     const cancelBtn = document.getElementById('cancel-transfer-btn');
@@ -50,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
         SandstormApp.showLoading();
         fetch('/api/bank/transfer', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
             body: JSON.stringify(data)
         })
             .then(r => r.json())
