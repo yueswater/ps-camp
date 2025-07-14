@@ -24,7 +24,8 @@ dependencies = [
     "google-api-python-client (>=2.176.0,<3.0.0)",
     "google-auth (>=2.40.3,<3.0.0)",
     "google-auth-oauthlib (>=1.2.2,<2.0.0)",
-    "beautifulsoup4 (>=4.13.4,<5.0.0)"
+    "beautifulsoup4 (>=4.13.4,<5.0.0)",
+    "flask-wtf (>=1.2.2,<2.0.0)"
 ]
 
 

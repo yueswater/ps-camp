@@ -23,6 +23,8 @@ from flask import (
     session,
     url_for,
 )
+from flask_wtf import CSRFProtect
+from flask_wtf.csrf import CSRFError
 from weasyprint import HTML
 
 from ps_camp.db.session import get_db_session
@@ -137,6 +139,11 @@ def get_account_by_user(user, bank_repo, db):
 def create_app():
     app = Flask(__name__)
     app.secret_key = "2025ntupscamp"
+    csrf = CSRFProtect(app)
+
+    @app.errorhandler(CSRFError)
+    def handle_csrf_error(e):
+        return render_template("error_csrf.html", reason=e.description), 400
 
     @app.template_filter("file_exists")
     def file_exists_filter(path):

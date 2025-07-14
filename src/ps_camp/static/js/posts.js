@@ -59,6 +59,7 @@ function initPostInteractions() {
             fetch(`/api/posts/${postId}/like`, {
                 method: 'POST',
                 headers: {
+                    "X-CSRFToken": getCookie("csrf_token"),
                     'Content-Type': 'application/json'
                 }
             })
@@ -152,6 +153,7 @@ function toggleLike(button) {
     fetch(`/api/posts/${postId}/like`, {
         method: isLiked ? 'DELETE' : 'POST',
         headers: {
+            "X-CSRFToken": getCookie("csrf_token"),
             'Content-Type': 'application/json'
         }
     }).then(res => res.json())
@@ -258,7 +260,10 @@ function showCommentModal(button) {
         if (comment) {
             fetch(`/api/posts/${postCard.dataset.postId}/replies`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie("csrf_token"),
+                },
                 body: JSON.stringify({ content: comment })
             })
                 .then(res => res.json())

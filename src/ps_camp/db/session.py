@@ -18,6 +18,7 @@ engine = create_engine(
     DATABASE_URL,
     echo=True,
     future=True,
+    pool_pre_ping=True,
     connect_args={"check_same_thread": False} if is_sqlite else {},
     **(
         {"pool_size": 10, "max_overflow": 20, "pool_timeout": 60, "pool_recycle": 1800}

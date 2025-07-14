@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>表單驗證失敗</h2>
+<p>{{ reason }}</p>
+<a href="{{ url_for('home') }}">回首頁</a>
+{% endblock %}
