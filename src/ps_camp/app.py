@@ -263,12 +263,12 @@ def create_app():
             account, affiliation_name = get_account_by_user(user, bank_repo, db)
             if not account:
                 return "找不到您的銀行帳戶，請聯繫主辦方", 404
-            
+
+            transactions = bank_repo.get_transactions(account.id)
+
             taipei = ZoneInfo("Asia/Taipei")
             for tx in transactions:
                 tx.created_at = tx.created_at.astimezone(taipei)
-
-            transactions = bank_repo.get_transactions(account.id)
             return render_template(
                 "bank.html",
                 account=account,
