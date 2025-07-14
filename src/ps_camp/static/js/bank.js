@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    console.log("🔐 CSRF Token:", csrfToken);
     const modal = document.getElementById('transfer-modal');
     const showBtn = document.getElementById('show-transfer');
     const cancelBtn = document.getElementById('cancel-transfer-btn');
