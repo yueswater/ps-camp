@@ -138,7 +138,7 @@ def get_account_by_user(user, bank_repo, db):
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = "2025ntupscamp"
+    app.secret_key = os.environ.get("SECRET_KEY", "default-fallback")
     csrf = CSRFProtect(app)
 
     @app.errorhandler(CSRFError)
