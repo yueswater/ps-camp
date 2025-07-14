@@ -328,8 +328,8 @@ def create_app():
 
     @app.route("/api/bank/transfer", methods=["POST"])
     def bank_transfer():
-        print("🚨 收到 transfer 請求")
-        print("✅ session：", session.get("user"))
+        print("[TRANSFER][DEBUG] session keys:", session.keys())
+        print("[TRANSFER][DEBUG] session user:", session.get("user"))
         data = request.get_json()
         to_account_number = data.get("to_account_number")
         amount = int(data.get("amount", 0))
