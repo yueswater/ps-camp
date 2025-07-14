@@ -24,7 +24,7 @@ from flask import (
     url_for,
 )
 from flask_wtf import CSRFProtect
-from flask_wtf.csrf import CSRFError
+from flask_wtf.csrf import CSRFError, validate_csrf, CSRFError
 from weasyprint import HTML
 
 from ps_camp.db.session import get_db_session
@@ -323,6 +323,11 @@ def create_app():
 
     @app.route("/api/bank/transfer", methods=["POST"])
     def bank_transfer():
+        token = request.headers.get("X-CSRFToken")  # 前端傳過來的
+        try:
+            validate_csrf(token)
+        except CSRFError as e:
+            return jsonify({"success": False, "message": f"CSRF 驗證失敗：{e.description}"}), 400
         if not session.get("user"):
             return jsonify(success=False, message="請先登入"), 401
 
