@@ -6,7 +6,7 @@ from datetime import UTC, datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 from functools import wraps
 from uuid import uuid4
-
+import mimetypes
 import markdown
 from dotenv import load_dotenv
 from flask import (
@@ -573,7 +573,7 @@ def create_app():
                 if action == "update_all":
                     updated = False
 
-                    # 帳號名稱
+                    # Account name
                     new_username = request.form.get("username", "").strip()
                     if new_username and new_username != user_obj.username:
                         if user_repo.get_by_username(new_username):
@@ -583,7 +583,7 @@ def create_app():
                         session["user"]["username"] = new_username
                         updated = True
 
-                    # 姓名
+                    # Name
                     if user_obj.role == "member":
                         new_name = request.form.get("fullname", "").strip()
                         if new_name and new_name != user_obj.fullname:
@@ -591,7 +591,7 @@ def create_app():
                             session["user"]["fullname"] = new_name
                             updated = True
 
-                    # 密碼
+                    # password
                     old_pw = request.form.get("old_password", "")
                     new_pw = request.form.get("new_password", "")
                     confirm_pw = request.form.get("confirm_password", "")
@@ -723,29 +723,44 @@ def create_app():
         base_path = os.path.join(current_app.static_folder, "images/NPCs")
         grouped_npcs = {}
 
+        # Only allowed secondary file names and MIME types
+        allowed_exts = {".jpg", ".jpeg", ".png"}
+        allowed_mimes = {"image/jpeg", "image/png"}
+
         for region in os.listdir(base_path):
+            if region.startswith("."):
+                continue  # Ignore the hidden folder
+
             region_path = os.path.join(base_path, region)
             if not os.path.isdir(region_path):
                 continue
 
             npc_list = []
             for filename in os.listdir(region_path):
-                # Process the sub-file name
-                if not filename.lower().endswith((".jpg", ".jpeg", ".png")):
+                if filename.startswith("."):
+                    continue  # Ignore hidden files
+
+                ext = os.path.splitext(filename)[1].lower()
+                if ext not in allowed_exts:
                     continue
+
+                filepath = os.path.join(region_path, filename)
+                mime_type, _ = mimetypes.guess_type(filepath)
+                if mime_type not in allowed_mimes:
+                    continue
+
                 name = os.path.splitext(filename)[0].replace("NPC-", "").strip()
                 image_url = f"/static/images/NPCs/{region}/{filename}"
 
-                npc_list.append(
-                    {
-                        "name": name,
-                        "title": "",  # Character title
-                        "detail": "",  # Details description
-                        "image": image_url,
-                    }
-                )
+                npc_list.append({
+                    "name": name,
+                    "title": "",  # Optional: fill later
+                    "detail": "",  # Optional: fill later
+                    "image": image_url,
+                })
 
-            grouped_npcs[region] = npc_list
+            if npc_list:
+                grouped_npcs[region] = npc_list
 
         return render_template("npcs.html", grouped_npcs=grouped_npcs)
 

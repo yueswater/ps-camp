@@ -2,39 +2,12 @@
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/npcs.css') }}">
 
-<!-- 
-<div class="npcs-container">
-    {% if not session.get("user") %}
-    <div class="empty-wrapper">
-      <div class="empty-state">
-        <i class="fas fa-user-times"></i>
-        <h3>目前尚無 NPC</h3>
-        <p>請稍後再查看或聯絡管理員新增資料。</p>
-      </div>
-    </div>
-    {% else %}
-        {% for region, npcs in grouped_npcs.items() %}
-        <h2 class="region-title">{{ region }}</h2>
-        <div class="npc-gallery">
-            {% for npc in npcs %}
-            <div class="npc-card" onclick="goToNpc('{{ npc.name }}')">
-                <img class="npc-image" src="{{ npc.image }}" alt="{{ npc.name }}" loading="lazy">
-                <div class="npc-name">{{ npc.name }}</div>
-                <div class="npc-title">{{ npc.title }}</div>
-            </div>
-            {% endfor %}
-        </div>
-        {% endfor %}
-    {% endif %}
-</div> -->
-
-
 <div class="npcs-container">
     {% for region, npcs in grouped_npcs.items() %}
         <h2 class="region-title">{{ region }}</h2>
         <div class="npc-gallery">
             {% for npc in npcs %}
-            <div class="npc-card" onclick="goToNpc('{{ npc.name }}')">
+            <div class="npc-card" onclick="goToNpc('{{ npc.name | tojson | safe }}')">
                 <img class="npc-image" src="{{ npc.image }}" alt="{{ npc.name }}" loading="lazy">
                 <div class="npc-name">{{ npc.name }}</div>
                 <div class="npc-title">{{ npc.title }}</div>
