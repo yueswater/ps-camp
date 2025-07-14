@@ -331,7 +331,8 @@ def create_app():
                 flash(f"輸出明細發生錯誤：{e}")
                 logging.debug(f"輸出明細發生錯誤：{e}")
                 return redirect(url_for("bank"))
-
+            
+    @csrf.exempt
     @app.route("/api/bank/transfer", methods=["POST"])
     def bank_transfer():
         token = request.headers.get("X-CSRFToken")  # 前端傳過來的

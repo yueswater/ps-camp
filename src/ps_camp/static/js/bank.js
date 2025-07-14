@@ -55,6 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fetch('/api/bank/transfer', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+            credentials: "include",
             body: JSON.stringify(data)
         })
             .then(r => r.json())
