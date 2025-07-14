@@ -23,8 +23,6 @@ from flask import (
     session,
     url_for,
 )
-from flask_wtf import CSRFProtect
-from flask_wtf.csrf import CSRFError, validate_csrf, CSRFError
 from weasyprint import HTML
 
 from ps_camp.db.session import get_db_session
@@ -139,23 +137,6 @@ def get_account_by_user(user, bank_repo, db):
 def create_app():
     app = Flask(__name__)
     app.secret_key = os.environ.get("SECRET_KEY", "default-fallback")
-    csrf = CSRFProtect(app)
-
-    @app.before_request
-    def protect_api_with_csrf():
-        if request.method == "POST" and request.path.startswith("/api/"):
-            if request.content_type == "application/json":
-                token = request.headers.get("X-CSRFToken")
-                try:
-                    validate_csrf(token)
-                except CSRFError as e:
-                    print("⚠️ CSRF 驗證失敗：", str(e))
-                    return {"success": False, "message": "CSRF token 驗證失敗"}, 400
-
-    @app.errorhandler(CSRFError)
-    def handle_csrf_error(e):
-        return render_template("error_csrf.html", reason=e.description), 400
-
     @app.template_filter("file_exists")
     def file_exists_filter(path):
         full_path = os.path.join(current_app.root_path, path)
@@ -331,18 +312,9 @@ def create_app():
                 flash(f"輸出明細發生錯誤：{e}")
                 logging.debug(f"輸出明細發生錯誤：{e}")
                 return redirect(url_for("bank"))
-            
-    @csrf.exempt
+
     @app.route("/api/bank/transfer", methods=["POST"])
     def bank_transfer():
-        token = request.headers.get("X-CSRFToken")  # 前端傳過來的
-        try:
-            validate_csrf(token)
-        except CSRFError as e:
-            return jsonify({"success": False, "message": f"CSRF 驗證失敗：{e.description}"}), 400
-        if not session.get("user"):
-            return jsonify(success=False, message="請先登入"), 401
-
         data = request.get_json()
         to_account_number = data.get("to_account_number")
         amount = int(data.get("amount", 0))
