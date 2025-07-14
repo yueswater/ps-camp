@@ -52,8 +52,8 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("📦 傳送資料:", data);
         fetch('/api/bank/transfer', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json'},
             credentials: "include",
+            headers: { 'Content-Type': 'application/json'},
             body: JSON.stringify(data)
         })
             .then(r => r.json())

@@ -137,6 +137,10 @@ def get_account_by_user(user, bank_repo, db):
 def create_app():
     app = Flask(__name__)
     app.secret_key = os.environ.get("SECRET_KEY", "default-fallback")
+    app.config.update({
+        "SESSION_COOKIE_SAMESITE": "None",
+        "SESSION_COOKIE_SECURE": True
+    })
     @app.template_filter("file_exists")
     def file_exists_filter(path):
         full_path = os.path.join(current_app.root_path, path)
