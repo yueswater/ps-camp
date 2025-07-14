@@ -23,6 +23,7 @@ from flask import (
     session,
     url_for,
 )
+from flask_session import Session
 from weasyprint import HTML
 
 from ps_camp.db.session import get_db_session
@@ -137,10 +138,18 @@ def get_account_by_user(user, bank_repo, db):
 def create_app():
     app = Flask(__name__)
     app.secret_key = os.environ.get("SECRET_KEY", "default-fallback")
-    app.config.update({
-        "SESSION_COOKIE_SAMESITE": "None",
-        "SESSION_COOKIE_SECURE": True
-    })
+    app.config.update(
+        SESSION_TYPE="filesystem",
+        SESSION_FILE_DIR="./.flask_session",
+        SESSION_PERMANENT=True,
+        SESSION_USE_SIGNER=True,
+        SESSION_COOKIE_HTTPONLY=True,
+        SESSION_COOKIE_SECURE=True,
+        SESSION_COOKIE_SAMESITE="Lax",
+        PERMANENT_SESSION_LIFETIME=timedelta(days=7),
+    )
+
+    Session(app)
     @app.template_filter("file_exists")
     def file_exists_filter(path):
         full_path = os.path.join(current_app.root_path, path)
