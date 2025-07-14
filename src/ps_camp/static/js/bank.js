@@ -49,6 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!data.to_account_number || !data.amount) return;
 
         SandstormApp.showLoading();
+        console.log("🔐 CSRF Token:", csrfToken);
+        console.log("📦 傳送資料:", data);
         fetch('/api/bank/transfer', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
