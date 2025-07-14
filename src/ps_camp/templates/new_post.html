@@ -4,7 +4,7 @@
     <div class="form-wrapper">
         <h2 class="form-title"><i class="fas fa-pen-nib"></i> 撰寫新貼文</h2>
         <form method="post" class="form new-post-form">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() | e }}">
             <div class="form-group">
                 <label class="form-label" for="title">標題</label>
                 <input class="form-input" type="text" name="title" id="title" required>

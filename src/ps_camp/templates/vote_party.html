@@ -5,7 +5,7 @@
 
 <div class="vote-page">
     <form method="POST" action="{{ url_for('vote_party') }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() | e }}">
         <h1>國會議員政黨投票</h1>
         <div class="party-grid">
             {% for party in parties %}

@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
 
 <form method="POST" action="{{ url_for('profile') }}" id="profile-form">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() | e }}">
     <div class="profile-container">
         <h2 style="text-align: center;">會員管理</h2>
 
@@ -62,7 +62,7 @@
         <span class="close">&times;</span>
         <h3>上傳新大頭貼</h3>
         <form method="POST" action="{{ url_for('upload_avatar') }}" enctype="multipart/form-data">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() | e }}">
             <div class="file-dropzone" id="avatar-dropzone">
                 <p id="avatar-label">點擊或拖曳上傳 PNG / JPG</p>
                 <input type="file" name="avatar" id="avatar-input" accept="image/png, image/jpeg" hidden>

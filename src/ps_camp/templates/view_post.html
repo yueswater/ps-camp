@@ -36,7 +36,7 @@
 
   {% if session.get("user") %}
     <form method="post" class="reply-form">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() | e }}">
       <textarea name="reply" rows="4" required placeholder="寫下你的留言…" class="reply-textarea"></textarea>
       <button type="submit" class="btn btn-primary">送出留言</button>
     </form>

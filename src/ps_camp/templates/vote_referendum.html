@@ -5,7 +5,7 @@
 
 <div class="vote-page">
     <form method="POST" action="{{ url_for('vote_referendum') }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() | e }}">
         <h1>公投案投票</h1>
         <div class="referendum-grid">
             {% for ref in referendums %}
