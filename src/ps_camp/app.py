@@ -141,6 +141,17 @@ def create_app():
     app.secret_key = os.environ.get("SECRET_KEY", "default-fallback")
     csrf = CSRFProtect(app)
 
+    @app.before_request
+    def protect_api_with_csrf():
+        if request.method == "POST" and request.path.startswith("/api/"):
+            if request.content_type == "application/json":
+                token = request.headers.get("X-CSRFToken")
+                try:
+                    validate_csrf(token)
+                except CSRFError as e:
+                    print("⚠️ CSRF 驗證失敗：", str(e))
+                    return {"success": False, "message": "CSRF token 驗證失敗"}, 400
+
     @app.errorhandler(CSRFError)
     def handle_csrf_error(e):
         return render_template("error_csrf.html", reason=e.description), 400
