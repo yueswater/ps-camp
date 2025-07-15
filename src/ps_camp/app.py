@@ -1209,7 +1209,7 @@ def create_app():
         expired_party = now > party_deadline
         expired_group = now > group_deadline
         can_upload_candidate = now <= candidate_deadline
-        can_upload_alliance = now <= alliance_deadline
+        can_upload_alliance = now >= datetime.combine(start_date + timedelta(days=3), datetime.min.time(), tz) and now <= alliance_deadline
 
         tz = timezone(timedelta(hours=8))
         user = session.get("user")
