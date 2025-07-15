@@ -1015,7 +1015,9 @@ body {
     }
 
     .info-value {
-        text-align: left;
+        color: #212529;
+        text-align: right;
+        word-wrap: break-word;
         width: 100%;
     }
 }
@@ -1187,6 +1189,9 @@ body {
 
     .info-label,
     .info-value {
+        color: #212529;
+        text-align: right;
+        word-wrap: break-word;
         font-size: 0.9rem;
     }
 }
@@ -1237,6 +1242,12 @@ body {
     .loading-text {
         font-size: 0.9rem;
     }
+    .info-value {
+        color: #212529;
+        text-align: right;
+        word-wrap: break-word;
+        font-size: 0.9rem;
+    }
 }
 
 /*==============================================
@@ -1249,12 +1260,24 @@ body {
         min-height: calc(100vh - 180px);
         padding-top: env(safe-area-inset-top, 2rem);
     }
+    .info-value {
+        color: #212529;
+        text-align: right;
+        word-wrap: break-word;
+        font-size: 0.9rem;
+    }
 }
 
 /*iPhone 14 Pro /iPhone 15 Pro */
 @media (max-width: 393px) and (min-height: 852px) {
     .hero {
         margin-top: 1rem;
+    }
+    .info-value {
+        color: #212529;
+        text-align: right;
+        word-wrap: break-word;
+        font-size: 0.9rem;
     }
 }
 
@@ -1270,6 +1293,12 @@ body {
 
     .main-content {
         padding: 1rem 0;
+    }
+    .info-value {
+        color: #212529;
+        text-align: right;
+        word-wrap: break-word;
+        font-size: 0.9rem;
     }
 }
 
@@ -1290,6 +1319,12 @@ body {
     .main-content {
         margin-top: 80px;
     }
+    .info-value {
+        color: #212529;
+        text-align: right;
+        word-wrap: break-word;
+        font-size: 0.9rem;
+    }
 }
 
 /*Pixel 7 Pro /Galaxy Note Series */
@@ -1300,6 +1335,12 @@ body {
 
     .hero {
         margin-bottom: 1.5rem;
+    }
+    .info-value {
+        color: #212529;
+        text-align: right;
+        word-wrap: break-word;
+        font-size: 0.9rem;
     }
 }
 
@@ -1347,5 +1388,11 @@ body {
     .nav-link {
         padding: 0.25rem 0.5rem;
         font-size: 0.8rem;
+    }
+    .info-value {
+        color: #212529;
+        text-align: right;
+        word-wrap: break-word;
+        font-size: 0.9rem;
     }
 }
