@@ -1213,7 +1213,7 @@ def create_app():
 
         tz = timezone(timedelta(hours=8))
         user = session.get("user")
-        if not user or user["role"] not in ["party", "group"]:
+        if not user or user["role"] not in ["party", "group", "admin"]:
             abort(403)
 
         with get_db_session() as db:
