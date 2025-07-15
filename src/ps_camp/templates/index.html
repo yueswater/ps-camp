@@ -16,6 +16,13 @@
 
 
 {% block content %}
+<script>
+  const currentTime = "{{ current_time.isoformat() if current_time is defined else '' }}";
+  const uploadCloseTime = "{{ upload_close_time.isoformat() if upload_close_time is defined else '' }}";
+
+  console.log("Current Time:", currentTime);
+  console.log("Upload Close Time:", uploadCloseTime);
+</script>
 {% if session.get("user") %}
 <div class="hero">
     <h1>歡迎來到沙政風暴</h1>
