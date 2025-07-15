@@ -62,7 +62,11 @@
     <button type="submit" class="submit-button">上傳候選人 & 建設性內閣名單</button>
     {% else %}
     <div class="disabled-form">
+      {%if current_time > candidate_deadline_dt %}
       <p style="color: gray;">⚠ 候選人提名與建設性內閣名單已截止</p>
+      {% elif current_time < candidate_deadline_dt %}
+      <p style="color: gray;">⚠ 候選人提名與建設性內閣名單尚未開放上傳</p>
+      {% endif %}
     </div>
     {% endif %}
 
@@ -82,7 +86,11 @@
     {% endif %}
     {% else %}
     <div class="disabled-form">
+      {%if current_time > alliance_deadline_dt %}
       <p style="color: gray;">⚠ 政黨聯盟協定書已截止</p>
+      {% elif current_time < alliance_deadline_dt %}
+      <p style="color: gray;">⚠ 政黨聯盟協定書尚未開放</p>
+      {% endif %}
     </div>
     {% endif %}
   </form>

@@ -1314,6 +1314,9 @@ def create_app():
 
                     flash("候選人提名與檔案上傳成功！", "success")
                     return redirect(url_for("home"))
+            
+                print("TYPE of alliance_deadline:", type(alliance_deadline))
+                print("TYPE of current_time:", type(now))
 
                 return render_template(
                     "submit.html",
@@ -1330,6 +1333,8 @@ def create_app():
                     register_close_time=get_register_close_time().astimezone(tz),
                     upload_close_time=get_upload_close_time().astimezone(tz),
                     now=datetime.now().astimezone(tz),
+                    candidate_deadline_dt=candidate_deadline,
+                    alliance_deadline_dt=alliance_deadline,
                     candidate_deadline=candidate_deadline.isoformat(),
                     alliance_deadline=alliance_deadline.isoformat(),
                     expired_party=expired_party,
