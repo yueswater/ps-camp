@@ -1,7 +1,23 @@
 {% extends "base.html" %}
 {% block content %}
-<!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/submit.css') }}">
-<script src="{{ url_for('static', filename='js/submit.js') }}"></script> -->
+
+<script>
+  const now = "{{ now }}";
+  const candidateDeadline = "{{ candidate_deadline }}";
+  const allianceDeadline = "{{ alliance_deadline }}";
+
+  console.log("🕒 現在時間：", now);
+  console.log("📌 候選人截止：", candidateDeadline);
+  console.log("📌 聯盟協定截止：", allianceDeadline);
+
+  // 如果想轉成 Date 物件（可比較）
+  const nowDate = new Date(now);
+  const candidateDate = new Date(candidateDeadline);
+  const allianceDate = new Date(allianceDeadline);
+
+  console.log("比較結果：", nowDate < candidateDate, nowDate > allianceDate);
+</script>
+
 
 <div class="container">
 <div class="submit-container">
