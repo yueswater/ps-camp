@@ -24,6 +24,8 @@ def compute_seats(party_votes: dict[str, int], total_seats: int = 34, threshold:
     )
 
     for i in range(remaining):
+        if i >= len(remainders):
+            break  # not enough political parties to allocate
         pid, _ = remainders[i]
         seats[pid] += 1
 

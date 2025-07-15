@@ -7,6 +7,7 @@
     <title>沙政風暴 | 開票結果</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/vote_results.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -64,6 +65,17 @@
         <div class="timestamp">
             <i class="fas fa-clock"></i>
             最後更新：<span id="last-update">載入中...</span>
+        </div>
+
+        <!-- 圓餅圖區塊 -->
+        <div class="section">
+            <h2 class="section-title">
+                <i class="fas fa-chart-pie"></i>
+                政黨得票比例圖
+            </h2>
+            <div class="chart-container" style="width: 800px; overflow-x: auto; margin: 0 auto;">
+                <canvas id="party-bar-chart" width="800" height="300" style="display: block; margin: 0 auto;"></canvas>
+            </div>
         </div>
     </div>
     <script src="{{ url_for('static', filename='js/vote_results.js') }}"></script>

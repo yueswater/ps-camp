@@ -1,3 +1,22 @@
+//Party logos
+const partyLogos = {
+    "女性權益": "/static/images/logos/女性權益.png",
+    "自由主義黨": "/static/images/logos/自由民主主義政黨.png",
+    "社會民主主義政黨": "/static/images/logos/社會民主主義政黨.png",
+    "勞工團結聯盟": "/static/images/logos/勞工團結聯盟.png",
+    "新保守主義政黨": "/static/images/logos/新保守主義政黨.png",
+    "綠黨": "/static/images/logos/綠黨.png",
+};
+
+const partyColors = {
+    "女性權益": "#e91e63",
+    "自由主義黨": "#2196f3",
+    "社會民主主義政黨": "#9c27b0",
+    "勞工團結聯盟": "#f57c00",
+    "新保守主義政黨": "#3f51b5",
+    "綠黨": "#4caf50",
+};
+
 //Remove mockData and get real data from the API instead
 let currentData = null;
 
@@ -88,12 +107,12 @@ async function updateResults() {
         const maxVotes = Math.max(...Object.values(partyVotes));
         const leaders = Object.entries(partyVotes)
             .filter(([, count]) => count === maxVotes)
-            .slice(0, 3); // 最多顯示 3 個
+            .slice(0, 3); //Display up to 3
 
         const names = leaders.map(([id]) => partyNames[id] || id);
         const count = names.length;
 
-        // 根據數量調整字體大小 class
+        //Adjust the font size according to the quantity class
         leadingPartyElement.classList.remove("leading-one", "leading-two", "leading-three");
         if (count === 1) {
             leadingPartyElement.classList.add("leading-one");
@@ -160,6 +179,9 @@ async function updateResults() {
             `;
             partyContainer.appendChild(item);
         });
+
+        //Render Bar chart
+        renderBarChart(partyVotes, partyNames);
     }
 
     //Referendum card display
@@ -230,4 +252,123 @@ document.addEventListener("DOMContentLoaded", function () {
 //If manual refresh function is required
 function refreshResults() {
     updateResults();
+}
+
+function renderBarChart(partyVotes, partyNames) {
+    const canvas = document.getElementById("party-bar-chart");
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+
+    if (window.partyBarChart) {
+        window.partyBarChart.destroy();
+    }
+
+    const sorted = Object.entries(partyVotes).sort(([, a], [, b]) => b - a);
+
+    const labels = [];
+    const values = [];
+    const logos = [];
+    const colors = [];
+
+    for (const [id, count] of sorted) {
+        const name = partyNames[id] || id;
+        console.log(`政黨名稱：'${name}'`, partyLogos[name]);
+        labels.push(name);
+        values.push(count);
+        logos.push(partyLogos[name]);
+        colors.push(partyColors[name] || "#d2691e");
+    }
+
+    // 動態設定 x 軸最大值（票數最大值 + 餘裕）
+    const maxVotes = Math.max(...values);
+    const xAxisMax = maxVotes + Math.ceil(maxVotes * 0.1); // +10% 空間
+
+    // 預先載入黨徽圖片
+    const logoImages = logos.map((src, index) => {
+        const img = new Image();
+        img.src = src;
+        img.onload = () => {
+            if (window.partyBarChart) {
+                window.partyBarChart.update();
+            }
+        };
+        img.onerror = () => {
+            console.warn(`Logo image failed to load: ${src}`);
+        };
+        return img;
+    });
+
+    window.partyBarChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: labels,
+            datasets: [{
+                data: values,
+                backgroundColor: colors,
+                borderRadius: 6,
+                barThickness: 30,
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { enabled: false }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        maxRotation: 0,
+                        minRotation: 0,
+                        // stepSize: Math.ceil(xAxisMax / 5),
+                        // callback: (value) => `${value.toLocaleString()}`
+                    },
+                    grid: {
+                        display: false
+                    },
+                },
+                y: {
+                    ticks: { display: false }
+                }
+            }
+        },
+        plugins: [
+            {
+                id: 'drawPartyLogosAndLabels',
+                afterDatasetsDraw(chart) {
+                    const { ctx } = chart;
+                    const meta = chart.getDatasetMeta(0);
+                    const yAxis = chart.scales.y;
+
+                    meta.data.forEach((bar, index) => {
+                        const logoImg = logoImages[index];
+                        const centerY = bar.y;
+                        const logoSize = 24;
+
+                        // 確保圖片載入成功再畫
+                        if (logoImg.complete && logoImg.naturalHeight !== 0) {
+                            ctx.drawImage(
+                                logoImg,
+                                10,
+                                centerY - logoSize / 2,
+                                logoSize,
+                                logoSize
+                            );
+                        }
+
+                        // 畫票數
+                        ctx.fillStyle = "#333";
+                        ctx.font = "14px sans-serif";
+                        ctx.textAlign = "left";
+                        ctx.textBaseline = "middle";
+                        ctx.fillText(`${values[index].toLocaleString()}`, bar.x + 10, centerY);
+                    });
+                }
+            }
+        ]
+    });
 }
