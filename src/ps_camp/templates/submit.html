@@ -1,24 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
 
-<script>
-  const now = "{{ now }}";
-  const candidateDeadline = "{{ candidate_deadline }}";
-  const allianceDeadline = "{{ alliance_deadline }}";
-
-  console.log("🕒 現在時間：", now);
-  console.log("📌 候選人截止：", candidateDeadline);
-  console.log("📌 聯盟協定截止：", allianceDeadline);
-
-  // 如果想轉成 Date 物件（可比較）
-  const nowDate = new Date(now);
-  const candidateDate = new Date(candidateDeadline);
-  const allianceDate = new Date(allianceDeadline);
-
-  console.log("比較結果：", nowDate < candidateDate, nowDate > allianceDate);
-</script>
-
-
 <div class="container">
 <div class="submit-container">
   {% if role == "party" %}
@@ -58,7 +40,7 @@
     <label for="description">政見（選填）</label>
     <textarea name="description" rows="4" placeholder="請輸入該候選人的政見..."></textarea>
 
-    <label>上傳候選人照片（選填）</label>
+    <label>上傳候選人照片（ZIP）</label>
     <div class="file-dropzone" data-input-id="photo_input" data-label-id="photo_label">
       <p id="photo_label" style="color: #ced4da;">點擊或拖曳上傳圖片</p>
       <input type="file" id="photo_input" name="photo_zip" accept=".zip" hidden>
