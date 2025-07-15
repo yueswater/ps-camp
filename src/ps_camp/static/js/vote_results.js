@@ -17,13 +17,6 @@ const partyColors = {
     "綠黨": "#009900",
 };
 
-// 女性：b30000
-// 綠黨：#009900
-// 新保守： #66ffff
-// 勞工：#996633
-// 社民：#ff9999
-// 自由：#0066cc
-
 //Remove mockData and get real data from the API instead
 let currentData = null;
 
