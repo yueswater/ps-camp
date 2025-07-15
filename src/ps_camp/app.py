@@ -1217,7 +1217,7 @@ def create_app():
             abort(403)
 
         with get_db_session() as db:
-            if user["role"] == "party":
+            if user["role"] in ["party", "admin"]:
                 # Check the status of political party members and nominations
                 all_members = (
                     db.query(User).filter(User.affiliation_id == user["id"]).all()
@@ -1335,7 +1335,7 @@ def create_app():
                     can_upload_alliance=can_upload_alliance,
                 )
 
-            elif user["role"] == "group":
+            elif user["role"] in ["group", "admin"]:
                 proposal_obj = db.query(Proposal).filter_by(group_id=user["id"]).first()
 
                 if request.method == "POST":
