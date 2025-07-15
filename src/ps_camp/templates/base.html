@@ -71,7 +71,7 @@
                             {% endif %}
 
                             {% elif current_time > register_close_time and current_time < upload_close_time %} {% set
-                                role=session.get("user", {}).get("role") %} {% if role in ["party", "group, admin" ] %} <li><a
+                                role=session.get("user", {}).get("role") %} {% if role in ["party", "group", "admin"] %} <li><a
                                     href="/submit" class="nav-link">上傳</a></li>
                                 {% endif %}
 
