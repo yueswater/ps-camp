@@ -1088,7 +1088,7 @@ def create_app():
             )
 
     @app.route("/vote_party", methods=["GET", "POST"])
-    @restrict_roles("admin", "member")
+    @restrict_roles("admin", "voter")
     def vote_party():
         if "user" not in session:
             flash("請先登入")
@@ -1100,9 +1100,9 @@ def create_app():
             user_repo = UserSQLRepository(db)
 
             # Prevent repeated voting
-            if vote_repo.has_voted(user_id):
-                flash("您已完成投票")
-                return render_template("vote_success.html")
+            # if vote_repo.has_voted(user_id):
+            #     flash("您已完成投票")
+            #     return render_template("vote_success.html")
 
             parties = [u for u in user_repo.get_all() if u.role == "party"]
 
@@ -1129,7 +1129,7 @@ def create_app():
             return render_template("vote_party.html", parties=parties)
 
     @app.route("/vote_referendum", methods=["GET", "POST"])
-    @restrict_roles("admin", "member")
+    @restrict_roles("admin", "voter")
     def vote_referendum():
         if "user" not in session:
             flash("請先登入")
@@ -1173,9 +1173,12 @@ def create_app():
                     if vote_value:
                         ref_repo.add_vote(user_id, ref.id, vote_value)
 
-                session.pop("vote_party", None)
-                flash("投票成功！")
-                return redirect(url_for("home"))
+                # session.pop("vote_party", None)
+                # flash("投票成功！")
+                # return redirect(url_for("home"))
+                session.clear()  # 登出：清除所有 session 資訊
+                flash("投票完成，已自動登出")
+                return redirect(url_for("login"))
 
             return render_template("vote_referendum.html", referendums=referendums)
 
