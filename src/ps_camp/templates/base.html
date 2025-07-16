@@ -65,8 +65,8 @@
                             vote_close_time %}
                             <li><a href="/results" class="nav-link">開票結果</a></li>
 
-                            {% elif current_time > vote_open_time %}
-                            {% if session.get("user", {}).get("role") == "member" %}
+                            {% elif current_time >= vote_open_time %}
+                            {% if session.get("user", {}).get("role") == "admin" %}
                             <li><a href="/vote_party" class="nav-link">立即投票</a></li>
                             {% endif %}
 
