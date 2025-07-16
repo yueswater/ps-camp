@@ -1236,7 +1236,7 @@ def create_app():
 
                 if request.method == "POST":
                     form = request.form
-                    photo_zip = request.files.get("photo_zip")
+                    candidates = request.files.get("photo")
                     cabinet_pdf = request.files.get("cabinet_pdf")
                     alliance_pdf = request.files.get("alliance_pdf")
 
@@ -1258,10 +1258,10 @@ def create_app():
 
                     # Save candidate photos
                     photo_url = None
-                    if photo_zip and photo_zip.filename.endswith(".zip"):
+                    if candidates and candidates.filename.endswith(".pdf"):
                         fullname = user.get("fullname", "unknown")
-                        filename = f"{fullname}_候選人照片"
-                        photo_url = upload_file_to_drive(photo_zip, filename)
+                        filename = f"{fullname}_政黨比例代表制國會議員候選人名單與個人政見"
+                        photo_url = upload_file_to_drive(candidates, filename)
 
                     for selected_user_id in selected_user_ids:
                         if selected_user_id in candidate_user_ids:
